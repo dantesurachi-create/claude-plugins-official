@@ -2321,6 +2321,26 @@
       "homepage": "https://github.com/slackapi/slack-mcp-plugin/tree/main"
     },
     {
+      "name": "sleek-design",
+      "description": "Design mobile apps with Sleek (sleek.design), the AI-powered mobile app design tool. Create projects, generate and iterate on UI screens from natural language, preview designs live in the Sleek editor, and implement them in code (HTML, React Native, SwiftUI). Requires a SLEEK_API_KEY from sleek.design/dashboard/api-keys (Pro plan or higher).",
+      "author": {
+        "name": "Sleek"
+      },
+      "category": "design",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/sleekdotdesign/agent-skills.git",
+        "path": "skills",
+        "ref": "main",
+        "sha": "0cbc75689de66561c132596d2a6baf3173e6b364"
+      },
+      "strict": false,
+      "skills": [
+        "./design-mobile-apps"
+      ],
+      "homepage": "https://github.com/sleekdotdesign/agent-skills"
+    },
+    {
       "name": "snowflake-cortex-code",
       "description": "Automatically route Snowflake prompts from Claude Code to Cortex Code for execution. Provides slash commands for code review and task delegation, plus skills for routing, run, and setup.",
       "author": {
