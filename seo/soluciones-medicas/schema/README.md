@@ -13,11 +13,20 @@ de al lado es medio partido ganado.
 
 | Página | Archivos a insertar |
 |---|---|
-| Home (`/`) | `physician-localbusiness.json` |
-| `/riesgo-quirurgico-caseros` | `physician-localbusiness.json` + `faq-riesgo-quirurgico.json` |
-| `/electrocardiograma-caseros` | `physician-localbusiness.json` + `faq-electrocardiograma.json` |
+| `/` | `clinica-medicalclinic.json` |
+| `/cardiologia` | `clinica-medicalclinic.json` + `cardiologo-physician.json` |
+| `/cardiologia/riesgo-quirurgico` | `cardiologo-physician.json` + `faq-card-riesgo-quirurgico.json` |
+| `/cardiologia/electrocardiograma` | `cardiologo-physician.json` + `faq-card-electrocardiograma.json` |
+| `/dermatologia` | `clinica-medicalclinic.json` + `dermatologo-physician.json` |
+| `/dermatologia/control-de-lunares` | `dermatologo-physician.json` + `faq-derma-lunares.json` |
+| `/dermatologia/acne` | `dermatologo-physician.json` + `faq-derma-acne.json` |
+| `/nosotros`, `/contacto`, `/especialidades` | `clinica-medicalclinic.json` |
 
-El bloque `physician-localbusiness.json` va en **todas** las páginas: repite la identidad del
+Los tres bloques se relacionan entre sí por sus identificadores: `clinica-medicalclinic.json`
+declara a los dos consultorios como `department`, y cada consultorio declara a la clínica como
+`parentOrganization`. Eso le dice a Google que son **un mismo lugar con dos especialidades**, que
+es exactamente la estructura que también van a tener las fichas de Google Business Profile. Si
+cambiás el dominio, cambialo en los `@id` de los tres archivos o la relación se rompe.
 consultorio en cada una y refuerza la señal geográfica.
 
 ## Cómo se inserta
@@ -57,7 +66,7 @@ Código personalizado, eligiendo "Head" y las páginas donde aplica.
 | `{{TELEFONO_SIN_ESPACIOS}}` | El teléfono en formato internacional sin espacios ni guiones. Para `011 4759-0000` va `1147590000`, y queda `+541147590000`. |
 | `{{LAT}}` / `{{LNG}}` | Clic derecho sobre la puerta del consultorio en Google Maps: los números aparecen arriba de todo. |
 | `{{CID_DE_LA_FICHA}}` | Buscá la ficha en Google Maps: el número largo después de `cid=` en la URL. Si no lo encontrás, borrá la línea `hasMap` entera. |
-| `{{PERFIL_DOCTORALIA}}` | La parte final de la URL del perfil de Doctoralia. |
+| `{{PERFIL_DOCTORALIA_CARDIO}}` / `{{PERFIL_DOCTORALIA_DERMA}}` | La parte final de la URL de cada perfil de Doctoralia. |
 
 Si algún dato no existe todavía —por ejemplo, si no hay Instagram— **borrá esa línea completa**
 en lugar de dejar el marcador. Un campo ausente no es un problema; un campo con basura sí.

@@ -4,14 +4,30 @@ Entre dos consultorios igual de cercanos y con fichas parecidas, el que tiene m�
 recientes aparece primero. Es la variable con mayor impacto que **sí** se puede controlar, y
 la que casi nadie trabaja de forma sistemática.
 
+> ⚠️ **Con tres fichas, son tres colecciones de reseñas separadas.** Las reseñas no se
+> transfieren ni se suman entre fichas: las de la ficha de la clínica no ayudan a la del
+> cardiólogo ni a la del dermatólogo. Cada profesional tiene que pedir reseñas **para su propia
+> ficha**, con su propio link. Es el costo de la estrategia de tres fichas y hay que asumirlo
+> desde el día uno, porque arrancar mal acá es difícil de corregir después.
+>
+> En la práctica: en recepción tienen que existir **tres códigos QR distintos**, y hay que saber
+> cuál darle a cada paciente según con quién se atendió. Si el paciente vio a los dos, dale el
+> del profesional que lo atendió por el motivo principal de la visita.
+
 ## El objetivo
 
-| Plazo | Meta |
-|---|---|
-| Mes 1 | 10 reseñas |
-| Mes 3 | 30 reseñas |
-| Mes 6 | 60 reseñas |
-| Sostenido | 4 a 8 reseñas nuevas por mes, para siempre |
+Por ficha, no en total:
+
+| Plazo | Ficha de cada profesional | Ficha de la clínica |
+|---|---|---|
+| Mes 1 | 8 reseñas | 5 reseñas |
+| Mes 3 | 25 reseñas | 15 reseñas |
+| Mes 6 | 50 reseñas | 25 reseñas |
+| Sostenido | 4 a 8 por mes, para siempre | 2 a 3 por mes |
+
+Las fichas de los profesionales son las que compiten por "cardiólogo caseros" y "dermatólogo
+caseros", así que se llevan la prioridad. La de la clínica se alimenta sola con los pacientes
+que buscan la marca.
 
 La constancia importa más que el total. Cincuenta reseñas de hace tres años pesan menos que
 veinte de los últimos dos meses: Google interpreta la frecuencia como señal de que el consultorio
@@ -28,9 +44,13 @@ En el panel de Google Business Profile hay un botón **"Pedir reseñas"** que da
 `g.page/r/XXXXX/review`. Ese link abre directamente el formulario con las estrellas, sin pasos
 intermedios. Cada paso intermedio pierde la mitad de la gente.
 
+**Generá uno por cada una de las tres fichas** y guardalos identificados, porque los links son
+indistinguibles entre sí a simple vista.
+
 ### Paso 2 — Poner el link en tres lugares
 
-1. **Un QR impreso** plastificado sobre el escritorio y otro en la recepción
+1. **Un QR impreso** plastificado en cada consultorio, con el link de esa ficha, más el de la
+   clínica en recepción
 2. **Respuesta automática de WhatsApp** que se manda al cerrar la consulta
 3. **Pie de los mails** de envío de estudios o informes
 
@@ -75,7 +95,15 @@ paciente nuevo lee para decidir.
 **A una reseña positiva** — incluí de forma natural el servicio y la localidad:
 
 > ¡Gracias {nombre}! Nos alegra que la consulta te haya resultado clara. Seguimos a disposición
-> para tu control cardiológico en Caseros. Saludos, {{NOMBRE_MEDICO}}.
+> para tu control cardiológico en Caseros. Saludos, Dr. Hernán Surachi.
+
+Y en la ficha de dermatología:
+
+> ¡Gracias {nombre}! Nos alegra que te hayas ido con las dudas resueltas. Te esperamos para tu
+> próximo control de lunares en Caseros. Saludos, Dr. Dante Surachi.
+
+Mencionar el servicio y la localidad de forma natural suma contexto a la ficha. Repetir la misma
+frase calcada en las cincuenta reseñas, no: se nota y queda mal.
 
 **A una reseña negativa** — y acá hay que tener mucho cuidado:
 

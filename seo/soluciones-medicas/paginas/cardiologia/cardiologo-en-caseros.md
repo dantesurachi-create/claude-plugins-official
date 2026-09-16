@@ -1,16 +1,16 @@
-# Página principal — "Cardiólogo en Caseros"
+# Página madre — "Cardiólogo en Caseros"
 
-> **URL:** `{{DOMINIO}}/` (la home)
+> **URL:** `https://www.solucionesmedicas.com.ar/cardiologia`
 > **Búsqueda objetivo:** cardiólogo caseros · cardiólogo en caseros · cardiólogo tres de febrero · cardiólogo cerca mío
-> **Schema a insertar:** `schema/physician-localbusiness.json`
+> **Schema a insertar:** `schema/cardiologo-physician.json`
 
 ---
 
 ## Etiquetas para el `<head>`
 
-**Title** (57 caracteres — el límite práctico antes de que Google lo corte es ~60):
+**Title** (43 caracteres — el límite práctico antes de que Google lo corte es ~60):
 ```
-Cardiólogo en Caseros | {{NOMBRE_MEDICO}} | Turnos
+Cardiólogo en Caseros | Soluciones Médicas
 ```
 
 **Meta description** (152 caracteres):
@@ -18,7 +18,7 @@ Cardiólogo en Caseros | {{NOMBRE_MEDICO}} | Turnos
 Consulta cardiológica en Caseros, Tres de Febrero. Electrocardiograma con informe en el día y riesgo quirúrgico. Turnos por WhatsApp al {{TELEFONO}}.
 ```
 
-**URL canónica:** `{{DOMINIO}}/`
+**URL canónica:** `https://www.solucionesmedicas.com.ar/cardiologia`
 
 ---
 
@@ -31,8 +31,9 @@ Cardiólogo en Caseros
 
 ### Bajada
 ```
-{{NOMBRE_MEDICO}} — {{ESPECIALIDAD_TITULO}} — {{MATRICULA}}
-Consultas, electrocardiograma y riesgo quirúrgico en {{DIRECCION}}, Caseros.
+Dr. Hernán Surachi — {{ESPECIALIDAD_CARDIO}} — {{MATRICULA_CARDIO}}
+Consultas, electrocardiograma y riesgo quirúrgico.
+Soluciones Médicas · Dr. Amadeo Sabattini 4720, Caseros.
 ```
 
 **[ Pedir turno por WhatsApp ]**   **[ Llamar al {{TELEFONO}} ]**
@@ -46,7 +47,7 @@ Consultas, electrocardiograma y riesgo quirúrgico en {{DIRECCION}}, Caseros.
 ### H2 — Atención cardiológica en Caseros, Tres de Febrero
 
 ```
-El consultorio está en {{DIRECCION}}, en Caseros, a {{REFERENCIA_UBICACION}}. Atendemos
+El consultorio está en Dr. Amadeo Sabattini 4720, en Caseros, a {{REFERENCIA_UBICACION}}. Atendemos
 {{HORARIOS}}, con turno previo.
 
 Vienen a atenderse pacientes de Caseros, Santos Lugares, Ciudadela, El Palomar, Sáenz Peña,
@@ -89,12 +90,12 @@ Evaluación para empezar o retomar actividad física.
 Electrocardiograma (ECG)
 Electrocardiograma de 12 derivaciones, con informe médico en el momento. Dura unos diez minutos,
 no duele y no requiere ayuno.
-→ Ver todo sobre el electrocardiograma en Caseros
+→ Ver todo sobre el electrocardiograma en Caseros  `/cardiologia/electrocardiograma`
 
 Evaluación de riesgo quirúrgico
 Consulta, electrocardiograma e informe de apto cardiológico para cirugías programadas. En la
 mayoría de los casos se resuelve en una sola visita.
-→ Ver cómo es la evaluación de riesgo quirúrgico
+→ Ver cómo es la evaluación de riesgo quirúrgico  `/cardiologia/riesgo-quirurgico`
 ```
 
 > Esos dos "→" son los **enlaces internos** a las otras dos páginas. Son importantes: le indican
@@ -121,8 +122,8 @@ Al pedir el turno conviene confirmar la cobertura, porque los planes cambian.
 ### H2 — Dónde estamos
 
 ```
-{{DIRECCION}}
-{{LOCALIDAD}} {{CP}}
+Dr. Amadeo Sabattini 4720
+Caseros, Tres de Febrero {{CP}}
 {{REFERENCIA_UBICACION}}
 
 [ Cómo llegar ]
@@ -132,12 +133,12 @@ Al pedir el turno conviene confirmar la cobertura, porque los planes cambian.
 > barrio (la estación, una avenida conocida, dónde estacionar). Ese párrafo le da a Google señales
 > geográficas concretas y a los pacientes les resuelve un problema real.
 
-### H2 — Sobre {{NOMBRE_MEDICO}}
+### H2 — Sobre Dr. Hernán Surachi
 
 ```
-{{NOMBRE_MEDICO}}
-{{ESPECIALIDAD_TITULO}}
-Matrícula {{MATRICULA}}
+Dr. Hernán Surachi
+{{ESPECIALIDAD_CARDIO}}
+Matrícula {{MATRICULA_CARDIO}}
 
 [ Dos o tres párrafos: dónde se formó, dónde hizo la residencia, en qué hospitales trabajó o
 trabaja, sociedades científicas a las que pertenece (Sociedad Argentina de Cardiología,
@@ -183,8 +184,8 @@ súbita o un desmayo, hay que llamar al 107 o ir a la guardia más cercana.
 ### Pie de página (en todas las páginas del sitio)
 
 ```
-{{NOMBRE_MEDICO}} - Cardiólogo · {{MATRICULA}}
-{{DIRECCION}}, {{LOCALIDAD}} {{CP}}
+Dr. Hernán Surachi - Cardiólogo · {{MATRICULA_CARDIO}}
+Dr. Amadeo Sabattini 4720, Caseros, Tres de Febrero {{CP}}
 Tel: {{TELEFONO}} · WhatsApp: {{WHATSAPP}} · {{EMAIL}}
 {{HORARIOS}}
 

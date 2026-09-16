@@ -1,0 +1,107 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Physician",
+  "@id": "https://www.solucionesmedicas.com.ar/dermatologia#consultorio",
+  "name": "Dr. Dante Surachi - Dermatólogo",
+  "description": "Consultorio de dermatología en Caseros, Tres de Febrero. Control de lunares con dermatoscopía, tratamiento del acné, manchas, dermatitis, psoriasis y afecciones de la piel, el pelo y las uñas.",
+  "url": "https://www.solucionesmedicas.com.ar/dermatologia",
+  "telephone": "+54{{TELEFONO_SIN_ESPACIOS}}",
+  "email": "{{EMAIL}}",
+  "medicalSpecialty": "Dermatologic",
+  "priceRange": "$$",
+  "currenciesAccepted": "ARS",
+  "parentOrganization": { "@id": "https://www.solucionesmedicas.com.ar/#clinica" },
+  "image": [
+    "https://www.solucionesmedicas.com.ar/img/consultorio-dermatologia.jpg",
+    "https://www.solucionesmedicas.com.ar/img/dermatoscopio.jpg"
+  ],
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Dr. Amadeo Sabattini 4720",
+    "addressLocality": "Caseros",
+    "addressRegion": "Buenos Aires",
+    "postalCode": "{{CP}}",
+    "addressCountry": "AR"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "{{LAT}}",
+    "longitude": "{{LNG}}"
+  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "09:00",
+      "closes": "19:00"
+    }
+  ],
+  "areaServed": [
+    { "@type": "City", "name": "Caseros" },
+    { "@type": "City", "name": "Santos Lugares" },
+    { "@type": "City", "name": "Ciudadela" },
+    { "@type": "City", "name": "El Palomar" },
+    { "@type": "City", "name": "Sáenz Peña" },
+    { "@type": "City", "name": "Villa Bosch" },
+    { "@type": "City", "name": "Martín Coronado" },
+    { "@type": "AdministrativeArea", "name": "Partido de Tres de Febrero" }
+  ],
+  "availableService": [
+    {
+      "@type": "MedicalProcedure",
+      "name": "Control de lunares",
+      "description": "Examen completo de la piel con dermatoscopía para detectar lesiones sospechosas a tiempo. No duele y no requiere preparación previa.",
+      "procedureType": "https://schema.org/DiagnosticProcedure",
+      "url": "https://www.solucionesmedicas.com.ar/dermatologia/control-de-lunares"
+    },
+    {
+      "@type": "MedicalProcedure",
+      "name": "Tratamiento del acné",
+      "description": "Tratamiento del acné adolescente y adulto, del acné severo y de las marcas que deja.",
+      "procedureType": "https://schema.org/TherapeuticProcedure",
+      "url": "https://www.solucionesmedicas.com.ar/dermatologia/acne"
+    },
+    {
+      "@type": "MedicalProcedure",
+      "name": "Dermatoscopía",
+      "description": "Examen de lunares con dermatoscopio, que permite observar estructuras no visibles a simple vista.",
+      "procedureType": "https://schema.org/DiagnosticProcedure"
+    },
+    {
+      "@type": "MedicalProcedure",
+      "name": "Criocirugía",
+      "description": "Tratamiento con frío de verrugas, queratosis y lesiones superficiales, realizado en el consultorio.",
+      "procedureType": "https://schema.org/TherapeuticProcedure"
+    },
+    {
+      "@type": "MedicalProcedure",
+      "name": "Biopsia de piel",
+      "description": "Toma de muestra de piel para análisis con anestesia local.",
+      "procedureType": "https://schema.org/DiagnosticProcedure"
+    },
+    {
+      "@type": "MedicalProcedure",
+      "name": "Extirpación de lesiones de piel",
+      "description": "Extracción quirúrgica de lunares y lesiones de piel con estudio anatomopatológico posterior.",
+      "procedureType": "https://schema.org/SurgicalProcedure"
+    }
+  ],
+  "employee": {
+    "@type": "Physician",
+    "name": "Dr. Dante Surachi",
+    "medicalSpecialty": "Dermatologic",
+    "identifier": {
+      "@type": "PropertyValue",
+      "name": "Matrícula",
+      "value": "{{MATRICULA_DERMA}}"
+    },
+    "alumniOf": "{{UNIVERSIDAD_DERMA}}",
+    "memberOf": {
+      "@type": "Organization",
+      "name": "Sociedad Argentina de Dermatología"
+    }
+  },
+  "sameAs": [
+    "https://www.doctoralia.com.ar/{{PERFIL_DOCTORALIA_DERMA}}"
+  ]
+}

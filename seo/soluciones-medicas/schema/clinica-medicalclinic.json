@@ -1,0 +1,63 @@
+{
+  "@context": "https://schema.org",
+  "@type": "MedicalClinic",
+  "@id": "https://www.solucionesmedicas.com.ar/#clinica",
+  "name": "Soluciones Médicas",
+  "description": "Centro médico en Caseros, Tres de Febrero, con consultorios de dermatología y cardiología. Control de lunares con dermatoscopía, tratamiento del acné, electrocardiograma con informe en el día y evaluación de riesgo quirúrgico.",
+  "url": "https://www.solucionesmedicas.com.ar",
+  "telephone": "+54{{TELEFONO_SIN_ESPACIOS}}",
+  "email": "{{EMAIL}}",
+  "priceRange": "$$",
+  "currenciesAccepted": "ARS",
+  "image": [
+    "https://www.solucionesmedicas.com.ar/img/fachada.jpg",
+    "https://www.solucionesmedicas.com.ar/img/sala-de-espera.jpg"
+  ],
+  "logo": "https://www.solucionesmedicas.com.ar/img/logo.png",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "Dr. Amadeo Sabattini 4720",
+    "addressLocality": "Caseros",
+    "addressRegion": "Buenos Aires",
+    "postalCode": "{{CP}}",
+    "addressCountry": "AR"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "{{LAT}}",
+    "longitude": "{{LNG}}"
+  },
+  "medicalSpecialty": ["Dermatologic", "Cardiovascular"],
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+      "opens": "09:00",
+      "closes": "19:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Saturday"],
+      "opens": "09:00",
+      "closes": "13:00"
+    }
+  ],
+  "areaServed": [
+    { "@type": "City", "name": "Caseros" },
+    { "@type": "City", "name": "Santos Lugares" },
+    { "@type": "City", "name": "Ciudadela" },
+    { "@type": "City", "name": "El Palomar" },
+    { "@type": "City", "name": "Sáenz Peña" },
+    { "@type": "City", "name": "Villa Bosch" },
+    { "@type": "City", "name": "Martín Coronado" },
+    { "@type": "AdministrativeArea", "name": "Partido de Tres de Febrero" }
+  ],
+  "department": [
+    { "@id": "https://www.solucionesmedicas.com.ar/cardiologia#consultorio" },
+    { "@id": "https://www.solucionesmedicas.com.ar/dermatologia#consultorio" }
+  ],
+  "sameAs": [
+    "https://www.instagram.com/{{INSTAGRAM}}",
+    "https://www.facebook.com/{{FACEBOOK}}"
+  ]
+}

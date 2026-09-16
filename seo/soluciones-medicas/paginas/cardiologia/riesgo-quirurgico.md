@@ -1,8 +1,8 @@
 # Landing — "Riesgo quirúrgico en Caseros"
 
-> **URL:** `{{DOMINIO}}/riesgo-quirurgico-caseros`
+> **URL:** `https://www.solucionesmedicas.com.ar/cardiologia/riesgo-quirurgico`
 > **Búsqueda objetivo:** riesgo quirúrgico caseros · apto prequirúrgico · riesgo quirúrgico en el día · prequirúrgico cardiológico
-> **Schema a insertar:** `schema/faq-riesgo-quirurgico.json` + `schema/physician-localbusiness.json`
+> **Schema a insertar:** `schema/faq-card-riesgo-quirurgico.json` + `schema/cardiologo-physician.json`
 
 **Por qué esta página es la oportunidad más grande del plan:** hoy, quien busca "riesgo
 quirúrgico" desde Caseros encuentra consultorios de Capital que hicieron una landing dedicada.
@@ -177,11 +177,11 @@ acá y se operan en Capital o en otro partido.
 ### Cierre
 ```
 Turnos para riesgo quirúrgico en Caseros
-{{DIRECCION}}, {{LOCALIDAD}} · {{HORARIOS}}
+Dr. Amadeo Sabattini 4720, Caseros, Tres de Febrero · {{HORARIOS}}
 
 [ Pedir turno por WhatsApp ]   [ Llamar al {{TELEFONO}} ]
 
-Ver también: Electrocardiograma en Caseros · Consulta cardiológica
+Ver también: Electrocardiograma · Cardiólogo en Caseros
 ```
 
 ---

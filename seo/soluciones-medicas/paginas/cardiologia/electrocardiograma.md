@@ -1,8 +1,8 @@
 # Landing — "Electrocardiograma en Caseros"
 
-> **URL:** `{{DOMINIO}}/electrocardiograma-caseros`
+> **URL:** `https://www.solucionesmedicas.com.ar/cardiologia/electrocardiograma`
 > **Búsqueda objetivo:** electrocardiograma caseros · ecg caseros · electrocardiograma con informe · dónde hacerse un electrocardiograma cerca
-> **Schema a insertar:** `schema/faq-electrocardiograma.json` + `schema/physician-localbusiness.json`
+> **Schema a insertar:** `schema/faq-card-electrocardiograma.json` + `schema/cardiologo-physician.json`
 
 Quien busca esto tiene una orden médica en la mano y quiere resolverlo hoy o mañana. Es una
 búsqueda de intención inmediata: la página tiene que responder rapidísimo tres cosas —dónde,
@@ -33,7 +33,7 @@ Electrocardiograma en Caseros
 
 ### Bajada
 ```
-Electrocardiograma de 12 derivaciones realizado e informado por {{NOMBRE_MEDICO}}, {{MATRICULA}}.
+Electrocardiograma de 12 derivaciones realizado e informado por Dr. Hernán Surachi, {{MATRICULA_CARDIO}}.
 Informe en el momento. Sin ayuno ni preparación previa.
 ```
 
@@ -186,9 +186,9 @@ defina el cardiólogo en la consulta según cada caso.
 ### Cierre
 ```
 Turnos para electrocardiograma en Caseros
-{{DIRECCION}}, {{LOCALIDAD}} · {{HORARIOS}}
+Dr. Amadeo Sabattini 4720, Caseros, Tres de Febrero · {{HORARIOS}}
 
 [ Pedir turno por WhatsApp ]   [ Llamar al {{TELEFONO}} ]
 
-Ver también: Riesgo quirúrgico en Caseros · Consulta cardiológica
+Ver también: Riesgo quirúrgico · Cardiólogo en Caseros
 ```
