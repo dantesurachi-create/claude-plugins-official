@@ -1,0 +1,62 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿El electrocardiograma duele?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Los electrodos son adhesivos que se apoyan sobre la piel y solo registran la actividad eléctrica del corazón. El equipo no emite corriente ni radiación."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Hay que estar en ayunas para un electrocardiograma?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No hace falta ayuno. Tampoco hay que suspender la medicación, salvo indicación expresa del médico tratante."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto dura un electrocardiograma?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El registro dura menos de un minuto. Con la colocación de los electrodos y la preparación, unos diez minutos en total."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto tarda el informe del electrocardiograma?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El informe médico se entrega en el momento, en la misma consulta."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuál es la diferencia entre electrocardiograma, Holter y ergometría?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El electrocardiograma registra el corazón en reposo durante unos segundos. El Holter lo registra de forma continua durante 24 o 48 horas y sirve para detectar arritmias intermitentes. La ergometría evalúa el corazón durante el esfuerzo físico, caminando en cinta o pedaleando."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Se puede hacer un electrocardiograma durante el embarazo?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. El electrocardiograma no utiliza radiación y es seguro durante el embarazo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Necesito orden médica para hacerme un electrocardiograma?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Por obra social generalmente sí es necesaria. Como paciente particular no hace falta. Conviene confirmarlo al pedir el turno."
+      }
+    }
+  ]
+}

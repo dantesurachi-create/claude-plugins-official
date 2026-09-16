@@ -1,0 +1,62 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Cuánto tarda la evaluación de riesgo quirúrgico?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "En la mayoría de los casos se completa en una sola consulta de 30 a 45 minutos y el apto se entrega el mismo día. Si hacen falta estudios complementarios, se indican en esa misma consulta."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto tiempo vale el apto de riesgo quirúrgico?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Depende de la institución donde se realice la cirugía y del criterio del cirujano: lo habitual es que se acepte entre 30 y 90 días. Conviene confirmarlo con el cirujano antes de sacar el turno."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué tengo que llevar a la consulta de riesgo quirúrgico?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El pedido del cirujano con el tipo de cirugía y la fecha prevista, la lista completa de la medicación con sus dosis, los estudios cardiológicos previos, los análisis de laboratorio recientes, el DNI y el carnet de la obra social."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Tengo que ir en ayunas al riesgo quirúrgico?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Ni la consulta ni el electrocardiograma requieren ayuno. Si además se realizan análisis de laboratorio el mismo día, hay que seguir las indicaciones del laboratorio."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo hacer la evaluación sin el pedido del cirujano?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí, la evaluación se puede realizar igual. De todos modos, llevar el pedido ayuda porque especifica el tipo de cirugía, y eso influye en la estimación del riesgo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Si me dan riesgo alto, ¿no me puedo operar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Riesgo alto no significa que la cirugía esté contraindicada. Significa que se deben tomar precauciones adicionales: optimizar la medicación, coordinar con el anestesiólogo, elegir el momento adecuado o prever monitoreo en el postoperatorio."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Sirve el apto cardiológico para cirugía estética?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Las clínicas de cirugía estética solicitan el apto cardiológico con la misma frecuencia que cualquier otra institución y la evaluación es la misma."
+      }
+    }
+  ]
+}
