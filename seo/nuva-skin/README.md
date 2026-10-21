@@ -70,6 +70,9 @@ agregar un link `wa.me` como link de turnos de la ficha.
 
 **WhatsApp confirmado por el dueño: `+54 9 11 3638-5709`** → `wa.me/5491136385709`
 
+Ya cambié el teléfono del negocio en Wix a ese número (era el fijo), así que
+los datos estructurados de la home ahora dan el número que sí atienden.
+
 → Ver `02-google-business-profile.md`
 
 ### 2. La ficha existe, está buena, y está medio vacía

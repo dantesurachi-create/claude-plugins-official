@@ -454,4 +454,37 @@ desperdicia el slot en cada página.
 | `{{MATRICULA}}` | No la tengo, y en contenido médico no es opcional |
 | Los precios | Es una decisión de negocio, no de SEO |
 | Verificar los 21 links del hub | Dos URLs tienen tilde; hay que ver cuáles usar |
-| El teléfono del negocio en Wix | Hoy figura el fijo `011 43285309`. Wix genera con eso los datos estructurados de la home, así que Google lee ese número. **No lo cambié yo** porque ese campo también sale impreso en las facturas — decidilo vos. |
+| ~~El teléfono del negocio en Wix~~ | ✅ **Hecho.** Cambiado de `011 43285309` a `+5491136385709`. Ver abajo. |
+
+---
+
+# 6. ✅ Teléfono del negocio en Wix — cambiado
+
+Aprobado por el dueño y aplicado el 21/10/2026.
+
+| | |
+|---|---|
+| Antes | `011 43285309` (el fijo) |
+| **Ahora** | **`+5491136385709`** (el WhatsApp, en formato E.164) |
+| Versión de las propiedades del sitio | 153 → 154 |
+
+**Por qué importa:** Wix genera automáticamente los datos estructurados
+`LocalBusiness` de la home a partir de este campo. Hasta ahora Google leía el
+fijo que no atienden. Ahora lee el número que sí.
+
+**Qué NO cambió** — lo verifiqué leyendo las propiedades después de escribir,
+y usé un *field mask* limitado a `phone` justamente para esto:
+
+| Campo | Estado |
+|---|---|
+| Mail | `esteticanuvaskin@gmail.com` — intacto |
+| Dirección | Carlos Pellegrini 1015, 8U, C1009, Retiro — intacta |
+| Coordenadas | −34.5964803, −58.3812724 — intactas |
+| Nombre del negocio | Dermatología Estética Nuva Skin — intacto |
+
+**Dónde más aparece este número ahora:** facturas de Wix, Wix Chat, y los datos
+estructurados de la home. Si en las facturas preferís que figure el fijo,
+decímelo y lo vuelvo atrás — es un campo, un segundo.
+
+**Formato:** `+5491136385709` es E.164, el formato que Google espera para
+`telephone` en datos estructurados. Es el mismo número que `wa.me/5491136385709`.

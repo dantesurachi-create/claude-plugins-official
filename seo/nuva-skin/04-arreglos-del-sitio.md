@@ -258,6 +258,7 @@ estrictos (YMYL), y además hay obligaciones profesionales:
 ## Checklist
 
 **Hecho por API** ✅
+- [x] **Teléfono del negocio → `+5491136385709`** (el WhatsApp; era el fijo)
 - [x] `/procedimientos` — título y descripción
 - [x] `/contacto` — título y descripción
 - [x] `/tenes-dudas` — título y descripción
