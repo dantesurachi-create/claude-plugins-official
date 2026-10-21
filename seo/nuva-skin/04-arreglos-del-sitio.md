@@ -78,6 +78,19 @@ Razón: nadie busca "procedimientos" — buscan "botox". Ahora el resultado de
 Google muestra las palabras que la persona acaba de tipear, que es lo que hace
 que clickee.
 
+> **Pero el título no alcanza, y esto lo descubrí después.** Leí el contenido
+> real de la página por API y tiene **191 caracteres de texto en total** — tan
+> poco que la herramienta de análisis de Wix se niega a procesarla
+> (`CONTENT_TOO_SHORT: 191 is less than minimum allowed length of 200`).
+>
+> Es el centro del catálogo, la puerta a los 24 tratamientos, y está
+> prácticamente vacía. Con 191 caracteres no hay nada que Google pueda rankear
+> ni nada que el visitante pueda escanear. **El título que acabo de corregir
+> ayuda a que clickeen; la página vacía los va a devolver a Google.**
+>
+> Esta página necesita contenido, no un título. Es la tarea nº 1 de la
+> Parte C. Detalle en `05`.
+
 ### 2. `/contacto`
 
 Recibía 108 impresiones y 2 clics. El texto explicaba que en la página de
@@ -181,6 +194,34 @@ reserva online como alternativa.
 
 ---
 
+## PARTE C — Las tres páginas vacías o ilegibles
+
+Leí el contenido real de las páginas por API (no pude abrir el sitio: la
+política de red del entorno bloquea todos los dominios). Tres páginas tienen un
+problema de contenido que ningún título puede arreglar:
+
+| Página | Problema real | Qué necesita |
+|---|---|---|
+| `/procedimientos` | **191 caracteres de texto** · 526 impresiones, 2 clics | Contenido: una frase por tratamiento, agrupados por zona o por objetivo, cada uno con su link. Es la tarea más rentable del sitio. |
+| `/contacto` | H1 = "Contacto" · **cuerpo vacío** · 108 impresiones, 2 clics | Dirección como texto, horarios, cómo llegar, en cuánto responden, y el botón de WhatsApp |
+| `/tenes-dudas` | **1.900 caracteres en un solo bloque**, sin subtítulos ni botón · 112 impresiones, **0 clics** | El texto es bueno: hay que **partirlo** en subtítulos escaneables y cerrar con un botón |
+
+Y en todo el sitio: el **H2** repite la marca en las internas
+(`Nuva Skin Medicina Estética`) y en la home dice
+`Descubrí cómo transformar tu vida` — *happy talk* en el segundo texto más
+importante del sitio, y una promesa de resultado implícita que en publicidad
+médica no corresponde.
+
+El detalle, con los textos reales y las propuestas, está en
+`05-ux-dont-make-me-think.md`.
+
+> ⚠️ **No apliques las sugerencias de SEO con IA de Wix.** Las corrí para ver
+> qué propone y son peores que lo que hay: minúsculas en "retiro", relleno de
+> palabras clave, y le pega la keyword al final del *happy talk* en lugar de
+> sacarlo. Comparación en `05`.
+
+---
+
 ## PARTE B — La página que falta
 
 El sitio tiene 31 páginas y cubre casi todo el catálogo. Falta **una**, y es la
@@ -232,6 +273,11 @@ estrictos (YMYL), y además hay obligaciones profesionales:
 - [ ] Renombrar etiquetas del menú (ver `05`)
 
 **Semanas 2 a 4**
+- [ ] **Escribir el contenido de `/procedimientos`** (hoy: 191 caracteres) — lo más rentable
+- [ ] **Escribir el contenido de `/contacto`** (hoy: vacío)
+- [ ] **Partir el texto de `/tenes-dudas`** en subtítulos + botón al final
+- [ ] Reemplazar el H2 de la home (`Descubrí cómo transformar tu vida`)
+- [ ] Reemplazar el H2 repetido de las internas (`Nuva Skin Medicina Estética`)
 - [ ] Publicar `/control-de-lunares-caba`
 - [ ] Aplicar la plantilla de 12 puntos a botox, rellenos y acné (ver `05`)
 - [ ] Decidir y publicar la política de precios (ver `05`)

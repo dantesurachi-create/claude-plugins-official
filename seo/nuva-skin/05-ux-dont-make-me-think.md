@@ -3,20 +3,124 @@
 Guía: Steve Krug, *Don't Make Me Think* (3ª ed.). No es decoración: cada regla
 de abajo apunta a un dato concreto del diagnóstico.
 
-> **Límite honesto de este documento.** No pude abrir el sitio desde este
-> entorno (la política de red bloquea el dominio), así que **no vi el diseño**:
-> ni paleta, ni tipografías, ni la disposición real de los elementos. Por eso
-> este documento especifica **estructura, jerarquía y textos** —que sí pude
-> derivar del inventario real de 31 páginas y de los datos de Search Console— y
-> **no** inventa colores ni fuentes.
+> **Qué pude ver y qué no.** Intenté abrir el sitio con el navegador (hay
+> Chromium instalado en este entorno). No se puede: la política de red rechaza
+> **todos** los dominios — probé `esteticanuvaskin.com`, `wix.com` y
+> `example.com`, y los tres devuelven 403 en el CONNECT del proxy. No es el
+> navegador: es el entorno.
+>
+> **Pero sí pude leer el contenido real de las páginas**, por la API de
+> Page Optimization de Wix, que lee la página desde el propio sitio. Así que
+> los textos, encabezados y estructura de abajo **no son suposiciones: son lo
+> que las páginas dicen hoy.**
+>
+> Lo que sigue sin ver es **el diseño visual**: paleta, tipografías,
+> disposición de los elementos, si el botón de WhatsApp existe y dónde está.
 >
 > **Regla de diseño que reemplaza lo que no puedo ver:** no introducir ningún
 > color, tipografía ni estilo de botón nuevo. Todo lo de abajo se construye
-> **reutilizando los tokens que el sitio ya tiene** — el color de acento que ya
-> usan los botones, la tipografía de títulos, el radio de bordes, el espaciado.
-> Krug es explícito: las convenciones propias del sitio son un activo, y
-> romperlas obliga a pensar. Si me pasás una captura de la home y de una página
-> de tratamiento, completo la parte visual con la paleta real.
+> **reutilizando los tokens que el sitio ya tiene**. Krug es explícito: las
+> convenciones propias del sitio son un activo, y romperlas obliga a pensar.
+>
+> **Si querés que yo pueda abrir el sitio**, hay que habilitar la red del
+> entorno: menú del entorno en la barra de título → *Edit* → *Network access*,
+> y agregar `esteticanuvaskin.com` en *Allowed domains* dejando tildado
+> *Allow package managers*. Instrucciones:
+> https://code.claude.com/docs/en/cloud-environments#network-access
+
+---
+
+## El contenido real de las páginas (leído por API)
+
+Esto es lo que las páginas tienen hoy. Cada hallazgo de abajo sale de acá.
+
+### `/procedimientos` — **191 caracteres de texto en total**
+
+La API de Wix se **negó** a analizar esta página:
+
+```
+CONTENT_TOO_SHORT: Page text content length 191 is less than
+minimum allowed length of 200
+```
+
+Es la página que recibe **526 impresiones y 2 clics**. Es el centro del
+catálogo —la puerta a los 24 tratamientos— y tiene menos texto que este
+párrafo.
+
+Eso explica el CTR de 0,4 % y por qué no posiciona para nada: una página de
+191 caracteres no le da a Google nada que rankear ni al visitante nada que
+escanear. No es un problema de título: **la página está vacía.**
+
+### `/contacto` — sin texto
+
+| Slot | Contenido real |
+|---|---|
+| H1 | `Contacto` |
+| H2 | `Nuva Skin Medicina Estética` |
+| Cuerpo | **vacío** (`null`) |
+
+Un H1 de una palabra y nada más. No está la dirección como texto, ni los
+horarios, ni qué pasa después de escribir, ni cuánto tardan en responder.
+
+Con 61 visitantes únicos en dos meses y **3 clics para contactar**, esta página
+es el embudo, y está vacía.
+
+### `/tenes-dudas` — 1.900 caracteres en un solo bloque
+
+| Slot | Contenido real |
+|---|---|
+| H1 | `¿Estás pensando en realizarte un tratamiento estético?` |
+| H2 | `Nuva Skin Medicina Estética` |
+| Cuerpo | **un único párrafo de ~1.900 caracteres** |
+
+Y acá está lo interesante: **el texto es bueno.** Está escrito en primera
+persona por el médico, es empático, honesto, y dice cosas valiosas —
+*"recibo pacientes a diario que vienen considerando realizarse tratamientos de
+estética hace mucho y postergan la decisión"*, o la recomendación final de
+poner los tratamientos en manos de profesionales formados, que es exactamente
+el tipo de contenido que Google premia en temas de salud.
+
+**El problema no es el contenido: es el formato.** Krug, capítulo 2: *no
+leemos, escaneamos*. Un bloque de 1.900 caracteres sin un subtítulo, sin una
+negrita, sin una lista y **sin un botón al final** no se lee: se abandona.
+
+112 impresiones, **0 clics**. Cero. Y quien llega tiene que leer 1.900
+caracteres para no encontrar ninguna salida.
+
+### El slot del H2 está desperdiciado en todo el sitio
+
+| Página | H2 real |
+|---|---|
+| Home | **`Descubrí cómo transformar tu vida`** |
+| `/contacto` | `Nuva Skin Medicina Estética` |
+| `/tenes-dudas` | `Nuva Skin Medicina Estética` |
+
+El H2 es el segundo texto más importante de una página. En las internas repite
+la marca —que ya está en el logo, en el título y en la URL— y en la home dice
+*"Descubrí cómo transformar tu vida"*.
+
+Ese es el *happy talk* que Krug manda matar, en el lugar más valioso del sitio.
+Y para una práctica médica es además una **promesa de resultado implícita**, lo
+cual es un problema de publicidad médica, no sólo de estilo.
+
+El H1 de la home, en cambio, está bien:
+`Dermatología estética en Retiro, CABA - Dr. Dante Surachi, médico dermatólogo`.
+
+### ⚠️ No apliques las sugerencias de SEO con IA de Wix
+
+Aproveché que corrí la herramienta de Wix para ver qué propone. Propone esto:
+
+| Slot | Texto actual | Lo que propone Wix |
+|---|---|---|
+| Título | Medicina estética y dermatología en Retiro, CABA \| Nuva Skin | `dermatólogo en retiro \| Estetica Nuva Skin, Buenos Aires` |
+| H1 | Dermatología estética en Retiro, CABA - Dr. Dante Surachi, médico dermatólogo | `Dermatólogo en Retiro: atención dermatológica estética` |
+| H2 | Descubrí cómo transformar tu vida | `Descubrí cómo transformar tu vida con un dermatólogo en retiro` |
+
+Es **peor** que lo que hay: minúsculas en "retiro", relleno de palabras clave, y
+pega la keyword al final del *happy talk* en lugar de sacarlo. **No lo
+apliques.**
+
+---
 
 ---
 
@@ -92,7 +196,17 @@ Krug, citando a Strunk & White: sacale la mitad de las palabras, y después la
 mitad de lo que quedó. Y su regla más filosa: **el *happy talk* tiene que
 morir** — ese texto de bienvenida que no dice nada y que nadie lee.
 
-Esto estaba, textual, en la página `/tenes-dudas`:
+El peor caso está en la home, y es el H2 — el segundo texto más importante
+del sitio:
+
+> ### `Descubrí cómo transformar tu vida`
+
+No dice qué hacen, ni dónde, ni para quién. Y promete un resultado, que en
+publicidad de práctica médica no se puede. **Propuesta:**
+
+> ### `Consultá por tu caso: evaluación médica antes de cualquier tratamiento`
+
+Y esto estaba, textual, en la meta descripción de `/tenes-dudas`:
 
 > *"¿Estás pensando en realizarte un tratamiento estético? Centro de
 > Dermatología Estética de alto nivel. Tratamientos estéticos realizados por
