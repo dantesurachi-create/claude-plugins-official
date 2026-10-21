@@ -130,11 +130,72 @@ trayendo gente.
 
 ## 4. Infraestructura: lo que está instalado y no se usa
 
-### Ficha de Google Business Profile
-**No existe ninguna conectada.** La consulta a la API devolvió cero
-ubicaciones. Tampoco aparece en Maps en las búsquedas que hice.
+### Ficha de Google Business Profile — corregido
 
-Esto es el agujero más grande del negocio. Detalle en `02`.
+> **Corrección.** La primera versión de este archivo decía que no existía ficha
+> de Google. Era falso, y el error fue mío: la API de Wix devolvió cero
+> ubicaciones, que significa **ninguna conectada a Wix**, no "ninguna existe".
+> Lo leí mal y lo afirmé mal.
+
+La ficha existe. Datos leídos de la API de Google el 21/10/2026:
+
+| Campo | Valor | Estado |
+|---|---|---|
+| Nombre | Dermatología Estética Nuva Skin | ✅ |
+| Categoría principal | **Dermatólogo** | ✅ correcta |
+| Categoría secundaria | Esteticista | ✅ |
+| Reclamada | sí | ✅ |
+| **Reseñas** | **4,7 ★ · 36 reseñas** (33 de 5★, 1 de 3★, 2 de 1★) | ✅ |
+| Dirección | Carlos Pellegrini 1015 8U, C1009 CABA | ✅ |
+| Horarios | Lun–Vie 9–20 · sáb y dom cerrado | ⚠️ |
+| **Teléfono** | **`+54 4328-5309`** — falta el `11` | 🔴 |
+| Descripción | 32 caracteres de 750 | 🔴 |
+| Servicios | ninguno | 🔴 |
+| Fotos | 6 | 🔴 |
+| Q&A | ninguna | 🔴 |
+| Atributos | ninguno | 🔴 |
+| Botón de reservar | ninguno | 🔴 |
+
+- CID `10291845774880843375` · Place ID `ChIJo2ed1gXLvJURb6bgJjT7044`
+- https://www.google.com/maps?cid=10291845774880843375
+
+**El teléfono es el hallazgo más importante de todo el diagnóstico.** Un fijo de
+CABA se escribe `+54 11 4328-5309`. El botón "Llamar" de Maps marca el número
+principal de la ficha; si está incompleto, no entra la llamada. Confirmado por
+dos APIs distintas de Google, y el teléfono secundario de la misma ficha
+(`+54 9 11 3638-5709`) sí lleva el `11`.
+
+**No pude verificar que la llamada falle** — no puedo llamar desde este
+entorno. Hay que probarlo a mano.
+
+**Dos problemas de acceso:**
+- El token de Google guardado en Wix está vencido: `invalid_grant; reconnect
+  required`. Mientras siga así nadie ve las estadísticas de la ficha (llamadas,
+  mensajes, pedidos de "cómo llegar") — justo los números que contestarían
+  "no nos llaman".
+- `status: "OWNED_ELSEWHERE"`: la ficha pertenece a una cuenta de Google
+  distinta de la vinculada al sitio.
+
+Detalle y plan en `02`.
+
+### Los títulos del sitio — corregido
+
+> **Segunda corrección.** Iba a reescribir los títulos de las páginas
+> principales. Al leerlos por API encontré que **ya están bien hechos**.
+
+El sitio tiene **31 páginas estáticas** y 24 páginas de tratamiento con títulos
+del tipo `Toxina botulínica (botox) en Retiro, CABA | Nuva Skin` —
+tratamiento + barrio + ciudad + marca. Está correcto.
+
+El sitio se actualizó el **20 de octubre de 2026**, un día antes de este
+diagnóstico. Si los títulos son nuevos, los datos de Search Console de arriba
+(21/7 al 19/10) reflejan el estado anterior, y un cambio de títulos tarda
+**3 a 8 semanas** en verse: **parte del trabajo ya está hecho y todavía no
+rindió.**
+
+Apliqué sólo 5 cambios, en las páginas que los datos muestran fallando:
+`/procedimientos`, `/contacto`, `/tenes-dudas`, y `noindex` en
+`/agregue-una-resena` y la política de privacidad. Detalle en `04`.
 
 ### Wix Bookings
 6 servicios publicados, todos con reserva online habilitada y sin requerir
@@ -201,15 +262,20 @@ Wix Invoices (V1).
 Wix Hotels no tiene nada que ver con una clínica. Conviene desinstalarla:
 suma peso y puede generar páginas basura indexables.
 
-### Reputación dispersa
+### Reputación — corregido
+
 | Plataforma | Puntaje | Reseñas |
 |---|---|---|
-| Cedeba (directorio) | 4,7 | 36 |
+| **Google** | **4,7 ★** | **36** |
 | Wanda Store (directorio) | 9,4 | 84 |
-| **Google** | **— sin ficha —** | **0** |
 
-Los pacientes **sí** dejan reseñas. Las están dejando en lugares que nadie
-consulta para elegir un dermatólogo.
+Yo había dicho que tenían 0 reseñas en Google. Era falso: el "4,7 con 36" que
+encontré en un directorio **era el rating de Google reflejado**. Tienen 36
+reseñas con 4,7 y una distribución muy buena — 33 de cinco estrellas.
+
+Eso cambia la estrategia de reseñas: el objetivo no es juntar desde cero, es
+**mantener el ritmo** (Google pondera la frescura) y **responderlas**, que hoy
+no se hace.
 
 ### Marca disputada
 "Nuva Skin" también es un depilador que se vende online (`nuvaskin.cl`) y hay
@@ -227,7 +293,7 @@ que ya rinde bien.
 | ¿No los encuentran, o los encuentran y no reservan? | **No los encuentran.** 1,4 visitas/día. |
 | ¿El sitio convierte? | **Sí** — 11 % de los visitantes contacta. |
 | ¿Captan pacientes nuevos por Google? | **Casi ninguno.** 41 % de los clics son de gente que ya los conocía. |
-| ¿Están en el mapa de Google? | **No. No hay ficha.** |
+| ¿Están en el mapa de Google? | **Sí**, con 4,7 ★ y 36 reseñas — pero **el teléfono de la ficha está roto**. |
 | ¿Funciona la reserva online? | Está prendida y **nunca se usó**. |
 | ¿Tienen base para reactivar? | **Sí: 351 contactos**, 90 % de 2022–2024. Solo 21 con teléfono. |
 | ¿Desde cuándo cae? | **Desde 2023. Caída del 92 %** en consultas nuevas. |

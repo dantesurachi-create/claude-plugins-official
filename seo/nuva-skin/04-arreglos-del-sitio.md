@@ -1,235 +1,239 @@
-# Acción #3 — Arreglos del sitio
+# Acción #3 — El sitio: lo que ya cambié y lo que queda
 
-Esto se divide en dos: lo que hay que arreglar **ya** porque bloquea contactos,
-y lo que hay que arreglar **en 2 semanas** porque aprovecha visibilidad que ya
-está pagada.
-
-> **Nota:** no pude abrir el sitio desde este entorno (la política de red
-> bloquea el dominio), así que no vi cómo se ve en pantalla. Todo lo de abajo
-> sale de Search Console, de la configuración de Wix y del CRM. Los puntos
-> marcados con 👁 hay que verificarlos a ojo antes de tocar.
+> **Corrección importante.** La primera versión de este documento proponía
+> reescribir los títulos y descripciones de las páginas principales. **Estaba
+> desactualizado.** Al leer los 31 títulos reales por API encontré que
+> **casi todos ya están bien escritos y bien localizados** — alguien hizo ese
+> trabajo (el sitio se actualizó el 20 de octubre de 2026). Varios de mis
+> cambios propuestos habrían sido laterales o peores.
+>
+> Así que apliqué **sólo los 4 que los datos de Search Console muestran que
+> están fallando**, y descarté el resto.
 
 ---
 
-## PARTE A — Urgente: el camino al contacto
+## Lo que ya está bien hecho (no tocar)
 
-### A1. WhatsApp fijo en todas las páginas 👁
+El sitio tiene **31 páginas estáticas**, y el inventario de tratamientos es
+mucho más amplio de lo que yo creía. Títulos reales, tal como están hoy:
 
-En Argentina, para estética, **WhatsApp es el canal**. Hoy el sitio registró
-**3 clics para contactar en 57 días** y tiene **4 formularios enviados**.
+| Página | Título actual |
+|---|---|
+| Home | Medicina estética y dermatología en Retiro, CABA \| Nuva Skin |
+| Botox | Toxina botulínica (botox) en Retiro, CABA \| Nuva Skin |
+| Rellenos | Rellenos con ácido hialurónico en Retiro, CABA \| Nuva Skin |
+| Labios | Relleno de labios con ácido hialurónico \| Nuva Skin Retiro |
+| Rinomodelación | Rinomodelación en Retiro, CABA \| Nuva Skin |
+| Armonización facial | Armonización facial en Retiro, CABA \| Nuva Skin |
+| Fox eye | Fox eye look en Retiro, CABA \| Nuva Skin |
+| Skin booster | Skin booster en Retiro, CABA \| Nuva Skin |
+| Peeling | Peeling en Retiro, CABA \| Nuva Skin |
+| Mesoterapia | Mesoterapia en Retiro, CABA \| Nuva Skin |
+| PRP | Plasma rico en plaquetas en Retiro, CABA \| Nuva Skin |
+| Microdermoabrasión | Microdermoabrasión en Retiro, CABA \| Nuva Skin |
+| Acné | Acné en Retiro, CABA \| Dermatólogo - Nuva Skin |
+| Cicatrices de acné | Cicatrices de acné en Retiro, CABA \| Nuva Skin |
+| Rosácea | Rosácea en Retiro, CABA \| Dermatólogo - Nuva Skin |
+| Hiperhidrosis | Hiperhidrosis en Retiro, CABA \| Nuva Skin |
+| Estrías | Estrías en Retiro, CABA \| Nuva Skin |
+| Teleangiectasias | Teleangiectasias y arañitas en Retiro, CABA \| Nuva Skin |
+| Caída del cabello | Caída del cabello en Retiro, CABA \| Nuva Skin |
+| Depilación definitiva | Depilación definitiva en Retiro, CABA \| Nuva Skin |
+| Dr. Surachi | Dr. Dante Surachi, médico dermatólogo en Retiro \| Nuva Skin |
+| Pacientes del exterior | English-Speaking Aesthetic Doctor in Buenos Aires \| Nuva Skin |
+| Evaluación facial | Evaluación facial y bioestimuladores \| Retiro \| Nuva Skin |
+| Post bajada de peso | Recomposición facial tras bajar de peso \| Nuva Skin Retiro |
 
-Poner el botón flotante de WhatsApp, visible en todas las páginas, fijo abajo
-a la derecha, también en celular. Wix lo tiene nativo (*Agregar → Contacto →
-Chat de WhatsApp*).
+Esto está bien: **tratamiento + barrio + ciudad + marca**, con el nombre del
+profesional donde corresponde. No hay nada que mejorar ahí.
 
-Con mensaje pre-cargado, que baja mucho la fricción:
-```
-Hola, quiero consultar por un turno en Nuva Skin.
-```
+**Consecuencia para las expectativas:** si estos títulos son nuevos, los datos
+de Search Console que leí (21/7 al 19/10) reflejan el estado *anterior*. Un
+cambio de títulos tarda **3 a 8 semanas** en verse. Es decir: parte del trabajo
+ya está hecho y **todavía no rindió**. Eso es una buena noticia, y también
+significa que la respuesta no es volver a tocar los títulos.
 
-### A2. El formulario tiene que pedir teléfono 👁
+---
 
-**21 de 351 contactos tienen teléfono.** El formulario pide mail y el teléfono
-es opcional o no está. Eso es el 94 % de los contactos imposibles de llamar.
+## ✅ Los 5 cambios que apliqué por API
 
-- Campo **Teléfono: obligatorio**
-- Campo Mail: obligatorio
-- Agregar un checkbox: `Quiero recibir información sobre tratamientos y
-  novedades del consultorio` *(sin esto no hay consentimiento de marketing —
-  ver `03`)*
-- Quitar todo campo que no sea nombre, teléfono, mail y mensaje. Cada campo
-  extra baja la tasa de envío.
+Aplicados y publicados el 21 de octubre de 2026 con la API de SEO de Wix.
+Los 5 se confirmaron en la respuesta del servidor; preservé en cada página las
+etiquetas que ya tenía (la meta `keywords` de cada una quedó intacta).
 
-### A3. Teléfono visible y clickeable arriba de todo 👁
+### 1. `/procedimientos` — el de mayor retorno del sitio
 
-`011 4328-5309` tiene que estar en el encabezado de todas las páginas, como
-link `tel:` para que desde el celular se marque con un toque.
+Recibía **526 impresiones y 2 clics** (CTR 0,4 %) en posición 5,8. A esa
+posición le corresponden 25–30 clics. El problema era que la descripción no
+nombraba **ni un solo tratamiento**.
 
-### A4. Revisar la reserva online 👁
+| | |
+|---|---|
+| Título antes | Procedimientos de dermatología estética \| Nuva Skin Retiro |
+| **Título ahora** | **Tratamientos: botox, rellenos y más \| Nuva Skin Retiro** |
+| Descripción antes | Procedimientos de dermatología estética en Retiro, CABA, realizados por dermatólogos. Turnos por WhatsApp. |
+| **Descripción ahora** | **Botox, rellenos, rinomodelación, peelings y mesoterapia en Retiro, CABA. Consulta con el Dr. Dante Surachi, dermatólogo. Turnos por WhatsApp.** |
 
-6 servicios publicados, reserva habilitada, **0 reservas en la historia del
-sitio**. Hay que sentarse y hacer el camino completo desde un celular, como si
-fuera un paciente:
+Razón: nadie busca "procedimientos" — buscan "botox". Ahora el resultado de
+Google muestra las palabras que la persona acaba de tipear, que es lo que hace
+que clickee.
+
+### 2. `/contacto`
+
+Recibía 108 impresiones y 2 clics. El texto explicaba que en la página de
+contacto hay formas de contactar — y tenía un salto de línea en medio de la
+meta descripción.
+
+| | |
+|---|---|
+| Título antes | Contacto \| Dermatología Estética Nuva Skin \| Buenos Aires |
+| **Título ahora** | **Turnos y contacto \| Nuva Skin Retiro, CABA** |
+| Descripción antes | Enterate todos los medios que tenés para comunicarte con nosotros en esta página. ⏎ Consultas, Turnos telefónicos, WhatsApp. |
+| **Descripción ahora** | **Pedí tu turno por WhatsApp o al 011 4328-5309. Carlos Pellegrini 1015, Retiro, CABA, a pasos del Obelisco y del subte línea B.** |
+
+Razón: *Don't Make Me Think*, capítulo 5 — "las instrucciones tienen que
+morir". Ahora el resultado de Google da el teléfono y la ubicación directamente,
+así que alguien puede llamar **sin entrar al sitio**.
+
+### 3. `/tenes-dudas`
+
+**112 impresiones y 0 clics.** Cero. El título no decía qué había detrás y la
+descripción era *happy talk*: "Centro de Dermatología Estética de alto nivel".
+
+| | |
+|---|---|
+| Título antes | ¿Tenés dudas? \| Dermatología Estética Nuva Skin |
+| **Título ahora** | **¿Pensás hacerte un tratamiento? \| Nuva Skin Retiro** |
+| Descripción antes | ¿Estás pensando en realizarte un tratamiento estético? ⏎ Centro de Dermatología Estética de alto nivel. Tratamientos estéticos realizados por médicos dermatólogos especializados . |
+| **Descripción ahora** | **Resolvé tus dudas antes de decidir: cómo es la consulta de evaluación con el Dr. Dante Surachi, dermatólogo, en Retiro, CABA. Turnos por WhatsApp.** |
+
+> No le puse "Preguntas frecuentes" a propósito: **no vi la página**, y
+> ponerle un nombre que no coincida con el contenido es el error que Krug
+> advierte en el capítulo de los carteles de calle. El título nuevo refleja lo
+> que la descripción original dejaba entrever, sin inventar.
+
+### 4. `/agregue-una-resena` — sacada del índice
+
+Era la **3ª página más mostrada del sitio**: 385 impresiones, 3 clics. Y su
+título era literalmente el nombre de la marca —
+"Dermatología Estética Nuva Skin | Buenos Aires"— así que **competía con la home
+por las búsquedas de marca**.
+
+| | |
+|---|---|
+| Título antes | Dermatología Estética Nuva Skin \| Buenos Aires |
+| **Título ahora** | **Dejá tu reseña \| Nuva Skin Retiro, CABA** |
+| **Agregado** | **`<meta name="robots" content="noindex">`** |
+
+La página sigue funcionando: se le puede seguir mandando el link a los
+pacientes. Lo que dejó de hacer es aparecer en Google compitiendo con la home.
+
+> **Es reversible.** Si en 6 semanas las impresiones de marca de la home no
+> suben, se saca el `noindex` y volvemos atrás. Pero 385 impresiones que
+> producen 3 clics no están captando a nadie.
+
+### 5. `/politica-de-privacidad` — sacada del índice
+
+Agregado `<meta name="robots" content="noindex">`. Es lo estándar para una
+página legal: no tiene valor de búsqueda y no debería ser puerta de entrada.
+
+---
+
+## Lo que NO cambié, y por qué
+
+| Página | Por qué no la toqué |
+|---|---|
+| Home y las 24 páginas de tratamiento | Los títulos ya están bien. Cambiarlos sería lateral o peor. |
+| URLs con tilde (`/estrías`, `/depilacióndefinitiva`) | Cambiar una URL **sin** la redirección 301 pierde lo que tiene posicionado, y las redirecciones no se pueden crear desde la API de SEO. Hay que hacerlo desde el panel: *Configuración → SEO → Redirecciones*. Es una mejora menor, no urgente. |
+| La meta `keywords` de cada página | Google la ignora desde 2009. Es inofensiva. No vale el riesgo de una escritura masiva por un tag que no hace nada. |
+| `/blog`, `/international-patients` y el resto | Están razonables y no son el cuello de botella. |
+
+---
+
+## PARTE A — Lo que bloquea contactos (a mano, en el Editor)
+
+**Esto no se puede hacer por API.** Un sitio hecho con el Editor de Wix no
+tiene API para mover ni estilar elementos: hay que hacerlo en el editor visual.
+El detalle de diseño y las razones de UX están en `05-ux-dont-make-me-think.md`.
+
+| Cambio | El dato que lo justifica |
+|---|---|
+| Botón flotante `Pedir turno` (WhatsApp) en todas las páginas | **3 clics para contactar en 57 días** |
+| Teléfono `tel:` clickeable en el encabezado | En celular es un toque y marca |
+| **Teléfono obligatorio en el formulario** | **21 de 351 contactos tienen teléfono** |
+| Checkbox de consentimiento de marketing | **0 de 351 lo tienen registrado** |
+| Probar la reserva online de punta a punta desde un celular | **6 servicios habilitados, 0 reservas en la historia** |
+| Desinstalar Wix Hotels | No tiene nada que ver con una clínica |
+
+### Cómo probar la reserva online
+
+Hacer el camino completo desde un celular, como si fueras un paciente:
 
 - [ ] ¿Se llega al botón de reservar desde la home en un toque?
 - [ ] ¿Hay horarios cargados y disponibles en el calendario?
-- [ ] ¿Los servicios tienen precio o dice "consultar"?
+- [ ] ¿Los servicios tienen precio, o dicen "a consultar"?
 - [ ] ¿Pide pago anticipado? *(si pide, probablemente sea el freno — sacarlo)*
 - [ ] ¿Pide crear cuenta? *(si pide, sacarlo: mata la conversión)*
 - [ ] ¿Llega la notificación al consultorio cuando alguien reserva?
 
-Si el camino tiene más de tres pasos, conviene reemplazarlo por WhatsApp como
-canal principal y dejar la reserva online como alternativa.
-
-### A5. Desinstalar Wix Hotels
-
-Está instalada y no tiene nada que ver con una clínica. Suma peso y puede
-generar páginas indexables sin sentido.
+Si el camino tiene más de tres pasos, dejar WhatsApp como canal principal y la
+reserva online como alternativa.
 
 ---
 
-## PARTE B — En 2 semanas: la visibilidad que ya tienen
+## PARTE B — La página que falta
 
-Estas correcciones **no requieren posicionar nada nuevo.** Google ya muestra
-estas páginas; el problema es que nadie las clickea. Es la mejor relación
-esfuerzo/resultado del sitio.
+El sitio tiene 31 páginas y cubre casi todo el catálogo. Falta **una**, y es la
+que más demanda estacional tiene en este momento del año:
 
-### B1. `/procedimientos` — la corrección más rentable
-
-**Hoy: 526 impresiones, 2 clics, 0,4 % de CTR, posición 5,8.**
-
-Google la muestra 526 veces y la clickean dos veces. En posición 5,8 debería
-traer 25–30 clics. El problema es el título y la descripción.
-
-| | |
-|---|---|
-| **Título** | `Tratamientos Dermatológicos y Estéticos en CABA \| Nuva Skin` |
-| **Meta descripción** | `Botox, rellenos con ácido hialurónico, rinomodelación, peelings, mesoterapia y plasma rico en plaquetas. Consultorio del Dr. Dante Surachi en Microcentro, Carlos Pellegrini 1015. Turnos al 011 4328-5309.` |
-
-La descripción nombra los tratamientos, el barrio y el teléfono. Eso es lo que
-hace que alguien clickee.
-
-### B2. `/` (home)
-
-**Hoy: 1.342 impresiones, 41 clics, 3,1 % de CTR, posición 4,9.**
-Lo esperable en esa posición es 5–7 %. Están perdiendo la mitad de los clics
-que les corresponden.
-
-| | |
-|---|---|
-| **Título** | `Dermatólogo en Microcentro CABA \| Nuva Skin - Dr. Dante Surachi` |
-| **Meta descripción** | `Consultorio de dermatología y medicina estética en Carlos Pellegrini 1015, a pasos del Obelisco. Dermatología clínica, botox, rellenos y tratamiento del acné. Turnos al 011 4328-5309.` |
-
-El título lleva **"Dermatólogo en Microcentro CABA"** adelante, no el nombre
-de la marca. Nadie busca "Nuva Skin" — buscan "dermatólogo". El nombre del
-doctor va igual porque es lo único que hoy les trae clics (41 % del total).
-
-### B3. `/contacto`
-
-**Hoy: 108 impresiones, 2 clics, posición 9,5.**
-
-| | |
-|---|---|
-| **Título** | `Turnos y Contacto \| Nuva Skin Dermatología - Microcentro CABA` |
-| **Meta descripción** | `Pedí tu turno al 011 4328-5309 o por WhatsApp. Carlos Pellegrini 1015, Microcentro, CABA, a pasos del Obelisco y de la estación Carlos Pellegrini (línea B).` |
-
-### B4. `/agregue-una-resena` — sacarla del índice
-
-**Hoy: 385 impresiones, 3 clics.** Es la 3ª página más mostrada del sitio.
-
-Una página para dejar reseñas no debería ser una puerta de entrada desde
-Google: son 385 impresiones por mes que no sirven para captar a nadie.
-
-Ponerla en **`noindex`** (en Wix: *SEO de la página → Avanzado → No permitir
-que esta página aparezca en los resultados de búsqueda*). Que siga existiendo
-para mandarle el link a los pacientes, pero fuera del índice.
-
-Lo mismo con **`/tenes-dudas`** (112 impresiones, **0 clics**): o se convierte
-en una página de preguntas frecuentes real y útil, o va a `noindex`.
-
-### B5. Arreglar las URLs con tildes
-
-| URL actual | Cómo le llega a Google | Cambiar a |
+| URL | Título | Por qué |
 |---|---|---|
-| `/depilacióndefinitiva` | `/depilaci%C3%B3ndefinitiva` | `/depilacion-definitiva` |
-| `/estrías` | `/estr%C3%ADas` | `/estrias` |
+| `/control-de-lunares-caba` | `Control de Lunares en Retiro, CABA \| Dermatólogo - Nuva Skin` | **Demanda estacional nov–feb. La ventana es ahora.** Una página nueva tarda 3–8 semanas en asentarse, así que tiene que publicarse ya para llegar posicionada al pico, no durante. |
 
-Se ven mal en el resultado de búsqueda y bajan el clic. **Importante:** al
-cambiar la URL, poner la redirección 301 de la vieja a la nueva (Wix lo hace
-en *Configuración → SEO → Redirecciones de URL*), si no se pierde lo poco que
-tienen posicionado.
-
-### B6. `/tratamiento-toxina-botulinica` — posición 58
-
-El procedimiento con mejor margen y más demanda del consultorio **no existe
-para Google**. Esta página necesita reescribirse completa, no retocar el
-título.
-
-| | |
-|---|---|
-| **URL** | `/botox-toxina-botulinica-caba` |
-| **Título** | `Botox en CABA \| Toxina Botulínica - Dr. Dante Surachi` |
-| **Meta descripción** | `Aplicación de toxina botulínica para arrugas de expresión en Microcentro, CABA. Consulta previa de evaluación con dermatólogo. Carlos Pellegrini 1015. Turnos al 011 4328-5309.` |
-
-> **Por qué "Botox" en el título:** es marca registrada de Allergan, así que
-> el texto de la página tiene que decir "toxina botulínica" y aclarar que
-> Botox® es una marca comercial. Pero es lo que la gente escribe en Google, y
-> usarlo de forma descriptiva y honesta en el título es legítimo. Nunca
-> presentarlo como que son distribuidores oficiales de la marca.
-
-Contenido mínimo de la página:
-- Qué es y cómo actúa la toxina botulínica
-- Qué zonas se tratan (frente, entrecejo, patas de gallo)
-- Cómo es la consulta previa de evaluación
-- Cómo es la sesión y cuánto dura
-- A los cuántos días se ve el efecto (3–7) y cuánto dura (4–6 meses)
-- Cuidados posteriores
-- Contraindicaciones *(obligatorio: es contenido médico)*
-- Preguntas frecuentes
-- Matrícula del profesional visible
-
----
-
-## PARTE C — Lo que falta estructuralmente
-
-El sitio tiene páginas por patología (`/acne`, `/rosacea`, `/estrías`) pero
-**casi ninguna tiene intención comercial local**. Les falta la combinación que
-busca la gente: **tratamiento + ciudad/barrio**.
-
-Páginas a crear, en este orden de prioridad:
-
-| # | URL | Título | Por qué |
-|---|---|---|---|
-| 1 | `/control-de-lunares-caba` | `Control de Lunares en CABA \| Dermatólogo - Nuva Skin` | **Demanda estacional nov–feb. Es la ventana, ahora.** |
-| 2 | `/botox-toxina-botulinica-caba` | `Botox en CABA \| Toxina Botulínica - Dr. Dante Surachi` | Mejor margen, más demanda |
-| 3 | `/dermatologo-microcentro` | `Dermatólogo en Microcentro, CABA \| Nuva Skin` | Captura la búsqueda por barrio |
-| 4 | `/acido-hialuronico-caba` | `Rellenos con Ácido Hialurónico en CABA \| Nuva Skin` | Alto valor por paciente |
-| 5 | `/tratamiento-acne-caba` | `Tratamiento del Acné en CABA \| Dermatólogo - Nuva Skin` | Volumen alto, paciente joven, recurrente |
-| 6 | `/rinomodelacion-caba` | `Rinomodelación sin Cirugía en CABA \| Nuva Skin` | Poca competencia local |
-
-**Regla:** una página = una intención de búsqueda. No meter todos los
-tratamientos en `/procedimientos` y esperar que posicione para todos. Eso es
-exactamente lo que está pasando hoy y es por eso que no posiciona para
-ninguno.
+Es además una **consulta médica**, no un tratamiento estético: entra mejor en
+comunicaciones a la base de contactos y atrae un paciente que después consulta
+por lo demás. Usar la plantilla de 12 puntos de `05`.
 
 ---
 
 ## Contenido médico: requisitos no negociables
 
 Todo el sitio es contenido de salud. Google lo evalúa con criterios más
-estrictos (YMYL), y además hay obligaciones legales:
+estrictos (YMYL), y además hay obligaciones profesionales:
 
-- [ ] **Nombre completo y matrícula** del Dr. Surachi visible en toda página de tratamiento
-- [ ] **Especialidad y formación** (universidad, títulos) en una página de perfil
+- [ ] **Nombre completo y matrícula** del Dr. Surachi visible en cada página de tratamiento
+- [ ] **Especialidad y formación** (universidad, títulos) en `/drsurachi`
 - [ ] **Contraindicaciones y riesgos** en cada página de procedimiento
 - [ ] Nada que prometa resultados
-- [ ] Nada de antes-y-después sin consentimiento escrito firmado del paciente
+- [ ] Nada de antes-y-después sin consentimiento escrito firmado
 - [ ] Dejar claro que todo procedimiento requiere consulta previa de evaluación
 - [ ] Dirección, teléfono y horarios iguales en el sitio, en Google y en los directorios
+
+> Este último punto tiene un error concreto hoy: el teléfono de la ficha de
+> Google está mal escrito. Ver `02`.
 
 ---
 
 ## Checklist
 
-**Esta semana (bloquea contactos)**
-- [ ] A1 — Botón flotante de WhatsApp en todas las páginas
-- [ ] A2 — Teléfono obligatorio en el formulario + checkbox de consentimiento
-- [ ] A3 — Teléfono clickeable en el encabezado
-- [ ] A4 — Probar la reserva online de punta a punta desde un celular
-- [ ] A5 — Desinstalar Wix Hotels
+**Hecho por API** ✅
+- [x] `/procedimientos` — título y descripción
+- [x] `/contacto` — título y descripción
+- [x] `/tenes-dudas` — título y descripción
+- [x] `/agregue-una-resena` — título + `noindex`
+- [x] `/politica-de-privacidad` — `noindex`
 
-**Semana 2 (visibilidad ya pagada)**
-- [ ] B1 — Título y descripción de `/procedimientos`
-- [ ] B2 — Título y descripción de la home
-- [ ] B3 — Título y descripción de `/contacto`
-- [ ] B4 — `noindex` en `/agregue-una-resena` y `/tenes-dudas`
-- [ ] B5 — URLs sin tildes + redirecciones 301
-- [ ] B6 — Reescribir la página de toxina botulínica
+**A mano en el Editor, esta semana**
+- [ ] Botón flotante `Pedir turno` (WhatsApp)
+- [ ] Teléfono `tel:` en el encabezado
+- [ ] Teléfono obligatorio en el formulario + checkbox de consentimiento
+- [ ] Probar la reserva online desde un celular
+- [ ] Desinstalar Wix Hotels
+- [ ] Renombrar etiquetas del menú (ver `05`)
 
-**Semanas 3 a 6 (crecimiento)**
-- [ ] C1 — `/control-de-lunares-caba` *(primero: es la ventana estacional)*
-- [ ] C2 — `/dermatologo-microcentro`
-- [ ] C3 — `/acido-hialuronico-caba`
-- [ ] C4 — `/tratamiento-acne-caba`
-- [ ] C5 — `/rinomodelacion-caba`
-- [ ] Matrícula y formación visibles en todo el sitio
+**Semanas 2 a 4**
+- [ ] Publicar `/control-de-lunares-caba`
+- [ ] Aplicar la plantilla de 12 puntos a botox, rellenos y acné (ver `05`)
+- [ ] Decidir y publicar la política de precios (ver `05`)
+- [ ] URLs sin tilde + redirecciones 301 desde el panel
+- [ ] Matrícula visible en todo el sitio
