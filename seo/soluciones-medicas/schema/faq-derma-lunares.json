@@ -1,0 +1,62 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿La dermatoscopía duele?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. El dermatoscopio se apoya sobre la piel y solo mira con aumento y luz polarizada. No corta, no pincha y no emite radiación."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cada cuánto conviene controlarse los lunares?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Una vez al año alcanza para la mayoría de las personas. Conviene hacerlo con más frecuencia si se tiene piel muy clara, muchos lunares, antecedentes familiares de melanoma, quemaduras solares con ampollas en la infancia o trabajo al aire libre."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto dura un control de lunares?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Entre 20 y 30 minutos, porque se revisa toda la superficie de la piel y no solo la lesión que preocupa."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Qué es la regla del ABCDE?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Es la guía para identificar lunares que merecen revisión: Asimetría entre las dos mitades, Bordes irregulares o mal definidos, Color con más de un tono, Diámetro mayor a 6 milímetros y Evolución, es decir cualquier cambio en el tiempo en tamaño, forma, color, o que empiece a picar o sangrar. La evolución es el signo más importante."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo tengo que ir al control de lunares?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sin maquillaje, sin esmalte de uñas y sin autobronceante, porque los tres tapan lo que hay que evaluar. El pelo suelto y sin productos, para poder revisar el cuero cabelludo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Es peligroso sacarse un lunar?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Es una creencia muy difundida y es falsa: la extirpación correcta de un lunar, realizada por un médico y con estudio anatomopatológico posterior, no disemina nada. Lo riesgoso es que alguien sin formación médica lo queme o lo corte."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Se puede hacer el control de lunares durante el embarazo?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Es un examen visual sin ningún riesgo. Además el embarazo puede modificar el aspecto de los lunares, así que es un buen momento para controlarlos."
+      }
+    }
+  ]
+}

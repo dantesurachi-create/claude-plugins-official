@@ -1,0 +1,62 @@
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Cuánto tarda en verse el resultado del tratamiento del acné?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "La mejoría suele empezar a notarse entre las 6 y las 8 semanas, y el resultado se evalúa a los 3 meses. Las primeras semanas puede incluso empeorar un poco, algo esperable con varios de los tratamientos habituales."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿El acné se va solo con la edad?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "A veces sí, pero puede tardar años y dejar marcas permanentes en el camino. Esperar tiene un costo que después resulta más difícil de revertir que el acné mismo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿El acné es un problema de higiene?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Lavarse más la cara no mejora el acné, y frotar fuerte lo empeora porque irrita la piel y agrava las lesiones inflamatorias."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Existe el acné en adultos?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí, y es más común de lo que se cree, sobre todo en mujeres. Suele ubicarse en la zona de la mandíbula y el mentón, y a veces se relaciona con factores hormonales que conviene estudiar."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿El sol mejora el acné?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Parece mejorarlo al principio porque el bronceado disimula el enrojecimiento, pero después suele empeorarlo. Además varios tratamientos para el acné aumentan la sensibilidad al sol, por lo que el protector solar forma parte del tratamiento."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Se pueden tratar las marcas que dejó el acné?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí, pero el orden importa: primero se controla el acné activo y después se tratan las marcas. Tratar cicatrices mientras siguen apareciendo lesiones nuevas no tiene sentido."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Tengo que dejar de maquillarme si tengo acné?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No hace falta. Sí conviene usar productos no comedogénicos y desmaquillarse bien todas las noches."
+      }
+    }
+  ]
+}
