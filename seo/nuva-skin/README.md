@@ -46,30 +46,28 @@ prender el que se apagó.
 
 ## Los agujeros, en orden de tamaño
 
-### 1. 🔴 El teléfono de la ficha de Google está mal escrito
+### 1. 🔴 La ficha publicita un canal que no atienden, y esconde el que sí usan
 
-La ficha de Google tiene como teléfono principal:
+Se comunican por **WhatsApp**. La ficha de Google tiene como teléfono
+**principal** el fijo — y encima mal escrito:
 
-```
-+54 4328-5309
-```
+| | Número en la ficha | Qué es |
+|---|---|---|
+| **Principal** | `+54 4328-5309` | el fijo, **sin el código de área `11`**, y no es su canal |
+| Secundario | `+54 9 11 3638-5709` | un celular, casi con seguridad el WhatsApp |
 
-Un fijo de CABA se escribe **`+54 11 4328-5309`**. **Falta el código de área
-`11`.** Dos APIs distintas de Google devuelven el mismo número incompleto, y el
-teléfono secundario de la misma ficha sí lo tiene — así que no es una rareza de
-cómo Google muestra los números argentinos.
+El botón **Llamar** de Google marca el principal. Quien encuentra la ficha y
+quiere contactarlos aprieta *Llamar*, marca un fijo incompleto que además no
+atienden, y **no encuentra WhatsApp en ningún lado**: Google no tiene botón de
+WhatsApp y el celular está enterrado como secundario.
 
-El botón **Llamar** de Google Maps marca el número principal. Si está
-incompleto, **el botón no completa la llamada.**
+Lo llamativo: **el sitio ya está bien en esto** — las 24 descripciones de las
+páginas de tratamiento terminan en "Turnos por WhatsApp". Quien hizo el SEO lo
+tenía claro. **La ficha es la que quedó desalineada.**
 
-"No nos escriben ni llaman" puede ser, literalmente, esto. Y explica la
-contradicción que no cerraba en los datos: la ficha tiene **36 reseñas con
-4,7 ★** —o sea que sí trae pacientes— y al mismo tiempo el teléfono no suena.
-
-> **Primera cosa a hacer hoy:** abrir
-> https://www.google.com/maps?cid=10291845774880843375 desde un celular y
-> apretar **Llamar**. No pude verificarlo yo porque no puedo llamar por
-> teléfono desde acá.
+El arreglo: poner como principal el número que sí atienden (con el `11`), y
+agregar un link `wa.me` como link de turnos de la ficha. Falta confirmar cuál
+de los dos números es el WhatsApp.
 
 → Ver `02-google-business-profile.md`
 
@@ -163,7 +161,7 @@ Si el cierre está a semanas o a un par de meses, hay que atacar en este orden:
 
 | # | Acción | Primeros resultados | Costo |
 |---|---|---|---|
-| 1 | **Arreglar el teléfono de la ficha de Google** | inmediato | $0 |
+| 1 | **Poner el WhatsApp al frente en la ficha de Google** | inmediato | $0 |
 | 2 | Recuperar el acceso a la ficha + reconectar Wix | 1–7 días | $0 |
 | 3 | Completar la ficha: servicios, descripción, fotos | 3–14 días | $0 |
 | 4 | Campaña a los 351 contactos de la base | 2–7 días | $0 |
@@ -186,7 +184,7 @@ que esto no vuelva a pasar — pero no es lo que paga el alquiler de este mes.
 3. Reconectar Google Business Profile en el panel de Wix (`02`)
 
 **Esta semana**
-4. Corregir el teléfono a `+54 11 4328-5309` (`02`)
+4. Teléfono principal = el que atienden, + link `wa.me` de turnos (`02`)
 5. Cargar los 16 servicios y la descripción completa en la ficha (`02`)
 6. Botón flotante de WhatsApp y teléfono clickeable en el sitio (`04`, `05`)
 7. Teléfono obligatorio en el formulario (`04`)

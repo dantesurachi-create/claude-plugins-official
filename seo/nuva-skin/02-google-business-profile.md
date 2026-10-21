@@ -42,7 +42,7 @@ es excelente — **33 de cinco estrellas**, 1 de tres, 2 de una.
 
 ---
 
-## 🔴 El teléfono está mal escrito, y es lo más grave del diagnóstico
+## 🔴 El teléfono de la ficha: mal escrito, y no es el canal que usan
 
 La ficha tiene como teléfono principal:
 
@@ -59,28 +59,65 @@ incompleto. Y el teléfono secundario de la misma ficha — `+54 9 11 3638-5709`
 **sí** tiene el `11`, lo que descarta que sea una forma rara en que Google
 muestre los números argentinos.
 
-### Por qué esto importa tanto
+### Por qué esto importa — reencuadrado
 
-El botón **Llamar** de Google Maps marca el número principal de la ficha. Si el
-número está incompleto, **el botón no completa la llamada**.
+El dueño aclaró algo que cambia la lectura: **se comunican principalmente por
+WhatsApp, no por el fijo.**
 
-El dueño dijo: *"no nos escriben ni llaman"*. Puede ser, literalmente, esto.
-Toda la gente que encontró la ficha en el mapa, apretó "Llamar" y escuchó un
-número inexistente, no volvió a intentar: se fue a la siguiente ficha.
+Eso baja la gravedad del dígito faltante y **sube** la del problema de fondo:
 
-Y explica una contradicción de los datos que no cerraba: la ficha tiene 36
-reseñas con 4,7 — o sea que **la ficha sí trae pacientes** — y al mismo tiempo
-el teléfono no suena.
+> **La ficha publicita un canal que no atienden, y esconde el que sí usan.**
 
-**No puedo verificar desde acá que la llamada falle**, porque no puedo llamar.
-Hay que probarlo a mano, y es la primera cosa que hay que hacer hoy:
+Mirá los dos teléfonos de la ficha:
 
-> **Prueba, ahora mismo:** abrir
-> https://www.google.com/maps?cid=10291845774880843375 desde un celular y
-> apretar **Llamar**. Si no entra la llamada, ese es el agujero por donde se fue
-> el negocio.
+| | Número en la ficha | Qué es |
+|---|---|---|
+| **Principal** | `+54 4328-5309` | el fijo, **mal escrito**, y encima no es su canal |
+| Secundario | `+54 9 11 3638-5709` | un **celular** — casi con seguridad el WhatsApp |
 
-**El arreglo:** poner `+54 11 4328-5309` como teléfono principal.
+El botón **Llamar** de Google marca el principal. Así que quien encuentra la
+ficha en el mapa y quiere contactarlos:
+
+1. aprieta *Llamar* → marca un fijo incompleto que además no atienden
+2. no encuentra WhatsApp en ningún lado: Google no muestra un botón de WhatsApp,
+   y el celular está enterrado como número secundario
+
+El canal que funciona es **invisible en la ficha**. Y el sitio tiene el mismo
+problema: la configuración de Wix también tiene el fijo (`011 43285309`) como
+teléfono del negocio.
+
+Lo llamativo es que **el sitio ya está bien en esto**: las 24 descripciones de
+las páginas de tratamiento terminan en *"Turnos por WhatsApp"*. Quien escribió
+el SEO lo tenía claro. **La ficha de Google es la que quedó desalineada.**
+
+### El arreglo
+
+1. **Teléfono principal → el número que sí atienden, bien escrito.**
+   Si el WhatsApp es el celular, poner `+54 9 11 3638-5709` como principal.
+   Si el fijo igual se atiende, va como secundario y **con el `11`**:
+   `+54 11 4328-5309`. Lo que no puede quedar es un principal incompleto.
+
+2. **Agregar un link de WhatsApp como "link de turnos"** de la ficha. Google
+   no tiene botón de WhatsApp, pero sí acepta una URL de reservas/turnos, y ahí
+   entra un `wa.me`:
+
+   ```
+   https://wa.me/{{WHATSAPP_SIN_SIGNOS}}?text=Hola,%20quiero%20consultar%20por%20un%20turno%20en%20Nuva%20Skin
+   ```
+
+   Con el celular de la ficha sería `5491136385709`.
+   **Confirmar el número antes de publicarlo** — un `wa.me` con un número
+   equivocado manda pacientes a un desconocido.
+
+3. **Poner el `wa.me` en las publicaciones semanales** de la ficha, con el
+   botón *Más info*. Es la otra forma de exponer WhatsApp en Google.
+
+4. **Alinear el teléfono del sitio** (Panel de Wix → *Información del negocio*)
+   con el de la ficha.
+
+> **Lo que queda por verificar, y no puedo hacerlo yo:** cuál de los dos
+> números es el WhatsApp, y si el fijo se atiende. Son los dos datos que
+> definen qué va como principal.
 
 ---
 
@@ -195,7 +232,7 @@ posteriores, sin compromiso de realizarlo ese mismo día.
 Estamos en Carlos Pellegrini 1015, oficina 8U, a pocas cuadras del Obelisco y
 de la estación Carlos Pellegrini del subte línea B, con acceso desde 9 de Julio.
 
-Turnos por teléfono, WhatsApp o desde nuestro sitio.
+Turnos por WhatsApp, por teléfono o desde nuestro sitio.
 ```
 
 ### 4. Fotos (hoy: 6)
@@ -246,7 +283,7 @@ Wix tiene la integración hecha: Panel → *Bookings* → *Integraciones* →
 Si no las cargan ustedes, las carga cualquiera, mal. Cargar estas:
 
 **¿Necesito turno previo?**
-> Sí, atendemos con turno. Podés pedirlo al 011 4328-5309, por WhatsApp o desde esteticanuvaskin.com.
+> Sí, atendemos con turno. La forma más rápida es por WhatsApp; también podés pedirlo desde esteticanuvaskin.com.
 
 **¿Dónde están exactamente?**
 > En Carlos Pellegrini 1015, oficina 8U, a pocas cuadras del Obelisco. La estación más cercana es Carlos Pellegrini, línea B.
@@ -361,7 +398,9 @@ febrero. Son las que más van a rendir.
 - [ ] Reconectar Google Business Profile en el panel de Wix
 
 **Esta semana, con el acceso resuelto**
-- [ ] **Teléfono principal → `+54 11 4328-5309`**
+- [ ] **Confirmar cuál número es el WhatsApp y si el fijo se atiende**
+- [ ] **Teléfono principal → el número que sí atienden, con el `11`**
+- [ ] **Agregar el link `wa.me` como link de turnos de la ficha**
 - [ ] Descripción completa (pegar la de arriba)
 - [ ] 16 servicios cargados
 - [ ] Subir fotos hasta llegar a 15, empezando por la fachada
