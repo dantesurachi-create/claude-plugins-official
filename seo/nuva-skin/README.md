@@ -66,8 +66,9 @@ páginas de tratamiento terminan en "Turnos por WhatsApp". Quien hizo el SEO lo
 tenía claro. **La ficha es la que quedó desalineada.**
 
 El arreglo: poner como principal el número que sí atienden (con el `11`), y
-agregar un link `wa.me` como link de turnos de la ficha. Falta confirmar cuál
-de los dos números es el WhatsApp.
+agregar un link `wa.me` como link de turnos de la ficha.
+
+**WhatsApp confirmado por el dueño: `+54 9 11 3638-5709`** → `wa.me/5491136385709`
 
 → Ver `02-google-business-profile.md`
 
@@ -235,7 +236,8 @@ suspende la ficha y además configura infracción a la Ley 24.240.
 | `02-google-business-profile.md` | La ficha real, el teléfono roto, el problema de propiedad, y todo lo que falta cargar |
 | `03-reactivacion-base.md` | Campaña a los 351: segmentación, tres mensajes redactados, cronograma y límites legales |
 | `04-arreglos-del-sitio.md` | Los 5 cambios ya aplicados por API, lo que no toqué y por qué, y lo que queda a mano |
-| `05-ux-dont-make-me-think.md` | Las decisiones de UX/UI según *Don't Make Me Think*: test del tronco, acción primaria, textos, plantilla de páginas, celular y cómo probarlo |
+| `05-ux-dont-make-me-think.md` | Las decisiones de UX/UI según *Don't Make Me Think*: el contenido real de las páginas, test del tronco, acción primaria, textos, plantilla de páginas, celular y cómo probarlo |
+| `06-contenido-para-pegar.md` | El contenido escrito de `/procedimientos`, `/contacto` y `/tenes-dudas`, los H2 de reemplazo y los links de WhatsApp |
 
 ## Qué está hecho y qué no
 

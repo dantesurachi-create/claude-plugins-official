@@ -73,7 +73,7 @@ Mirá los dos teléfonos de la ficha:
 | | Número en la ficha | Qué es |
 |---|---|---|
 | **Principal** | `+54 4328-5309` | el fijo, **mal escrito**, y encima no es su canal |
-| Secundario | `+54 9 11 3638-5709` | un **celular** — casi con seguridad el WhatsApp |
+| Secundario | `+54 9 11 3638-5709` | el **WhatsApp**, confirmado por el dueño |
 
 El botón **Llamar** de Google marca el principal. Así que quien encuentra la
 ficha en el mapa y quiere contactarlos:
@@ -92,10 +92,10 @@ el SEO lo tenía claro. **La ficha de Google es la que quedó desalineada.**
 
 ### El arreglo
 
-1. **Teléfono principal → el número que sí atienden, bien escrito.**
-   Si el WhatsApp es el celular, poner `+54 9 11 3638-5709` como principal.
-   Si el fijo igual se atiende, va como secundario y **con el `11`**:
-   `+54 11 4328-5309`. Lo que no puede quedar es un principal incompleto.
+1. **Teléfono principal → `+54 9 11 3638-5709`** (el WhatsApp).
+   Es el número que atienden, así que es el que tiene que marcar el botón
+   *Llamar*. El fijo pasa a secundario y **con el `11`**: `+54 11 4328-5309`.
+   Lo que no puede quedar es un principal incompleto y sin atender.
 
 2. **Agregar un link de WhatsApp como "link de turnos"** de la ficha. Google
    no tiene botón de WhatsApp, pero sí acepta una URL de reservas/turnos, y ahí
@@ -105,9 +105,11 @@ el SEO lo tenía claro. **La ficha de Google es la que quedó desalineada.**
    https://wa.me/{{WHATSAPP_SIN_SIGNOS}}?text=Hola,%20quiero%20consultar%20por%20un%20turno%20en%20Nuva%20Skin
    ```
 
-   Con el celular de la ficha sería `5491136385709`.
-   **Confirmar el número antes de publicarlo** — un `wa.me` con un número
-   equivocado manda pacientes a un desconocido.
+   Con el número confirmado, el link es:
+
+   ```
+   https://wa.me/5491136385709?text=Hola,%20quiero%20consultar%20por%20un%20turno%20en%20Nuva%20Skin
+   ```
 
 3. **Poner el `wa.me` en las publicaciones semanales** de la ficha, con el
    botón *Más info*. Es la otra forma de exponer WhatsApp en Google.
@@ -115,9 +117,8 @@ el SEO lo tenía claro. **La ficha de Google es la que quedó desalineada.**
 4. **Alinear el teléfono del sitio** (Panel de Wix → *Información del negocio*)
    con el de la ficha.
 
-> **Lo que queda por verificar, y no puedo hacerlo yo:** cuál de los dos
-> números es el WhatsApp, y si el fijo se atiende. Son los dos datos que
-> definen qué va como principal.
+> **Lo único que queda por verificar:** si el fijo se atiende. Si no, conviene
+> sacarlo de la ficha en lugar de dejarlo como secundario.
 
 ---
 
@@ -398,8 +399,7 @@ febrero. Son las que más van a rendir.
 - [ ] Reconectar Google Business Profile en el panel de Wix
 
 **Esta semana, con el acceso resuelto**
-- [ ] **Confirmar cuál número es el WhatsApp y si el fijo se atiende**
-- [ ] **Teléfono principal → el número que sí atienden, con el `11`**
+- [ ] **Teléfono principal → `+54 9 11 3638-5709`** (el WhatsApp)
 - [ ] **Agregar el link `wa.me` como link de turnos de la ficha**
 - [ ] Descripción completa (pegar la de arriba)
 - [ ] 16 servicios cargados

@@ -212,8 +212,8 @@ Y en todo el sitio: el **H2** repite la marca en las internas
 importante del sitio, y una promesa de resultado implícita que en publicidad
 médica no corresponde.
 
-El detalle, con los textos reales y las propuestas, está en
-`05-ux-dont-make-me-think.md`.
+El diagnóstico está en `05-ux-dont-make-me-think.md`, y **el contenido ya
+escrito y listo para pegar, en `06-contenido-para-pegar.md`**.
 
 > ⚠️ **No apliques las sugerencias de SEO con IA de Wix.** Las corrí para ver
 > qué propone y son peores que lo que hay: minúsculas en "retiro", relleno de
