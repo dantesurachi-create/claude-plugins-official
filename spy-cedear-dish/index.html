@@ -1,0 +1,524 @@
+<title>SPY CEDEAR Dish</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: lab bench. Left = the culture dish (live neurons), right = market + controls; charts full width below. */
+:root {
+  --bg: #f3f6f5; --surface: #ffffff; --surface-2: #e9efed; --ink: #121817; --ink-2: #4c5a57; --muted: #74827f; --line: #d5dedb;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  --hit: #12803f; --miss: #c63a39; --cell: #2a78d6; --noise: #c63a39;
+  --f-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1312; --surface: #161d1c; --surface-2: #1d2624; --ink: #e7eeec; --ink-2: #b4c2bf; --muted: #84948f; --line: #2b3735;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --hit: #3fbf72; --miss: #ef6b6a; --cell: #5fa3f0; --noise: #ef6b6a; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0e1312; --surface: #161d1c; --surface-2: #1d2624; --ink: #e7eeec; --ink-2: #b4c2bf; --muted: #84948f; --line: #2b3735;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --hit: #3fbf72; --miss: #ef6b6a; --cell: #5fa3f0; --noise: #ef6b6a; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 20px; }
+header h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(28px, 4.4vw, 46px); line-height: 1.05; margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+header p { margin: 8px 0 0; color: var(--ink-2); max-width: 68ch; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.bench { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 20px; }
+@media (max-width: 860px) { .bench { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; min-width: 0; display: grid; gap: 14px; align-content: start; }
+.panel h2 { font-family: var(--f-display); font-weight: 500; font-size: 19px; margin: 0; }
+.dish-box { position: relative; width: 100%; max-width: 100%; aspect-ratio: 1 / 1; }
+#dish { width: 100%; height: 100%; display: block; }
+.verdict { position: absolute; left: 12px; top: 12px; font-family: var(--f-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+  padding: 4px 9px; border-radius: 99px; background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line); }
+.verdict.hit { color: var(--hit); border-color: var(--hit); }
+.verdict.miss { color: var(--miss); border-color: var(--miss); }
+.legend-dish { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.legend-dish span::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 0; background: var(--c); }
+
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 480px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tile { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+.tile .k { font-size: 12px; color: var(--muted); }
+.tile .v { font-family: var(--f-mono); font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile .sub { font-family: var(--f-mono); font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button { font: 600 14px var(--f-body); border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); padding: 9px 14px; cursor: pointer; }
+button:hover { border-color: var(--ink-2); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--s1); outline-offset: 2px; }
+button.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+button[aria-pressed="true"] { border-color: var(--s2); box-shadow: inset 0 0 0 1px var(--s2); }
+.speed { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.speed input { width: 110px; }
+.you { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 14px; }
+.you p { margin: 0; font-size: 13px; color: var(--ink-2); }
+
+.meters { display: grid; gap: 8px; }
+.meter { display: grid; grid-template-columns: 120px minmax(0, 1fr) 52px; gap: 10px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.bar { height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--ink-2); border-radius: 99px; transition: width 0.2s; }
+.meter b { font-family: var(--f-mono); font-weight: 400; font-variant-numeric: tabular-nums; text-align: right; color: var(--ink); }
+
+.chart-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.legend span::before { content: ""; display: inline-block; width: 14px; height: 2px; margin-right: 6px; vertical-align: 4px; background: var(--c); }
+.chart-box { position: relative; width: 100%; height: 300px; }
+.chart-box.small { height: 170px; }
+canvas.chart { width: 100%; height: 100%; display: block; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
+  font-size: 12px; font-family: var(--f-mono); font-variant-numeric: tabular-nums; color: var(--ink); box-shadow: 0 4px 16px rgb(0 0 0 / 0.12); white-space: nowrap; z-index: 2; }
+.tip .row { display: flex; gap: 8px; align-items: center; }
+.tip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+
+.log { font-family: var(--f-mono); font-size: 12px; font-variant-numeric: tabular-nums; max-height: 180px; overflow: auto; display: grid; gap: 2px; color: var(--ink-2); }
+.log div { display: grid; grid-template-columns: 64px 74px 1fr 56px; gap: 8px; white-space: nowrap; }
+.log .h { color: var(--hit); } .log .m { color: var(--miss); }
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; font-size: 14px; color: var(--ink-2); }
+.notes h3 { font-family: var(--f-display); font-weight: 500; font-size: 16px; color: var(--ink); margin: 0 0 4px; }
+.notes p { margin: 0; }
+.fine { font-size: 12px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">BYMA · CEDEAR SPY · ratio 20:1 · priced in ARS via CCL</div>
+    <h1>Teach a dish of neurons to trade SPY</h1>
+    <p>A simulated culture of 48 neurons watches the SPY CEDEAR each day and calls it up or down. Like the DishBrain experiment, it gets no reward signal. A miss floods the dish with unpredictable noise. A hit gives it a calm, regular beat. The cells drift toward whatever wiring keeps the world predictable.</p>
+  </header>
+
+  <div class="bench">
+    <section class="panel" aria-label="Neuron culture">
+      <div class="chart-head"><h2>The culture</h2><span class="eyebrow" id="dayLabel">Day 0</span></div>
+      <div class="dish-box">
+        <canvas id="dish" aria-label="Animated dish of neurons"></canvas>
+        <div class="verdict" id="verdict">WAITING</div>
+      </div>
+      <div class="legend-dish">
+        <span style="--c: var(--muted)">sensory electrodes (market in)</span>
+        <span style="--c: var(--cell)">culture neurons</span>
+        <span style="--c: var(--s3)">motor UP</span>
+        <span style="--c: var(--s2)">motor DOWN</span>
+      </div>
+      <div class="meters">
+        <div class="meter"><span>Surprise (noise)</span><div class="bar"><i id="mNoise" style="background: var(--miss)"></i></div><b id="vNoise">0%</b></div>
+        <div class="meter"><span>Exploration</span><div class="bar"><i id="mTemp"></i></div><b id="vTemp">0%</b></div>
+        <div class="meter"><span>Hit rate, 20 d</span><div class="bar"><i id="mHit" style="background: var(--hit)"></i></div><b id="vHit">–</b></div>
+      </div>
+    </section>
+
+    <section class="panel" aria-label="Market and controls">
+      <div class="chart-head"><h2>Market</h2><span class="eyebrow">simulated session</span></div>
+      <div class="tiles">
+        <div class="tile"><div class="k">SPY CEDEAR</div><div class="v" id="tPx">–</div><div class="sub" id="tPxChg">–</div></div>
+        <div class="tile"><div class="k">SPY (USD)</div><div class="v" id="tSpy">–</div><div class="sub" id="tSpyChg">–</div></div>
+        <div class="tile"><div class="k">Dólar CCL</div><div class="v" id="tCcl">–</div><div class="sub" id="tCclChg">–</div></div>
+        <div class="tile"><div class="k">Dish equity</div><div class="v" id="tDish">–</div><div class="sub" id="tDishR">–</div></div>
+        <div class="tile"><div class="k">Your equity</div><div class="v" id="tYou">–</div><div class="sub" id="tYouR">–</div></div>
+        <div class="tile"><div class="k">Buy &amp; hold</div><div class="v" id="tHold">–</div><div class="sub" id="tHoldR">–</div></div>
+      </div>
+      <div class="controls">
+        <button class="primary" id="btnRun">Run</button>
+        <button id="btnStep">Next day</button>
+        <button id="btnReset">New market</button>
+        <button id="btnSound" aria-pressed="false">Sound off</button>
+        <label class="speed" for="speed">Speed <input id="speed" type="range" min="1" max="30" value="6"> <span id="speedV">6 d/s</span></label>
+      </div>
+      <div class="you">
+        <div class="eyebrow">Your position</div>
+        <div class="controls">
+          <button id="btnLong" aria-pressed="false">Hold CEDEARs</button>
+          <button id="btnCash" aria-pressed="true">Stay in pesos</button>
+        </div>
+        <p>Play against the dish. Your position applies from the next day until you change it. Everyone starts with ARS 1.000.000.</p>
+      </div>
+      <div class="log" id="log" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <section class="panel" aria-label="Performance over time">
+    <div class="chart-head">
+      <h2>Performance over time</h2>
+      <div class="legend">
+        <span style="--c: var(--s1)">Dish</span>
+        <span style="--c: var(--s2)">You</span>
+        <span style="--c: var(--s3)">Buy &amp; hold</span>
+      </div>
+    </div>
+    <div class="chart-box"><canvas class="chart" id="cEq" aria-label="Equity in ARS millions by day"></canvas><div class="tip" id="tipEq" hidden></div></div>
+    <div class="chart-head"><span class="eyebrow">Dish hit rate, rolling 20 days · 50% is a coin flip</span></div>
+    <div class="chart-box small"><canvas class="chart" id="cHit" aria-label="Dish rolling hit rate"></canvas><div class="tip" id="tipHit" hidden></div></div>
+  </section>
+
+  <section class="notes">
+    <div><h3>How a day works</h3><p>Before the open, six market features (yesterday's move, the 5- and 20-day trend, distance from the average, volatility, the CCL move) stimulate 12 sensory electrodes. The culture settles, and whichever motor region fires harder sets the call: up means hold CEDEARs, down means sit in pesos.</p></div>
+    <div><h3>Miss: noise</h3><p>A wrong call triggers a burst of random stimulation that lingers for days, and the synapses that drove the call get weakened and jittered. Unpredictable input is what the culture is trying to avoid.</p></div>
+    <div><h3>Hit: a calm beat</h3><p>A right call gets a steady, predictable pulse. The active pathway is strengthened (Hebbian: cells that fire together wire together) and exploration drops.</p></div>
+    <div><h3>The market</h3><p>Prices are a simulation, not live data: SPY follows trending regimes with short momentum, the CCL drifts up with jumps, and the CEDEAR is SPY × CCL ÷ 20. This is a toy for learning, not investment advice.</p></div>
+  </section>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const fmtARS = v => "$" + Math.round(v).toLocaleString("es-AR");
+  const fmtM = v => "$" + (v / 1e6).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "M";
+  const pct = v => (v >= 0 ? "+" : "") + (v * 100).toFixed(2) + "%";
+
+  // ---------- seeded RNG ----------
+  let seed = Date.now() % 2147483647;
+  const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const gauss = () => { let u = 0, v = 0; while (!u) u = rand(); while (!v) v = rand(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+
+  // ---------- constants ----------
+  const RATIO = 20, START = 1e6, NS = 12, NH = 48, NM = 8;
+  let S; // full game state
+
+  // ---------- market ----------
+  function marketStep(m) {
+    if (rand() < 0.025) m.regime = rand() < 0.62 ? 1 : -1;
+    const mu = m.regime > 0 ? 0.0006 : -0.0012;
+    const vol = m.regime > 0 ? 0.008 : 0.016;
+    const r = mu + 0.38 * m.lastR + vol * gauss();
+    let c = 0.0005 + 0.2 * m.lastC + 0.006 * gauss();
+    if (rand() < 0.01) c += 0.04 + 0.04 * rand(); // CCL jump
+    m.lastR = r; m.lastC = c;
+    m.spy *= Math.exp(r); m.ccl *= Math.exp(c);
+    m.spyHist.push(m.spy); m.cclHist.push(m.ccl);
+    m.px.push(m.spy * m.ccl / RATIO);
+  }
+
+  function features(m) {
+    const p = m.px, n = p.length - 1;
+    const ret = k => Math.log(p[n] / p[Math.max(0, n - k)]);
+    const ma = p.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, p.length);
+    const rets = []; for (let i = Math.max(1, n - 19); i <= n; i++) rets.push(Math.log(p[i] / p[i - 1]));
+    const sd = Math.sqrt(rets.reduce((a, b) => a + b * b, 0) / Math.max(1, rets.length)) || 0.01;
+    const cc = Math.log(m.cclHist[n] / m.cclHist[Math.max(0, n - 1)]);
+    const f = [ret(1) / 0.012, ret(5) / 0.03, ret(20) / 0.06, Math.log(p[n] / ma) / 0.03, (sd - 0.012) / 0.006, cc / 0.008];
+    const x = [];
+    for (const v of f) { const t = Math.tanh(v); x.push(Math.max(0, t), Math.max(0, -t)); } // on/off electrode pairs
+    return x;
+  }
+
+  // ---------- culture ----------
+  function makeDish() {
+    const neurons = [];
+    for (let i = 0; i < NH; i++) {
+      const a = rand() * Math.PI * 2, r = Math.sqrt(rand()) * 0.62;
+      neurons.push({ x: Math.cos(a) * r, y: Math.sin(a) * r, h: 0 });
+    }
+    const Win = [], Wr = [], W = [[], []];
+    for (let i = 0; i < NH; i++) {
+      Win.push(Array.from({ length: NS }, () => rand() < 0.5 ? gauss() * 1.1 : 0));
+      Wr.push(Array.from({ length: NH }, () => rand() < 0.1 ? gauss() * 0.35 : 0));
+    }
+    for (let k = 0; k < 2; k++) for (let i = 0; i < NH; i++) W[k].push(gauss() * 0.05);
+    return { neurons, Win, Wr, W, bias: Array.from({ length: NH }, () => gauss() * 0.2), temp: 0.6, noise: 0, beat: 0, motor: [0, 0], x: new Array(NS).fill(0) };
+  }
+
+  function think(d, x) {
+    d.x = x;
+    const prev = d.neurons.map(n => n.h);
+    for (let i = 0; i < NH; i++) {
+      let s = d.bias[i];
+      for (let j = 0; j < NS; j++) s += d.Win[i][j] * x[j];
+      for (let j = 0; j < NH; j++) if (d.Wr[i][j]) s += d.Wr[i][j] * prev[j];
+      s += d.noise * 0.6 * gauss();                    // lingering unpredictable stimulation
+      d.neurons[i].h = 0.3 * prev[i] + 0.7 * Math.tanh(s);
+    }
+    const h = d.neurons.map(n => n.h);
+    d.motor = d.W.map(w => w.reduce((a, wi, i) => a + wi * h[i], 0));
+    const drive = d.motor[0] - d.motor[1] + d.temp * 0.25 * gauss();
+    return { up: drive > 0, h };
+  }
+
+  function learn(d, h, choseUp, hit) {
+    const c = choseUp ? 0 : 1, o = 1 - c, eta = 0.04;
+    if (hit) { // calm beat: consolidate the pathway that worked
+      for (let i = 0; i < NH; i++) { d.W[c][i] += eta * h[i]; d.W[o][i] -= eta * h[i]; }
+      d.temp = Math.max(0.05, d.temp * 0.93);
+      d.noise *= 0.4; d.beat = 1;
+    } else {   // noise: weaken and jitter the pathway, raise exploration
+      for (let i = 0; i < NH; i++) { d.W[c][i] -= eta * h[i]; d.W[o][i] += eta * h[i]; d.W[c][i] += 0.01 * gauss(); }
+      d.temp = Math.min(1, d.temp + 0.04);
+      d.noise = Math.min(1, d.noise + 0.55);
+    }
+    for (const w of d.W) { const n = Math.hypot(...w); if (n > 3) for (let i = 0; i < NH; i++) w[i] *= 3 / n; }
+  }
+
+  // ---------- game ----------
+  function newGame() {
+    const m = { spy: 640 + rand() * 80, ccl: 1380 + rand() * 120, regime: 1, lastR: 0, lastC: 0, spyHist: [], cclHist: [], px: [] };
+    m.spyHist.push(m.spy); m.cclHist.push(m.ccl); m.px.push(m.spy * m.ccl / RATIO);
+    for (let i = 0; i < 25; i++) marketStep(m); // warm-up history for the features
+    const p0 = m.px[m.px.length - 1];
+    S = { m, dish: makeDish(), day: 0, dishEq: START, youEq: START, holdUnits: START / p0, youLong: false, youLongNext: false,
+      eq: [{ day: 0, dish: START, you: START, hold: START }], hits: [], hitRate: [], last: null, log: [] };
+    renderAll();
+  }
+
+  function stepDay() {
+    const { m, dish } = S;
+    const x = features(m);
+    const { up, h } = think(dish, x);
+    const p0 = m.px[m.px.length - 1];
+    S.youLong = S.youLongNext;
+    marketStep(m);
+    const p1 = m.px[m.px.length - 1];
+    const r = p1 / p0 - 1;
+    const hit = (r > 0) === up;
+    if (up) S.dishEq *= 1 + r;
+    if (S.youLong) S.youEq *= 1 + r;
+    learn(dish, h, up, hit);
+    S.day++;
+    S.hits.push(hit ? 1 : 0);
+    const w = S.hits.slice(-20);
+    S.hitRate.push({ day: S.day, v: w.reduce((a, b) => a + b, 0) / w.length });
+    S.eq.push({ day: S.day, dish: S.dishEq, you: S.youEq, hold: S.holdUnits * p1 });
+    S.last = { hit, up, r };
+    S.log.unshift({ day: S.day, up, r, hit });
+    if (S.log.length > 60) S.log.pop();
+    feedback(hit);
+    renderAll();
+  }
+
+  // ---------- sound ----------
+  let ac = null, soundOn = false;
+  function feedback(hit) {
+    flash = { hit, t: performance.now() };
+    if (!soundOn || !ac) return;
+    const t = ac.currentTime;
+    if (hit) { // two soft low beats, like a resting heartbeat
+      [0, 0.22].forEach((dt, k) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = "sine"; o.frequency.value = k ? 62 : 74;
+        g.gain.setValueAtTime(0.0001, t + dt); g.gain.exponentialRampToValueAtTime(0.35, t + dt + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dt + 0.2);
+        o.connect(g).connect(ac.destination); o.start(t + dt); o.stop(t + dt + 0.25);
+      });
+    } else { // burst of white noise
+      const len = Math.floor(ac.sampleRate * 0.35), buf = ac.createBuffer(1, len, ac.sampleRate), ch = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1;
+      const src = ac.createBufferSource(), g = ac.createGain(), f = ac.createBiquadFilter();
+      f.type = "bandpass"; f.frequency.value = 1800 + Math.random() * 2500; f.Q.value = 0.6;
+      g.gain.setValueAtTime(0.18, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+      src.buffer = buf; src.connect(f).connect(g).connect(ac.destination); src.start(t);
+    }
+  }
+
+  // ---------- dish drawing ----------
+  let flash = null;
+  const dishCv = $("dish");
+  function drawDish(now) {
+    const dpr = window.devicePixelRatio || 1, W = dishCv.clientWidth, H = dishCv.clientHeight;
+    if (!W) return;
+    if (dishCv.width !== Math.round(W * dpr)) { dishCv.width = Math.round(W * dpr); dishCv.height = Math.round(H * dpr); }
+    const g = dishCv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    const cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2 - 8, d = S.dish;
+    const cCell = css("--cell"), cLine = css("--line"), cMuted = css("--muted"), cUp = css("--s3"), cDn = css("--s2"), cNoise = css("--noise"), cHit = css("--hit"), cSurf = css("--surface-2");
+    // dish
+    g.fillStyle = cSurf; g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = cLine; g.lineWidth = 2; g.stroke();
+    g.beginPath(); g.arc(cx, cy, R - 7, 0, Math.PI * 2); g.lineWidth = 1; g.stroke();
+    // calm beat rings
+    const age = flash ? (now - flash.t) / 1000 : 9;
+    if (flash && flash.hit && age < 1.2) {
+      for (let k = 0; k < 2; k++) {
+        const a = age - k * 0.25; if (a < 0) continue;
+        g.strokeStyle = cHit; g.globalAlpha = Math.max(0, 0.6 - a * 0.6); g.lineWidth = 2;
+        g.beginPath(); g.arc(cx, cy, R * 0.15 + a * R * 0.7, 0, Math.PI * 2); g.stroke();
+      }
+      g.globalAlpha = 1;
+    }
+    const P = n => [cx + n.x * R, cy + n.y * R];
+    // sensory electrodes on the left arc
+    const sens = []; for (let j = 0; j < NS; j++) { const a = Math.PI * (0.7 + 0.6 * j / (NS - 1)); sens.push([cx + Math.cos(a) * R * 0.86, cy + Math.sin(a) * R * 0.86]); }
+    const motor = (k, i) => { const a = (k === 0 ? -0.42 : 0.12) * Math.PI + (i / (NM - 1)) * 0.3 * Math.PI; return [cx + Math.cos(a) * R * 0.86, cy + Math.sin(a) * R * 0.86]; };
+    // input wiring (strongest only)
+    g.lineWidth = 1;
+    for (let i = 0; i < NH; i++) for (let j = 0; j < NS; j++) {
+      const w = d.Win[i][j] * d.x[j]; if (Math.abs(w) < 0.35) continue;
+      g.strokeStyle = cMuted; g.globalAlpha = Math.min(0.35, Math.abs(w) * 0.2);
+      g.beginPath(); g.moveTo(...sens[j]); g.lineTo(...P(d.neurons[i])); g.stroke();
+    }
+    // output wiring: learned weights
+    for (let k = 0; k < 2; k++) for (let i = 0; i < NH; i++) {
+      const w = d.W[k][i]; if (w < 0.08) continue;
+      g.strokeStyle = k === 0 ? cUp : cDn; g.globalAlpha = Math.min(0.5, w * 0.9);
+      g.beginPath(); g.moveTo(...P(d.neurons[i])); g.lineTo(...motor(k, i % NM)); g.stroke();
+    }
+    g.globalAlpha = 1;
+    // neurons
+    const jitter = d.noise;
+    for (const n of d.neurons) {
+      let [x, y] = P(n);
+      if (jitter > 0.05) { x += (Math.random() - 0.5) * jitter * 6; y += (Math.random() - 0.5) * jitter * 6; }
+      const a = Math.abs(n.h);
+      g.fillStyle = cCell; g.globalAlpha = 0.15 + 0.85 * a;
+      g.beginPath(); g.arc(x, y, 4 + a * 5, 0, Math.PI * 2); g.fill();
+      if (jitter > 0.1 && Math.random() < jitter * 0.25) { // noise sparks
+        g.fillStyle = cNoise; g.globalAlpha = 0.9; g.beginPath(); g.arc(x, y, 2.5, 0, Math.PI * 2); g.fill();
+      }
+    }
+    g.globalAlpha = 1;
+    // electrodes
+    sens.forEach(([x, y], j) => { g.fillStyle = cMuted; g.globalAlpha = 0.3 + 0.7 * d.x[j]; g.fillRect(x - 4, y - 4, 8, 8); });
+    const mAct = d.motor.map(v => Math.min(1, Math.abs(v)));
+    for (let k = 0; k < 2; k++) for (let i = 0; i < NM; i++) {
+      const [x, y] = motor(k, i);
+      g.fillStyle = k === 0 ? cUp : cDn; g.globalAlpha = 0.35 + 0.65 * mAct[k];
+      g.fillRect(x - 4, y - 4, 8, 8);
+    }
+    g.globalAlpha = 1;
+    g.fillStyle = cMuted; g.font = "600 11px " + css("--f-mono");
+    g.textAlign = "right"; const u = motor(0, 0), dn = motor(1, NM - 1);
+    g.fillText("UP", u[0] - 8, u[1] - 8); g.fillText("DOWN", dn[0] - 8, dn[1] + 16);
+    g.textAlign = "left"; g.fillText("MARKET IN", cx - R * 0.86 + 12, cy + 4);
+  }
+
+  // ---------- charts ----------
+  function setupCanvas(cv) {
+    const dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    return { g, W, H };
+  }
+  function niceTicks(lo, hi, n) {
+    const span = hi - lo || 1, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+    const step = [1, 2, 2.5, 5, 10].map(s => s * mag).find(s => s >= step0);
+    const t = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) t.push(+v.toFixed(10));
+    return t;
+  }
+  function lineChart(cv, data, series, opts, hoverIdx) {
+    const { g, W, H } = setupCanvas(cv);
+    const pad = { l: 58, r: 66, t: 10, b: 24 };
+    const cw = W - pad.l - pad.r, ch = H - pad.t - pad.b;
+    const xs = data.map(d => d.day), xMax = Math.max(10, xs[xs.length - 1] || 0);
+    let lo = opts.min ?? Infinity, hi = opts.max ?? -Infinity;
+    if (opts.min == null) for (const d of data) for (const s of series) { lo = Math.min(lo, d[s.key]); hi = Math.max(hi, d[s.key]); }
+    if (opts.min == null) { const p = (hi - lo) * 0.08 || hi * 0.02; lo -= p; hi += p; }
+    const X = v => pad.l + (v / xMax) * cw, Y = v => pad.t + ch - ((v - lo) / (hi - lo)) * ch;
+    const cMuted = css("--muted"), cLine = css("--line"), cInk2 = css("--ink-2");
+    g.font = "11px " + css("--f-mono"); g.fillStyle = cMuted; g.lineWidth = 1;
+    for (const t of niceTicks(lo, hi, opts.ticks || 5)) {
+      const y = Math.round(Y(t)) + 0.5; g.strokeStyle = cLine; g.beginPath(); g.moveTo(pad.l, y); g.lineTo(pad.l + cw, y); g.stroke();
+      g.textAlign = "right"; g.fillText(opts.fmtY(t), pad.l - 8, y + 4);
+    }
+    g.textAlign = "center";
+    for (const t of niceTicks(0, xMax, 6)) if (t >= 0) g.fillText("d" + t, X(t), H - 6);
+    if (opts.ref != null) { g.setLineDash([4, 4]); g.strokeStyle = cInk2; g.beginPath(); g.moveTo(pad.l, Y(opts.ref)); g.lineTo(pad.l + cw, Y(opts.ref)); g.stroke(); g.setLineDash([]); }
+    g.lineWidth = 2; g.lineJoin = "round";
+    const ends = [];
+    for (const s of series) {
+      if (data.length < 1) continue;
+      g.strokeStyle = s.color; g.beginPath();
+      data.forEach((d, i) => { const x = X(d.day), y = Y(d[s.key]); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+      const last = data[data.length - 1]; ends.push({ s, x: X(last.day), y: Y(last[s.key]), v: last[s.key] });
+    }
+    // endpoint dots + direct labels, nudged apart
+    ends.sort((a, b) => a.y - b.y);
+    for (let i = 1; i < ends.length; i++) ends[i].ly = Math.max(ends[i].y, (ends[i - 1].ly ?? ends[i - 1].y) + 14);
+    g.textAlign = "left"; g.font = "600 11px " + css("--f-mono");
+    for (const e of ends) {
+      g.fillStyle = css("--surface"); g.beginPath(); g.arc(e.x, e.y, 5, 0, 7); g.fill();
+      g.fillStyle = e.s.color; g.beginPath(); g.arc(e.x, e.y, 3.5, 0, 7); g.fill();
+      g.fillStyle = cInk2; g.fillText(e.s.label, e.x + 9, (e.ly ?? e.y) + 4);
+    }
+    if (hoverIdx != null && data[hoverIdx]) {
+      const d = data[hoverIdx], x = X(d.day);
+      g.strokeStyle = cInk2; g.lineWidth = 1; g.beginPath(); g.moveTo(x, pad.t); g.lineTo(x, pad.t + ch); g.stroke();
+      for (const s of series) { g.fillStyle = css("--surface"); g.beginPath(); g.arc(x, Y(d[s.key]), 5, 0, 7); g.fill(); g.fillStyle = s.color; g.beginPath(); g.arc(x, Y(d[s.key]), 3.5, 0, 7); g.fill(); }
+    }
+    return { X, pad, cw, xMax };
+  }
+
+  const eqSeries = () => [{ key: "dish", label: "Dish", color: css("--s1") }, { key: "you", label: "You", color: css("--s2") }, { key: "hold", label: "Hold", color: css("--s3") }];
+  const hitSeries = () => [{ key: "v", label: "", color: css("--s1") }];
+  const charts = {
+    eq: { cv: $("cEq"), tip: $("tipEq"), hover: null, data: () => S.eq, series: eqSeries, opts: { fmtY: v => (v / 1e6).toFixed(2) + "M" },
+      tipHtml: d => `<div>Day ${d.day}</div>` + eqSeries().map(s => `<div class="row"><span class="dot" style="--c:${s.color}"></span>${s.label === "Hold" ? "Buy & hold" : s.label} ${fmtARS(d[s.key])}</div>`).join("") },
+    hit: { cv: $("cHit"), tip: $("tipHit"), hover: null, data: () => S.hitRate, series: hitSeries, opts: { min: 0, max: 1, ticks: 4, ref: 0.5, fmtY: v => Math.round(v * 100) + "%" },
+      tipHtml: d => `<div>Day ${d.day}</div><div>Hit rate ${(d.v * 100).toFixed(0)}%</div>` },
+  };
+  function drawChart(c) { c.geo = lineChart(c.cv, c.data(), c.series(), c.opts, c.hover); }
+  for (const c of Object.values(charts)) {
+    const move = e => {
+      const data = c.data(); if (!data.length || !c.geo) return;
+      const rect = c.cv.getBoundingClientRect(), mx = e.clientX - rect.left;
+      const day = ((mx - c.geo.pad.l) / c.geo.cw) * c.geo.xMax;
+      let best = 0; for (let i = 0; i < data.length; i++) if (Math.abs(data[i].day - day) < Math.abs(data[best].day - day)) best = i;
+      c.hover = best; drawChart(c);
+      c.tip.innerHTML = c.tipHtml(data[best]); c.tip.hidden = false;
+      const tw = c.tip.offsetWidth, x = c.geo.X(data[best].day);
+      c.tip.style.left = Math.min(rect.width - tw - 4, Math.max(4, x + 12 + tw > rect.width ? x - tw - 12 : x + 12)) + "px";
+      c.tip.style.top = "8px";
+    };
+    c.cv.addEventListener("pointermove", move);
+    c.cv.addEventListener("pointerdown", move);
+    c.cv.addEventListener("pointerleave", () => { c.hover = null; c.tip.hidden = true; drawChart(c); });
+  }
+
+  // ---------- render ----------
+  function chg(el, v) { el.textContent = pct(v); el.style.color = v >= 0 ? css("--hit") : css("--miss"); }
+  function renderAll() {
+    const { m, dish } = S, n = m.px.length - 1;
+    $("dayLabel").textContent = "Day " + S.day;
+    $("tPx").textContent = fmtARS(m.px[n]); chg($("tPxChg"), m.px[n] / m.px[n - 1] - 1);
+    $("tSpy").textContent = "US$" + m.spyHist[n].toFixed(2); chg($("tSpyChg"), m.spyHist[n] / m.spyHist[n - 1] - 1);
+    $("tCcl").textContent = fmtARS(m.ccl); chg($("tCclChg"), m.cclHist[n] / m.cclHist[n - 1] - 1);
+    const last = S.eq[S.eq.length - 1];
+    $("tDish").textContent = fmtM(last.dish); chg($("tDishR"), last.dish / START - 1);
+    $("tYou").textContent = fmtM(last.you); chg($("tYouR"), last.you / START - 1);
+    $("tHold").textContent = fmtM(last.hold); chg($("tHoldR"), last.hold / START - 1);
+    const v = $("verdict");
+    if (S.last) { v.textContent = (S.last.hit ? "HIT · calm beat" : "MISS · noise") + " · called " + (S.last.up ? "UP" : "DOWN"); v.className = "verdict " + (S.last.hit ? "hit" : "miss"); }
+    else { v.textContent = "WAITING · press Run"; v.className = "verdict"; }
+    $("mNoise").style.width = dish.noise * 100 + "%"; $("vNoise").textContent = Math.round(dish.noise * 100) + "%";
+    $("mTemp").style.width = dish.temp * 100 + "%"; $("vTemp").textContent = Math.round(dish.temp * 100) + "%";
+    const hr = S.hitRate[S.hitRate.length - 1];
+    $("mHit").style.width = (hr ? hr.v * 100 : 0) + "%"; $("vHit").textContent = hr ? Math.round(hr.v * 100) + "%" : "–";
+    $("log").innerHTML = S.log.slice(0, 30).map(l => `<div><span>Day ${l.day}</span><span>call ${l.up ? "UP" : "DOWN"}</span><span>${pct(l.r)}</span><span class="${l.hit ? "h" : "m"}">${l.hit ? "HIT" : "MISS"}</span></div>`).join("");
+    $("btnLong").setAttribute("aria-pressed", String(S.youLongNext)); $("btnCash").setAttribute("aria-pressed", String(!S.youLongNext));
+    drawChart(charts.eq); drawChart(charts.hit);
+  }
+
+  // ---------- loop & controls ----------
+  let running = false, acc = 0, lastT = performance.now();
+  const speed = $("speed");
+  function frame(now) {
+    const dt = (now - lastT) / 1000; lastT = now;
+    if (running) { acc += dt * +speed.value; let k = 0; while (acc >= 1 && k++ < 5) { acc -= 1; stepDay(); } if (acc > 1) acc = 0; }
+    if (S.dish.noise > 0) S.dish.noise = Math.max(0, S.dish.noise - dt * 0.05);
+    drawDish(now);
+    requestAnimationFrame(frame);
+  }
+  $("btnRun").onclick = () => { running = !running; $("btnRun").textContent = running ? "Pause" : "Run"; };
+  $("btnStep").onclick = () => { running = false; $("btnRun").textContent = "Run"; stepDay(); };
+  $("btnReset").onclick = () => { seed = (Date.now() % 2147483646) + 1; newGame(); };
+  $("btnSound").onclick = () => {
+    soundOn = !soundOn;
+    if (soundOn && !ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { soundOn = false; } }
+    if (ac && ac.state === "suspended") ac.resume();
+    $("btnSound").textContent = soundOn ? "Sound on" : "Sound off"; $("btnSound").setAttribute("aria-pressed", String(soundOn));
+  };
+  $("btnLong").onclick = () => { S.youLongNext = true; renderAll(); };
+  $("btnCash").onclick = () => { S.youLongNext = false; renderAll(); };
+  speed.oninput = () => { $("speedV").textContent = speed.value + " d/s"; };
+  addEventListener("resize", () => renderAll());
+  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => renderAll());
+  new MutationObserver(() => renderAll()).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  newGame();
+  // open in a working state: pre-run 60 days so the dish and charts have history
+  for (let i = 0; i < 60; i++) stepDay();
+  flash = null;
+  requestAnimationFrame(frame);
+})();
+</script>
