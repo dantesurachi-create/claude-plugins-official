@@ -1,6 +1,7 @@
 """Train and test the dish in FinRL's StockTradingEnv on the SPY CEDEAR.
 
-    python -m finrl_byma.run --data data            # dish vs buy & hold
+    python -m finrl_byma.run --source iol            # history from your IOL account
+    python -m finrl_byma.run --data data            # history from TradingView exports
     python -m finrl_byma.run --data data --ppo      # also train FinRL's PPO baseline
 """
 from __future__ import annotations
@@ -61,6 +62,7 @@ def run_ppo(train: pd.DataFrame, test: pd.DataFrame, initial: float, steps: int)
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--source", choices=["tradingview", "iol"], default="tradingview", help="where the history comes from")
     ap.add_argument("--data", default="data", help="folder with TradingView exports (SPY, optional SPYC)")
     ap.add_argument("--start"), ap.add_argument("--end")
     ap.add_argument("--initial", type=float, default=1_000_000)
@@ -71,7 +73,7 @@ def main() -> None:
     ap.add_argument("--out", default="results")
     a = ap.parse_args()
 
-    df = BymaProcessor(a.data).load(start_date=a.start, end_date=a.end)
+    df = BymaProcessor(a.data, a.source).load(start_date=a.start, end_date=a.end)
     dates = sorted(df.date.unique())
     cut = dates[int(len(dates) * a.split)]
     test = df[df.date >= cut]

@@ -1,6 +1,7 @@
 """FinRL data processor for BYMA CEDEARs, with the same methods as finrl.meta.data_processors.*.
 
-download_data reads TradingView exports from a folder; one CSV per ticker (SPY, and SPYC for the CCL).
+download_data reads history from TradingView exports in a folder (one CSV per ticker: SPY, and SPYC for
+the CCL) or from your IOL account.
 """
 from __future__ import annotations
 
@@ -17,8 +18,21 @@ INDICATORS = ["macd", "rsi_30", "boll_ub", "boll_lb", "close_30_sma"]
 
 
 class BymaProcessor:
-    def __init__(self, data_dir: str | Path = "data"):
+    def __init__(self, data_dir: str | Path = "data", source: str = "tradingview"):
         self.data_dir = Path(data_dir)
+        self.source = source
+        self._iol = None
+
+    def iol(self):
+        if self._iol is None:
+            from .iol_api import IOLClient
+            self._iol = IOLClient()
+        return self._iol
+
+    def available(self, tic: str) -> bool:
+        if self.source == "iol":
+            return True
+        return self.csv_for(tic) is not None
 
     def csv_for(self, tic: str) -> Path | None:
         return next((p for p in sorted(self.data_dir.glob("*.csv")) if ticker_from_filename(p) == tic.upper()), None)
@@ -26,6 +40,12 @@ class BymaProcessor:
     def download_data(self, ticker_list, start_date=None, end_date=None, time_interval="1D") -> pd.DataFrame:
         frames = []
         for tic in ticker_list:
+            if self.source == "iol":
+                df = self.iol().history(tic, start_date or "2020-01-01", end_date)
+                if df.empty and tic == ticker_list[0]:
+                    raise RuntimeError(f"IOL returned no history for {tic}")
+                frames.append(df)
+                continue
             path = self.csv_for(tic)
             if path is None:
                 raise FileNotFoundError(f"No TradingView export for {tic} in {self.data_dir}/ (e.g. 'BCBA_{tic}, 1D.csv')")
@@ -72,7 +92,7 @@ class BymaProcessor:
         return df
 
     def load(self, ars="SPY", usd="SPYC", start_date=None, end_date=None, tech_indicator_list=INDICATORS) -> pd.DataFrame:
-        tickers = [ars] + ([usd] if self.csv_for(usd) else [])
+        tickers = [ars] + ([usd] if self.available(usd) else [])
         df = self.clean_data(self.download_data(tickers, start_date, end_date))
         df = self.add_technical_indicator(df, tech_indicator_list)
         return self.add_ccl(df, ars, usd)

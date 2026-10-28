@@ -171,7 +171,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     <div><h3>How a day works</h3><p>Before the open, six market features (yesterday's move, the 5- and 20-day trend, distance from the average, volatility, the CCL move) stimulate 12 sensory electrodes. The culture settles, and whichever motor region fires harder sets the call: up means hold CEDEARs, down means sit in pesos.</p></div>
     <div><h3>Miss: noise</h3><p>A wrong call triggers a burst of random stimulation that lingers for days, and the synapses that drove the call get weakened and jittered. Unpredictable input is what the culture is trying to avoid.</p></div>
     <div><h3>Hit: a calm beat</h3><p>A right call gets a steady, predictable pulse. The active pathway is strengthened (Hebbian: cells that fire together wire together) and exploration drops.</p></div>
-    <div><h3>Real prices</h3><p>On <a href="https://www.tradingview.com/symbols/BCBA-SPY/" target="_blank" rel="noopener">TradingView</a>, open BCBA:SPY on a daily chart and choose Export chart data. Load that CSV here; add BCBA:SPYC too and the CCL is implied as SPY ÷ SPYC. Live quotes come from the BYMA Market Data API through the FinRL server in this folder, during market hours (11:00 to 17:00 Buenos Aires time). Without real data the game runs a simulation. This is a toy for learning, not investment advice.</p></div>
+    <div><h3>Real prices</h3><p>On <a href="https://www.tradingview.com/symbols/BCBA-SPY/" target="_blank" rel="noopener">TradingView</a>, open BCBA:SPY on a daily chart and choose Export chart data. Load that CSV here; add BCBA:SPYC too and the CCL is implied as SPY ÷ SPYC. For live quotes, run the FinRL server in this folder with your InvertirOnline login (or BYMA Market Data credentials). It trades SPY during market hours (11:00 to 17:00 Buenos Aires time). Without real data the game runs a simulation. This is a toy for learning, not investment advice.</p></div>
   </section>
 </div>
 
@@ -233,11 +233,13 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   }
   const num = v => { const n = typeof v === "string" ? parseFloat(v) : v; return Number.isFinite(n) && n > 0 ? n : null; };
 
-  // History from the local FinRL server (finrl_byma/server.py), which reads TradingView exports.
+  // History from the local FinRL server (finrl_byma/server.py): your IOL account or TradingView exports.
+  let serverSource = null;
   async function loadServerBars() {
     const body = await getJSON("api/history");
     const bars = (body && body.bars || []).filter(b => num(b.px)).map(b => ({ label: b.label, px: b.px, ccl: num(b.ccl), spy: num(b.ccl) ? b.px * RATIO / b.ccl : null }));
     if (bars.length < 60) throw new Error("the data server has fewer than 60 days of SPY history");
+    serverSource = body.source || "your FinRL server";
     return bars.slice(-520);
   }
 
@@ -588,21 +590,21 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     const real = S.feed.kind === "real";
     $("dayLabel").textContent = S.day ? m.labels[n] : "Step 0";
     const fe = $("feed"), note = $("feedNote");
-    const srcName = S.feed.source === "server" ? "TradingView exports on your FinRL server" : "your TradingView export";
+    const srcName = S.feed.source === "server" ? serverSource + " (via your FinRL server)" : "your TradingView export";
     if (real && S.replayDone && S.feed.source !== "server") {
       fe.textContent = "REAL · REPLAY DONE"; fe.className = "feed real";
-      note.textContent = "Replay of your TradingView export is done. Live BYMA quotes need the local FinRL server with BYMA Market Data credentials (see README).";
+      note.textContent = "Replay of your TradingView export is done. Live quotes need the local FinRL server with your IOL login or BYMA credentials (see README).";
     } else if (real && S.replayDone) {
       fe.textContent = !bymaOpen() ? "REAL · BYMA CLOSED" : live.ok ? "LIVE · BYMA" : "REAL · WAITING"; fe.className = "feed real";
       note.textContent = live.err ? `Live quote failed: ${live.err.replace(/\.$/, "")}. Retrying every 30 seconds while BYMA is open.`
-        : bymaOpen() ? `Trading live quotes from ${live.source || "BYMA Market Data"}, every 30 seconds${live.checked ? " · last check " + live.checked + " ART" : ""}.`
+        : bymaOpen() ? `Trading live quotes from ${live.source || "your broker"}, every 30 seconds${live.checked ? " · last check " + live.checked + " ART" : ""}.`
         : `BYMA is closed. The dish trades the next live quote after 11:00 ART${live.checked ? " · last check " + live.checked : ""}.`;
     } else if (real) {
       fe.textContent = "REAL · REPLAY"; fe.className = "feed real";
-      note.textContent = `Training on ${S.feed.queue.length + S.day} daily closes from ${srcName} (${S.feed.queue.length} to go).`;
+      note.textContent = `Training on ${S.feed.queue.length + S.day} daily closes from ${srcName}, ${S.feed.queue.length} to go.`;
     } else {
       fe.textContent = "SIMULATED"; fe.className = "feed sim";
-      note.textContent = feedErr ? `Real data unavailable: ${feedErr}. Showing a simulated market. Load a TradingView export, or run the FinRL server for live BYMA quotes.` : "Simulated market. Load a TradingView export of BCBA:SPY to train on real prices.";
+      note.textContent = feedErr ? `Real data unavailable: ${feedErr}. Showing a simulated market. Load a TradingView export, or run the FinRL server with your IOL login for live quotes.` : "Simulated market. Load a TradingView export of BCBA:SPY to train on real prices.";
     }
     $("btnMode").textContent = real ? "Use simulation" : "Use real data";
     $("tPx").textContent = fmtARS(m.px[n]); chg($("tPxChg"), m.px[n] / m.px[n - 1] - 1);
