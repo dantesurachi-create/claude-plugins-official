@@ -74,6 +74,7 @@ cd spy-cedear-dish
 pip install -r requirements.txt
 export IOL_USERNAME='your IOL user'
 export IOL_PASSWORD='your IOL password'
+python -m finrl_byma.check                  # read-only: login, quotes, history, portfolio
 python -m finrl_byma.server --source iol     # open http://localhost:8000
 python -m finrl_byma.run --source iol --ppo  # FinRL backtest
 ```
