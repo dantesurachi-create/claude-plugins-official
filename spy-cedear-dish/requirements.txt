@@ -1,0 +1,8 @@
+finrl
+pandas
+numpy
+requests
+stockstats
+gymnasium
+matplotlib
+stable-baselines3

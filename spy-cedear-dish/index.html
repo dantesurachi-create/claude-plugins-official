@@ -1,3 +1,4 @@
+<meta charset="utf-8">
 <title>SPY CEDEAR Dish</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,6 +52,10 @@ header p { margin: 8px 0 0; color: var(--ink-2); max-width: 68ch; }
 button { font: 600 14px var(--f-body); border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); padding: 9px 14px; cursor: pointer; }
 button:hover { border-color: var(--ink-2); }
 button:focus-visible, input:focus-visible { outline: 2px solid var(--s1); outline-offset: 2px; }
+.file { font: 600 14px var(--f-body); border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); padding: 9px 14px; cursor: pointer; }
+.file:hover { border-color: var(--ink-2); }
+.file:focus-within { outline: 2px solid var(--s1); outline-offset: 2px; }
+.file input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 button.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 button[aria-pressed="true"] { border-color: var(--s2); box-shadow: inset 0 0 0 1px var(--s2); }
 .speed { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-2); }
@@ -118,7 +123,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
 
     <section class="panel" aria-label="Market and controls">
       <div class="chart-head"><h2>Market</h2><span class="feed" id="feed">CONNECTING</span></div>
-      <p class="fine" id="feedNote">Loading SPY CEDEAR history from data912…</p>
+      <p class="fine" id="feedNote">Looking for the local FinRL data server…</p>
       <div class="tiles">
         <div class="tile"><div class="k">SPY CEDEAR</div><div class="v" id="tPx">–</div><div class="sub" id="tPxChg">–</div></div>
         <div class="tile"><div class="k" id="kSpy">SPY (USD)</div><div class="v" id="tSpy">–</div><div class="sub" id="tSpyChg">–</div></div>
@@ -132,6 +137,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
         <button id="btnStep">Next step</button>
         <button id="btnReset">Restart</button>
         <button id="btnMode">Use simulation</button>
+        <label class="file" for="csv">Load TradingView CSV<input id="csv" type="file" accept=".csv,text/csv" multiple></label>
         <button id="btnSound" aria-pressed="false">Sound off</button>
         <label class="speed" for="speed">Speed <input id="speed" type="range" min="1" max="30" value="6"> <span id="speedV">6 steps/s</span></label>
       </div>
@@ -165,7 +171,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     <div><h3>How a day works</h3><p>Before the open, six market features (yesterday's move, the 5- and 20-day trend, distance from the average, volatility, the CCL move) stimulate 12 sensory electrodes. The culture settles, and whichever motor region fires harder sets the call: up means hold CEDEARs, down means sit in pesos.</p></div>
     <div><h3>Miss: noise</h3><p>A wrong call triggers a burst of random stimulation that lingers for days, and the synapses that drove the call get weakened and jittered. Unpredictable input is what the culture is trying to avoid.</p></div>
     <div><h3>Hit: a calm beat</h3><p>A right call gets a steady, predictable pulse. The active pathway is strengthened (Hebbian: cells that fire together wire together) and exploration drops.</p></div>
-    <div><h3>The market</h3><p>Real mode trains the dish on about two years of daily SPY CEDEAR closes from <a href="https://data912.com" target="_blank" rel="noopener">data912</a>. Then it trades live quotes once a minute while BYMA is open (11:00 to 17:00 Buenos Aires time). The CCL comes from <a href="https://dolarapi.com" target="_blank" rel="noopener">DolarAPI</a>, or is implied as SPY ÷ SPYC. The quotes are free and delayed. If they can't be reached, the game falls back to a simulation. This is a toy for learning, not investment advice.</p></div>
+    <div><h3>Real prices</h3><p>On <a href="https://www.tradingview.com/symbols/BCBA-SPY/" target="_blank" rel="noopener">TradingView</a>, open BCBA:SPY on a daily chart and choose Export chart data. Load that CSV here; add BCBA:SPYC too and the CCL is implied as SPY ÷ SPYC. Live quotes come from the BYMA Market Data API through the FinRL server in this folder, during market hours (11:00 to 17:00 Buenos Aires time). Without real data the game runs a simulation. This is a toy for learning, not investment advice.</p></div>
   </section>
 </div>
 
@@ -190,7 +196,6 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   // ---------- market feeds ----------
   // Shaped like the Gym trading environments (TradingGym, FinRL): a feed hands out one bar at a time.
   // A bar is { label, px (ARS), spy (USD), ccl (ARS per USD) }; spy and ccl may be null on real bars.
-  const API = "https://data912.com", DOLAR = "https://dolarapi.com/v1/dolares/contadoconliqui";
   const TZ = "America/Argentina/Buenos_Aires";
 
   function pushBar(m, bar) {
@@ -219,37 +224,51 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), ms);
     try {
       const r = await fetch(url, { signal: ctl.signal, cache: "no-store" });
-      if (!r.ok) throw new Error(new URL(url).host + " answered " + r.status);
-      return await r.json();
+      const body = await r.json().catch(() => null);
+      if (!r.ok) throw new Error((body && body.error) || "the data server answered " + r.status);
+      return body;
     } catch (e) {
-      throw new Error(e.name === "AbortError" ? new URL(url).host + " timed out" : e.message.startsWith(new URL(url).host) ? e.message : new URL(url).host + " is unreachable from this page");
+      throw new Error(e.name === "AbortError" ? "the data server timed out" : e instanceof TypeError ? "no local data server is running" : e.message);
     } finally { clearTimeout(t); }
   }
   const num = v => { const n = typeof v === "string" ? parseFloat(v) : v; return Number.isFinite(n) && n > 0 ? n : null; };
-  const closeOf = r => num(r.c ?? r.close ?? r.cierre ?? r.last);
-  const dateOf = r => String(r.date ?? r.fecha ?? r.d ?? "").slice(0, 10);
-  async function history(ticker) {
-    const rows = await getJSON(`${API}/historical/cedears/${ticker}`);
-    if (!Array.isArray(rows)) throw new Error("data912 sent an unexpected history format");
-    return rows.map(r => ({ date: dateOf(r), c: closeOf(r) })).filter(r => r.date && r.c).sort((x, y) => x.date < y.date ? -1 : 1);
+
+  // History from the local FinRL server (finrl_byma/server.py), which reads TradingView exports.
+  async function loadServerBars() {
+    const body = await getJSON("api/history");
+    const bars = (body && body.bars || []).filter(b => num(b.px)).map(b => ({ label: b.label, px: b.px, ccl: num(b.ccl), spy: num(b.ccl) ? b.px * RATIO / b.ccl : null }));
+    if (bars.length < 60) throw new Error("the data server has fewer than 60 days of SPY history");
+    return bars.slice(-520);
   }
 
-  // Real BYMA data: daily closes of the SPY CEDEAR in pesos to train on, then delayed live quotes.
-  // The CCL is implied from the same CEDEAR in two currencies: SPY (pesos) ÷ SPYC (cable dollars).
-  async function loadRealBars() {
-    const ars = await history("SPY");
-    if (ars.length < 60) throw new Error("data912 returned too little SPY history");
-    let usd = new Map();
-    for (const t of ["SPYC", "SPYD"]) {
-      try { usd = new Map((await history(t)).map(r => [r.date, r.c])); if (usd.size) break; } catch (e) { /* optional */ }
+  // History straight from TradingView chart exports picked in the browser (BCBA:SPY, optionally BCBA:SPYC).
+  function parseTradingViewCSV(text) {
+    const lines = text.trim().split(/\r?\n/), head = lines[0].split(",").map(h => h.trim().toLowerCase());
+    const it = head.indexOf("time"), ic = head.indexOf("close");
+    if (it < 0 || ic < 0) throw new Error("this isn't a TradingView export (no time and close columns)");
+    const rows = [];
+    for (const ln of lines.slice(1)) {
+      const c = ln.split(","), t = c[it], close = num(c[ic]);
+      if (!close) continue;
+      const d = /^\d+$/.test(t) ? new Date(+t * 1000) : new Date(t);
+      if (isNaN(d)) continue;
+      rows.push({ date: new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(d), c: close });
     }
-    return ars.slice(-520).map(r => {
-      const u = usd.get(r.date);
-      return { label: r.date, px: r.c, ccl: u ? r.c / u : null, spy: u ? u * RATIO : null };
-    });
+    return rows;
   }
-  function realFeed(bars) {
-    return { kind: "real", queue: bars.slice(), hasNext() { return this.queue.length > 0; }, next() { return this.queue.shift(); } };
+  const tickerOf = name => ((name.toUpperCase().match(/^(?:[A-Z]+_)?([A-Z0-9.]+)/) || [])[1] || "");
+  async function loadCsvBars(files) {
+    let ars = null, usd = new Map();
+    for (const f of files) {
+      const rows = parseTradingViewCSV(await f.text()), tic = tickerOf(f.name);
+      if (tic === "SPYC" || tic === "SPYD") usd = new Map(rows.map(r => [r.date, r.c])); else ars = rows;
+    }
+    if (!ars) throw new Error("pick the BCBA:SPY export (the pesos line); BCBA:SPYC is optional, for the CCL");
+    if (ars.length < 60) throw new Error("the SPY export has fewer than 60 days");
+    return ars.slice(-520).map(r => { const u = usd.get(r.date); return { label: r.date, px: r.c, ccl: u ? r.c / u : null, spy: u ? u * RATIO : null }; });
+  }
+  function realFeed(bars, source) {
+    return { kind: "real", source, queue: bars.slice(), hasNext() { return this.queue.length > 0; }, next() { return this.queue.shift(); } };
   }
 
   function baTime(d = new Date()) {
@@ -259,28 +278,23 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   }
   const bymaOpen = () => { const t = baTime(); return !["Sat", "Sun"].includes(t.day) && t.h >= 11 && t.h < 17; };
 
-  const live = { ok: false, err: null, ccl: null, cclSource: null, checked: null };
+  // Live quotes from the BYMA Market Data API, through the local server so the credentials never reach the page.
+  const live = { ok: false, err: null, ccl: null, source: null, checked: null };
   async function pollLive() {
-    if (!S || S.feed.kind !== "real" || !S.replayDone) return;
+    if (!S || S.feed.source !== "server" || !S.replayDone) return;
     try {
-      const [panel, dolar] = await Promise.all([getJSON(`${API}/live/arg_cedears`), getJSON(DOLAR).catch(() => null)]);
-      const row = sym => Array.isArray(panel) ? panel.find(r => String(r.symbol ?? r.ticker ?? "").toUpperCase() === sym) : null;
-      const spy = row("SPY"), spyc = row("SPYC") || row("SPYD");
-      const px = spy && num(spy.c ?? spy.last);
-      const u = spyc && num(spyc.c ?? spyc.last);
-      const cclApi = dolar && num(dolar.venta);
-      if (cclApi) { live.ccl = cclApi; live.cclSource = "dolarapi"; }
-      else if (px && u) { live.ccl = px / u; live.cclSource = "SPY ÷ SPYC"; }
-      live.ok = !!px; live.err = px ? null : "SPY was missing from the data912 CEDEAR panel"; live.checked = baTime().hhmm;
-      const lastPx = S.m.px[S.m.px.length - 1];
-      if (px && px !== lastPx && bymaOpen()) {
+      const q = await getJSON("api/quote");
+      const px = num(q.px);
+      if (num(q.ccl)) live.ccl = q.ccl;
+      live.source = q.source || "BYMA"; live.ok = !!px; live.err = px ? null : "the quote had no SPY price"; live.checked = baTime().hhmm;
+      if (px && px !== S.m.px[S.m.px.length - 1] && bymaOpen()) {
         S.feed.queue.push({ label: "Live " + live.checked, px, ccl: live.ccl, spy: live.ccl ? px * RATIO / live.ccl : null });
         stepDay();
       }
     } catch (e) { live.ok = false; live.err = e.message; }
     renderAll();
   }
-  setInterval(() => { if (S && S.feed.kind === "real" && S.replayDone && bymaOpen()) pollLive(); }, 60000);
+  setInterval(() => { if (S && S.feed.source === "server" && S.replayDone && bymaOpen()) pollLive(); }, 30000);
 
   function features(m) {
     const p = m.px, n = p.length - 1;
@@ -354,7 +368,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   function stepDay() {
     const { m, dish, feed } = S;
     if (!feed.hasNext()) {
-      if (feed.kind === "real" && !S.replayDone) { S.replayDone = true; setRunning(false); pollLive(); }
+      if (feed.kind === "real" && !S.replayDone) { S.replayDone = true; setRunning(false); renderAll(); pollLive(); }
       return false;
     }
     const x = features(m);
@@ -574,23 +588,27 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     const real = S.feed.kind === "real";
     $("dayLabel").textContent = S.day ? m.labels[n] : "Step 0";
     const fe = $("feed"), note = $("feedNote");
-    if (real && S.replayDone) {
+    const srcName = S.feed.source === "server" ? "TradingView exports on your FinRL server" : "your TradingView export";
+    if (real && S.replayDone && S.feed.source !== "server") {
+      fe.textContent = "REAL · REPLAY DONE"; fe.className = "feed real";
+      note.textContent = "Replay of your TradingView export is done. Live BYMA quotes need the local FinRL server with BYMA Market Data credentials (see README).";
+    } else if (real && S.replayDone) {
       fe.textContent = !bymaOpen() ? "REAL · BYMA CLOSED" : live.ok ? "LIVE · BYMA" : "REAL · WAITING"; fe.className = "feed real";
-      note.textContent = live.err ? `Live quote failed: ${live.err}. Retrying every minute while BYMA is open.`
-        : bymaOpen() ? `Trading delayed live quotes, polled every minute${live.checked ? " · last check " + live.checked + " ART" : ""}.`
+      note.textContent = live.err ? `Live quote failed: ${live.err.replace(/\.$/, "")}. Retrying every 30 seconds while BYMA is open.`
+        : bymaOpen() ? `Trading live quotes from ${live.source || "BYMA Market Data"}, every 30 seconds${live.checked ? " · last check " + live.checked + " ART" : ""}.`
         : `BYMA is closed. The dish trades the next live quote after 11:00 ART${live.checked ? " · last check " + live.checked : ""}.`;
     } else if (real) {
       fe.textContent = "REAL · REPLAY"; fe.className = "feed real";
-      note.textContent = `Training on ${S.feed.queue.length + S.day} real daily closes from data912 (${S.feed.queue.length} to go). Live trading starts when the replay ends.`;
+      note.textContent = `Training on ${S.feed.queue.length + S.day} daily closes from ${srcName} (${S.feed.queue.length} to go).`;
     } else {
       fe.textContent = "SIMULATED"; fe.className = "feed sim";
-      note.textContent = feedErr ? `Real data unavailable: ${feedErr}. Showing a simulated market. Open this file in a normal browser to use live BYMA data.` : "Simulated market.";
+      note.textContent = feedErr ? `Real data unavailable: ${feedErr}. Showing a simulated market. Load a TradingView export, or run the FinRL server for live BYMA quotes.` : "Simulated market. Load a TradingView export of BCBA:SPY to train on real prices.";
     }
     $("btnMode").textContent = real ? "Use simulation" : "Use real data";
     $("tPx").textContent = fmtARS(m.px[n]); chg($("tPxChg"), m.px[n] / m.px[n - 1] - 1);
     const useLive = real && S.replayDone && live.ccl, ccl = useLive ? live.ccl : m.cclHist[n], spyU = !useLive && m.spyHist[n] ? m.spyHist[n] : ccl ? m.px[n] * RATIO / ccl : null;
     $("kSpy").textContent = real ? "SPY implied (USD)" : "SPY (USD)";
-    $("kCcl").textContent = useLive ? "Dólar CCL · " + live.cclSource : real ? "Dólar CCL · SPY ÷ SPYC" : "Dólar CCL";
+    $("kCcl").textContent = real ? "Dólar CCL · SPY ÷ SPYC" : "Dólar CCL";
     $("tSpy").textContent = spyU ? "US$" + spyU.toFixed(2) : "–";
     if (m.spyHist[n] && m.spyHist[n - 1]) chg($("tSpyChg"), m.spyHist[n] / m.spyHist[n - 1] - 1); else $("tSpyChg").textContent = "";
     $("tCcl").textContent = ccl ? fmtARS(ccl) : "–";
@@ -624,8 +642,15 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   function setRunning(v) { running = v; $("btnRun").textContent = running ? "Pause" : "Run"; }
   $("btnRun").onclick = () => setRunning(!running);
   $("btnStep").onclick = () => { setRunning(false); stepDay(); };
-  $("btnReset").onclick = () => { setRunning(false); start(S.feed.kind === "real" && realBars ? realFeed(realBars) : simFeed()); };
-  $("btnMode").onclick = () => { setRunning(false); S.feed.kind === "real" ? start(simFeed()) : boot(); };
+  $("btnReset").onclick = () => { setRunning(false); start(S.feed.kind === "real" && realBars ? realFeed(realBars, realSource) : simFeed()); };
+  $("btnMode").onclick = () => { setRunning(false); S.feed.kind === "real" ? start(simFeed()) : realBars ? start(realFeed(realBars, realSource)) : boot(); };
+  $("csv").onchange = async e => {
+    const files = [...e.target.files]; e.target.value = "";
+    if (!files.length) return;
+    setRunning(false);
+    try { realBars = await loadCsvBars(files); realSource = "csv"; feedErr = null; start(realFeed(realBars, "csv")); }
+    catch (err) { feedErr = err.message; if (S.feed.kind !== "sim") start(simFeed()); else renderAll(); }
+  };
   $("btnSound").onclick = () => {
     soundOn = !soundOn;
     if (soundOn && !ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { soundOn = false; } }
@@ -639,7 +664,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => renderAll());
   new MutationObserver(() => renderAll()).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
-  let realBars = null, feedErr = null;
+  let realBars = null, realSource = null, feedErr = null;
   function start(feed) {
     seed = (Date.now() % 2147483646) + 1;
     newGame(feed);
@@ -649,12 +674,12 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     renderAll();
   }
   async function boot() {
-    try { realBars = realBars || await loadRealBars(); feedErr = null; start(realFeed(realBars)); }
+    try { realBars = await loadServerBars(); realSource = "server"; feedErr = null; start(realFeed(realBars, "server")); }
     catch (e) { feedErr = e.message; if (!S || S.feed.kind !== "sim") start(simFeed()); else renderAll(); }
   }
   start(simFeed()); // something to look at while the real data loads
   feedErr = null;
-  $("feed").textContent = "CONNECTING"; $("feed").className = "feed"; $("feedNote").textContent = "Loading SPY CEDEAR history from data912…";
+  $("feed").textContent = "CONNECTING"; $("feed").className = "feed"; $("feedNote").textContent = "Looking for the local FinRL data server…";
   boot();
   requestAnimationFrame(frame);
 })();
