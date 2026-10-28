@@ -43,12 +43,12 @@ class BymaProcessor:
             if self.source == "iol":
                 df = self.iol().history(tic, start_date or "2020-01-01", end_date)
                 if df.empty and tic == ticker_list[0]:
-                    raise RuntimeError(f"IOL returned no history for {tic}")
+                    raise RuntimeError(f"IOL no devolvió historial de {tic}")
                 frames.append(df)
                 continue
             path = self.csv_for(tic)
             if path is None:
-                raise FileNotFoundError(f"No TradingView export for {tic} in {self.data_dir}/ (e.g. 'BCBA_{tic}, 1D.csv')")
+                raise FileNotFoundError(f"No hay exportación de TradingView de {tic} en {self.data_dir}/ (por ejemplo 'BCBA_{tic}, 1D.csv')")
             frames.append(load_tradingview_csv(path, tic))
         df = pd.concat(frames, ignore_index=True)
         if start_date:

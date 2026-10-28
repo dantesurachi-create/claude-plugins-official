@@ -27,9 +27,9 @@ class BymaMarketData:
         self.client_secret = client_secret or os.environ.get("BYMA_CLIENT_SECRET")
         self.feed = feed or os.environ.get("BYMA_FEED", "snapshot")
         if not (self.client_id and self.client_secret):
-            raise RuntimeError("Set BYMA_CLIENT_ID and BYMA_CLIENT_SECRET to use the BYMA Market Data API.")
+            raise RuntimeError("Configurá BYMA_CLIENT_ID y BYMA_CLIENT_SECRET para usar la API de Market Data de BYMA.")
         if self.feed not in FEEDS:
-            raise ValueError(f"BYMA_FEED must be one of {FEEDS}")
+            raise ValueError(f"BYMA_FEED tiene que ser uno de {FEEDS}")
         self.session = requests.Session()
         self._token: str | None = None
         self._expires = 0.0
@@ -45,7 +45,7 @@ class BymaMarketData:
         self._expires = time.time() + float(body.get("expires_in", 300))
         scopes = body.get("scope", "")
         if scopes and self.feed not in scopes:
-            raise PermissionError(f"These BYMA credentials don't grant the '{self.feed}' feed (scopes: {scopes}).")
+            raise PermissionError(f"Estas credenciales de BYMA no incluyen el feed '{self.feed}' (permisos: {scopes}).")
 
     def equity(self, group: str = "CEDEARS", currency: str = "ARS", settle_period: str = "0003") -> list[dict[str, Any]]:
         self._auth()

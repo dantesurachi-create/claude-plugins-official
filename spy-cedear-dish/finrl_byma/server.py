@@ -44,7 +44,7 @@ class Handler(SimpleHTTPRequestHandler):
     live = None  # (name, quote function) or None
     live_error: str | None = None
     trader = None  # RealTrader or None
-    trader_error = "Real trading is off. Start the server with DISH_REAL_TRADING=1 and an IOL login to enable it."
+    trader_error = "La plata real está apagada. Abrí la app con la opción --real y tu usuario de IOL para habilitarla."
 
     def _local(self) -> bool:
         # Refuse requests whose Host isn't this computer, so other websites can't reach the API (DNS rebinding).
@@ -77,11 +77,11 @@ class Handler(SimpleHTTPRequestHandler):
 
     def quote(self):
         if self.live is None:
-            raise RuntimeError(self.live_error or "no live quote source is configured")
+            raise RuntimeError(self.live_error or "no hay fuente de precios en vivo configurada")
         name, quote = self.live
         px, usd = quote()
         if not px:
-            raise RuntimeError(f"{name} returned no SPY price")
+            raise RuntimeError(f"{name} no devolvió precio de SPY")
         return {"source": name, "px": px, "ccl": px / usd if usd else None, "ts": int(time.time())}
 
     def config(self):
@@ -92,25 +92,25 @@ class Handler(SimpleHTTPRequestHandler):
         if not self.trader:
             raise PermissionError(self.trader_error)
         if need_code and not self.trader.check_code(body.get("code")):
-            raise PermissionError("Wrong arming code. Use the code shown in the server's terminal.")
+            raise PermissionError("Código de activación incorrecto. Usá el código que muestra la terminal.")
         return self.trader
 
     def arm(self, body):
         t = self._trader(body)
         t.armed = True
-        print("Real trading ARMED")
+        print("Plata real ACTIVADA")
         return t.status()
 
     def disarm(self, body):
         t = self._trader(body, need_code=False)  # stopping never needs the code
         t.armed = False
-        print("Real trading disarmed")
+        print("Plata real desactivada")
         return t.status()
 
     def order(self, body):
         t = self._trader(body)
         result = t.act(body.get("side"), body.get("maxArs"))
-        print("Real trading:", result)
+        print("Plata real:", result)
         return {**result, "status": t.status()}
 
     def _json(self, fn):
@@ -136,7 +136,7 @@ def build_server(source="tradingview", data="data", live="auto", port=8000) -> T
         live = "iol" if os.environ.get("IOL_USERNAME") else "byma" if os.environ.get("BYMA_CLIENT_ID") else "off"
     iol = None
     if live == "off":
-        Handler.live_error = "live quotes are off: set IOL_USERNAME and IOL_PASSWORD (or BYMA credentials) and restart the server"
+        Handler.live_error = "precios en vivo apagados: abrí la app con tu usuario de IOL (o credenciales de BYMA)"
     else:
         try:
             if live == "iol":
@@ -146,7 +146,7 @@ def build_server(source="tradingview", data="data", live="auto", port=8000) -> T
             else:
                 from .byma_api import BymaMarketData
                 Handler.live = quote_fn(BymaMarketData(), "byma")
-            print(f"Live quotes from {Handler.live[0]}")
+            print(f"Precios en vivo de {Handler.live[0]}")
         except Exception as e:
             Handler.live_error = str(e)
     if Handler.live_error:
@@ -154,31 +154,42 @@ def build_server(source="tradingview", data="data", live="auto", port=8000) -> T
 
     if os.environ.get("DISH_REAL_TRADING") == "1":
         if iol is None:
-            Handler.trader_error = "Real trading needs live quotes from IOL (set IOL_USERNAME and IOL_PASSWORD)."
+            Handler.trader_error = "Para operar con plata real hacen falta los precios en vivo de IOL (usuario y contraseña de IOL)."
             print(Handler.trader_error)
         else:
             from .trader import RealTrader
             Handler.trader = RealTrader(iol, GAME_DIR / "dish_positions.json")
             t = Handler.trader
-            print(f"\n  REAL TRADING AVAILABLE. Arming code: {t.code}\n"
-                  f"  Limits: ARS {t.max_ars:,.0f} per buy, {t.min_interval:.0f}s between orders, "
-                  f"{t.max_orders} orders a day.\n")
-    print(f"Serving the app on http://localhost:{port}")
+            print(f"\n  PLATA REAL DISPONIBLE. Código de activación: {t.code}\n"
+                  f"  Límites: ${t.max_ars:,.0f} por compra, {t.min_interval:.0f} s entre órdenes, "
+                  f"{t.max_orders} órdenes por día.\n")
+    print(f"App disponible en http://localhost:{port}")
     return ThreadingHTTPServer(("127.0.0.1", port), partial(Handler, directory=str(GAME_DIR)))
 
 
 def add_args(ap: argparse.ArgumentParser) -> None:
-    ap.add_argument("--source", choices=["tradingview", "iol"], default="tradingview", help="where the history comes from")
-    ap.add_argument("--data", default="data", help="folder with TradingView exports (SPY, optional SPYC)")
+    ap.add_argument("--source", choices=["tradingview", "iol"], default="tradingview", help="de dónde sale el historial")
+    ap.add_argument("--data", default="data", help="carpeta con exportaciones de TradingView (SPY y opcionalmente SPYC)")
     ap.add_argument("--live", choices=["auto", "iol", "byma", "off"], default="auto",
-                    help="live quotes: auto uses IOL if IOL_USERNAME is set, else BYMA if BYMA_CLIENT_ID is set")
+                    help="precios en vivo: auto usa IOL si hay usuario de IOL, si no BYMA si hay credenciales de BYMA")
     ap.add_argument("--port", type=int, default=8000)
+    ap.add_argument("--real", action="store_true", help="habilita operar con plata real (igual hay que activarla en la app)")
+    ap.add_argument("--max-ars", type=float, help="máximo en pesos por compra con plata real (por defecto 100000)")
+
+
+def apply_args(a: argparse.Namespace) -> None:
+    """Turn the command-line options for real trading into the settings trader.py reads."""
+    if a.real:
+        os.environ["DISH_REAL_TRADING"] = "1"
+    if a.max_ars:
+        os.environ["DISH_MAX_ARS"] = str(a.max_ars)
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     add_args(ap)
     a = ap.parse_args()
+    apply_args(a)
     build_server(a.source, a.data, a.live, a.port).serve_forever()
 
 

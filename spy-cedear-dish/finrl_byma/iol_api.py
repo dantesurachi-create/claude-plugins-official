@@ -23,7 +23,7 @@ class IOLClient:
         self.username = username or os.environ.get("IOL_USERNAME")
         self.password = password or os.environ.get("IOL_PASSWORD")
         if not (self.username and self.password):
-            raise RuntimeError("Set IOL_USERNAME and IOL_PASSWORD to use the IOL API.")
+            raise RuntimeError("Falta tu usuario y contraseña de IOL.")
         self.session = requests.Session()
         self._token: dict[str, Any] | None = None
         self._expires = 0.0
@@ -40,7 +40,7 @@ class IOLClient:
             self._token = None
             return self._auth()
         if r.status_code in (400, 401):
-            raise PermissionError("IOL rejected the login. Check IOL_USERNAME, IOL_PASSWORD, and that API access is enabled for your account.")
+            raise PermissionError("IOL rechazó el ingreso. Revisá el usuario, la contraseña y que la API esté habilitada en tu cuenta.")
         r.raise_for_status()
         self._token = r.json()
         self._expires = time.time() + float(self._token.get("expires_in", 900))
@@ -62,7 +62,7 @@ class IOLClient:
         except ValueError:
             data = {"message": r.text[:300]}
         if not r.ok:
-            raise RuntimeError(f"IOL refused the order ({r.status_code}): {data}")
+            raise RuntimeError(f"IOL rechazó la orden ({r.status_code}): {data}")
         return data
 
     def portfolio_qty(self, symbol: str) -> int:

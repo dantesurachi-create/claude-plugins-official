@@ -63,38 +63,38 @@ class RealTrader:
     def act(self, side: str, max_ars: float | None = None) -> dict[str, Any]:
         """Bring the dish's real position in line with its call: buy on UP, sell on DOWN."""
         if not self.armed:
-            raise PermissionError("Real trading isn't armed.")
+            raise PermissionError("La plata real no está activada.")
         if side not in ("buy", "sell"):
-            raise ValueError("side must be buy or sell")
+            raise ValueError("side tiene que ser buy o sell")
         if not byma_open():
-            return {"skipped": "BYMA is closed"}
+            return {"skipped": "BYMA está cerrado"}
         now = time.time()
         if now - self.state["last_ts"] < self.min_interval:
-            return {"skipped": f"less than {self.min_interval:.0f}s since the last order"}
+            return {"skipped": f"pasaron menos de {self.min_interval:.0f} s desde la última orden"}
         if self._count_today() >= self.max_orders:
             self.armed = False
-            return {"skipped": f"daily limit of {self.max_orders} orders reached; real trading disarmed"}
+            return {"skipped": f"se alcanzó el límite de {self.max_orders} órdenes por día; plata real desactivada"}
 
         held = self.iol.portfolio_qty(SYMBOL)
         owned = min(self.state["owned"], held)  # a buy that never filled doesn't count
         q = self.iol.quote(SYMBOL)
         if not q or not q["price"]:
-            raise RuntimeError("IOL returned no SPY price")
+            raise RuntimeError("IOL no devolvió precio de SPY")
         last = q["price"]
 
         if side == "buy":
             if owned > 0:
                 self.state["owned"] = owned
-                return {"skipped": f"already holding {owned} SPY bought by the dish"}
+                return {"skipped": f"ya tiene {owned} SPY comprados por la placa"}
             budget = min(self.max_ars, float(max_ars or self.max_ars))
             price = last * (1 + SLIPPAGE)
             qty = math.floor(budget / price)
             if qty < 1:
-                return {"skipped": f"ARS {budget:,.0f} doesn't buy one SPY at {price:,.2f}"}
+                return {"skipped": f"con ${budget:,.0f} no alcanza para un SPY a ${price:,.2f}"}
         else:
             if owned < 1:
                 self.state["owned"] = 0
-                return {"skipped": "the dish holds no SPY to sell"}
+                return {"skipped": "la placa no tiene SPY para vender"}
             price, qty = last * (1 - SLIPPAGE), owned
 
         res = self.iol.order(side, SYMBOL, qty, price, self.plazo)

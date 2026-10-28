@@ -23,7 +23,7 @@ def load_tradingview_csv(path: str | Path, tic: str | None = None) -> pd.DataFra
     raw = pd.read_csv(path)
     raw.columns = [c.strip().lower() for c in raw.columns]
     if "time" not in raw.columns or "close" not in raw.columns:
-        raise ValueError(f"{path}: expected TradingView columns time, open, high, low, close")
+        raise ValueError(f"{path}: faltan las columnas de TradingView time, open, high, low, close")
     t = raw["time"]
     # TradingView exports time either as UNIX seconds or as ISO 8601, depending on the export setting.
     if pd.api.types.is_numeric_dtype(t):

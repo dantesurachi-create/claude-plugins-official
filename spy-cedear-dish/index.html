@@ -1,5 +1,7 @@
 <meta charset="utf-8">
-<title>SPY CEDEAR Dish</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e1312">
+<title>Placa SPY CEDEAR</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -21,6 +23,8 @@
   --s1: #3987e5; --s2: #d95926; --s3: #199e70; --hit: #3fbf72; --miss: #ef6b6a; --cell: #5fa3f0; --noise: #ef6b6a; color-scheme: dark; }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; }
 body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
 .wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 48px;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
@@ -107,126 +111,127 @@ canvas.chart { width: 100%; height: 100%; display: block; }
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">BYMA · CEDEAR SPY · ratio 20:1 · priced in ARS via CCL</div>
-    <h1>Teach a dish of neurons to trade SPY</h1>
-    <p>A simulated culture of 48 neurons watches the SPY CEDEAR each day and calls it up or down. Like the DishBrain experiment, it gets no reward signal. A miss floods the dish with unpredictable noise. A hit gives it a calm, regular beat. The cells drift toward whatever wiring keeps the world predictable.</p>
+    <div class="eyebrow">BYMA · CEDEAR SPY · ratio 20:1 · en pesos vía CCL</div>
+    <h1>Enseñale a una placa de neuronas a operar SPY</h1>
+    <p>Un cultivo simulado de 48 neuronas mira el CEDEAR de SPY y decide si va a subir o a bajar. Como en el experimento DishBrain, no recibe premios. Cuando se equivoca, la placa se llena de ruido impredecible. Cuando acierta, recibe un pulso tranquilo y regular. Las células se reorganizan para que el mundo les resulte predecible.</p>
   </header>
 
   <div class="bench">
-    <section class="panel" aria-label="Neuron culture">
-      <div class="chart-head"><h2>The culture</h2><span class="eyebrow" id="dayLabel">Day 0</span></div>
+    <section class="panel" aria-label="Cultivo de neuronas">
+      <div class="chart-head"><h2>El cultivo</h2><span class="eyebrow" id="dayLabel">Paso 0</span></div>
       <div class="dish-box">
-        <canvas id="dish" aria-label="Animated dish of neurons"></canvas>
-        <div class="verdict" id="verdict">WAITING</div>
+        <canvas id="dish" aria-label="Placa de neuronas animada"></canvas>
+        <div class="verdict" id="verdict">ESPERANDO</div>
       </div>
       <div class="legend-dish">
-        <span style="--c: var(--muted)">sensory electrodes (market in)</span>
-        <span style="--c: var(--cell)">culture neurons</span>
-        <span style="--c: var(--s3)">motor UP</span>
-        <span style="--c: var(--s2)">motor DOWN</span>
+        <span style="--c: var(--muted)">electrodos sensoriales (entrada del mercado)</span>
+        <span style="--c: var(--cell)">neuronas del cultivo</span>
+        <span style="--c: var(--s3)">motor SUBE</span>
+        <span style="--c: var(--s2)">motor BAJA</span>
       </div>
       <div class="meters">
-        <div class="meter"><span>Surprise (noise)</span><div class="bar"><i id="mNoise" style="background: var(--miss)"></i></div><b id="vNoise">0%</b></div>
-        <div class="meter"><span>Exploration</span><div class="bar"><i id="mTemp"></i></div><b id="vTemp">0%</b></div>
-        <div class="meter"><span>Hit rate, 20 d</span><div class="bar"><i id="mHit" style="background: var(--hit)"></i></div><b id="vHit">–</b></div>
+        <div class="meter"><span>Sorpresa (ruido)</span><div class="bar"><i id="mNoise" style="background: var(--miss)"></i></div><b id="vNoise">0%</b></div>
+        <div class="meter"><span>Exploración</span><div class="bar"><i id="mTemp"></i></div><b id="vTemp">0%</b></div>
+        <div class="meter"><span>Aciertos, 20 pasos</span><div class="bar"><i id="mHit" style="background: var(--hit)"></i></div><b id="vHit">–</b></div>
       </div>
     </section>
 
-    <section class="panel" aria-label="Market and controls">
-      <div class="chart-head"><h2>Market</h2><span class="feed" id="feed">CONNECTING</span></div>
-      <p class="fine" id="feedNote">Looking for the local FinRL data server…</p>
+    <section class="panel" aria-label="Mercado y controles">
+      <div class="chart-head"><h2>Mercado</h2><span class="feed" id="feed">CONECTANDO</span></div>
+      <p class="fine" id="feedNote">Buscando el servidor local de datos…</p>
       <div class="tiles">
-        <div class="tile"><div class="k">SPY CEDEAR</div><div class="v" id="tPx">–</div><div class="sub" id="tPxChg">–</div></div>
+        <div class="tile"><div class="k">CEDEAR SPY</div><div class="v" id="tPx">–</div><div class="sub" id="tPxChg">–</div></div>
         <div class="tile"><div class="k" id="kSpy">SPY (USD)</div><div class="v" id="tSpy">–</div><div class="sub" id="tSpyChg">–</div></div>
         <div class="tile"><div class="k" id="kCcl">Dólar CCL</div><div class="v" id="tCcl">–</div><div class="sub" id="tCclChg">–</div></div>
-        <div class="tile"><div class="k" id="kDish">Dish equity</div><div class="v" id="tDish">–</div><div class="sub" id="tDishR">–</div></div>
-        <div class="tile"><div class="k">Your equity</div><div class="v" id="tYou">–</div><div class="sub" id="tYouR">–</div></div>
-        <div class="tile"><div class="k">Buy &amp; hold</div><div class="v" id="tHold">–</div><div class="sub" id="tHoldR">–</div></div>
+        <div class="tile"><div class="k" id="kDish">Capital de la placa</div><div class="v" id="tDish">–</div><div class="sub" id="tDishR">–</div></div>
+        <div class="tile"><div class="k">Tu capital</div><div class="v" id="tYou">–</div><div class="sub" id="tYouR">–</div></div>
+        <div class="tile"><div class="k">Comprar y mantener</div><div class="v" id="tHold">–</div><div class="sub" id="tHoldR">–</div></div>
       </div>
       <div class="controls">
-        <button class="primary" id="btnRun">Run</button>
-        <button id="btnStep">Next step</button>
-        <button id="btnReset">Restart</button>
-        <label class="file" for="csv">Load TradingView CSV<input id="csv" type="file" accept=".csv,text/csv" multiple></label>
-        <button id="btnSound" aria-pressed="false">Sound off</button>
-        <label class="speed" for="speed">Speed <input id="speed" type="range" min="1" max="30" value="6"> <span id="speedV">6 steps/s</span></label>
+        <button class="primary" id="btnRun">Iniciar</button>
+        <button id="btnStep">Siguiente paso</button>
+        <button id="btnReset">Reiniciar</button>
+        <label class="file" for="csv">Cargar CSV de TradingView<input id="csv" type="file" accept=".csv,text/csv" multiple></label>
+        <button id="btnSound" aria-pressed="false">Sonido apagado</button>
+        <label class="speed" for="speed">Velocidad <input id="speed" type="range" min="1" max="30" value="6"> <span id="speedV">6 pasos/s</span></label>
       </div>
       <div class="setup">
-        <label for="mode">Mode
+        <label for="mode">Modo
           <select id="mode">
-            <option value="sim">Simulated market</option>
-            <option value="paper">Paper trading · real prices, fake money</option>
-            <option value="real">Real money · IOL account</option>
+            <option value="sim">Mercado simulado</option>
+            <option value="paper">Práctica · precios reales, plata ficticia</option>
+            <option value="real">Plata real · cuenta IOL</option>
           </select>
         </label>
-        <label for="interval">Trading interval
+        <label for="interval">Intervalo de operación
           <select id="interval">
-            <option value="15">15 seconds</option>
-            <option value="30">30 seconds</option>
-            <option value="60" selected>1 minute</option>
-            <option value="300">5 minutes</option>
-            <option value="900">15 minutes</option>
-            <option value="1800">30 minutes</option>
-            <option value="3600">1 hour</option>
-            <option value="day">Once a day</option>
+            <option value="15">15 segundos</option>
+            <option value="30">30 segundos</option>
+            <option value="60" selected>1 minuto</option>
+            <option value="300">5 minutos</option>
+            <option value="900">15 minutos</option>
+            <option value="1800">30 minutos</option>
+            <option value="3600">1 hora</option>
+            <option value="day">Una vez por día</option>
           </select>
         </label>
-        <label for="cost">Cost per trade, %
+        <label for="cost">Costo por operación, %
           <input id="cost" type="number" min="0" max="3" step="0.1" value="0.5">
         </label>
       </div>
       <p class="fine" id="modeNote"></p>
       <div class="realbox" id="realBox" hidden>
-        <div class="eyebrow">Real money</div>
-        <p id="realNote">Checking whether the server allows real trading…</p>
+        <div class="eyebrow">Plata real</div>
+        <p id="realNote">Consultando si el servidor permite operar con plata real…</p>
         <div class="setup">
-          <label for="maxArs">Most per buy, ARS <input id="maxArs" type="number" min="1000" step="1000" value="50000"></label>
-          <label for="code">Arming code <input id="code" type="password" autocomplete="off" placeholder="shown in the server terminal"></label>
+          <label for="maxArs">Máximo por compra, ARS <input id="maxArs" type="number" min="1000" step="1000" value="50000"></label>
+          <label for="code">Código de activación <input id="code" type="password" autocomplete="off" placeholder="lo muestra la terminal"></label>
         </div>
-        <label class="ack" for="ack"><input id="ack" type="checkbox"> I understand the dish will place real buy and sell orders for SPY in my IOL account, and I can lose money.</label>
+        <label class="ack" for="ack"><input id="ack" type="checkbox"> Entiendo que la placa va a mandar órdenes reales de compra y venta de SPY en mi cuenta de IOL, y que puedo perder plata.</label>
         <div class="controls">
-          <button id="btnArm" class="danger">Arm real trading</button>
-          <button id="btnDisarm">Stop real trading</button>
+          <button id="btnArm" class="danger">Activar plata real</button>
+          <button id="btnDisarm">Detener plata real</button>
         </div>
         <div class="log" id="orders" aria-live="polite"></div>
       </div>
       <div class="you">
-        <div class="eyebrow">Your position</div>
+        <div class="eyebrow">Tu posición</div>
         <div class="controls">
-          <button id="btnLong" aria-pressed="false">Hold CEDEARs</button>
-          <button id="btnCash" aria-pressed="true">Stay in pesos</button>
+          <button id="btnLong" aria-pressed="false">Tener CEDEARs</button>
+          <button id="btnCash" aria-pressed="true">Quedarme en pesos</button>
         </div>
-        <p>Play against the dish. Your position applies from the next step until you change it. Everyone starts with ARS 1.000.000.</p>
+        <p>Jugá contra la placa. Tu posición rige desde el próximo paso hasta que la cambies. Todos arrancan con $1.000.000.</p>
       </div>
       <div class="log" id="log" aria-live="polite"></div>
     </section>
   </div>
 
-  <section class="panel" aria-label="Performance over time">
+  <section class="panel" aria-label="Rendimiento en el tiempo">
     <div class="chart-head">
-      <h2>Performance over time</h2>
+      <h2>Rendimiento en el tiempo</h2>
       <div class="legend">
-        <span style="--c: var(--s1)">Dish</span>
-        <span style="--c: var(--s2)">You</span>
-        <span style="--c: var(--s3)">Buy &amp; hold</span>
+        <span style="--c: var(--s1)">Placa</span>
+        <span style="--c: var(--s2)">Vos</span>
+        <span style="--c: var(--s3)">Comprar y mantener</span>
       </div>
     </div>
-    <div class="chart-box"><canvas class="chart" id="cEq" aria-label="Equity in ARS millions by day"></canvas><div class="tip" id="tipEq" hidden></div></div>
-    <div class="chart-head"><span class="eyebrow">Dish hit rate, rolling 20 days · 50% is a coin flip</span></div>
-    <div class="chart-box small"><canvas class="chart" id="cHit" aria-label="Dish rolling hit rate"></canvas><div class="tip" id="tipHit" hidden></div></div>
+    <div class="chart-box"><canvas class="chart" id="cEq" aria-label="Capital en millones de pesos por paso"></canvas><div class="tip" id="tipEq" hidden></div></div>
+    <div class="chart-head"><span class="eyebrow">Aciertos de la placa, últimos 20 pasos · 50% es tirar una moneda</span></div>
+    <div class="chart-box small"><canvas class="chart" id="cHit" aria-label="Aciertos de la placa"></canvas><div class="tip" id="tipHit" hidden></div></div>
   </section>
 
   <section class="notes">
-    <div><h3>How a day works</h3><p>Before the open, six market features (yesterday's move, the 5- and 20-day trend, distance from the average, volatility, the CCL move) stimulate 12 sensory electrodes. The culture settles, and whichever motor region fires harder sets the call: up means hold CEDEARs, down means sit in pesos.</p></div>
-    <div><h3>Miss: noise</h3><p>A wrong call triggers a burst of random stimulation that lingers for days, and the synapses that drove the call get weakened and jittered. Unpredictable input is what the culture is trying to avoid.</p></div>
-    <div><h3>Hit: a calm beat</h3><p>A right call gets a steady, predictable pulse. The active pathway is strengthened (Hebbian: cells that fire together wire together) and exploration drops.</p></div>
-    <div><h3>Real prices</h3><p>On <a href="https://www.tradingview.com/symbols/BCBA-SPY/" target="_blank" rel="noopener">TradingView</a>, open BCBA:SPY on a daily chart and choose Export chart data. Load that CSV here; add BCBA:SPYC too and the CCL is implied as SPY ÷ SPYC. For live quotes, run the FinRL server in this folder with your InvertirOnline login (or BYMA Market Data credentials). It trades SPY during market hours (11:00 to 17:00 Buenos Aires time). Without real data the game runs a simulation. This is a toy for learning, not investment advice.</p></div>
+    <div><h3>Cómo funciona un paso</h3><p>Seis señales del mercado (el último movimiento, la tendencia de 5 y 20 pasos, la distancia al promedio, la volatilidad y el movimiento del CCL) estimulan 12 electrodos sensoriales. El cultivo se acomoda, y la región motora que más se activa decide: sube significa tener CEDEARs, baja significa quedarse en pesos.</p></div>
+    <div><h3>Error: ruido</h3><p>Una predicción errada dispara una ráfaga de estímulos al azar que dura varios pasos, y las sinapsis que llevaron a esa decisión se debilitan y se sacuden. El cultivo intenta evitar justamente lo impredecible.</p></div>
+    <div><h3>Acierto: pulso tranquilo</h3><p>Una predicción correcta recibe un pulso regular y predecible. El camino que se activó se refuerza (Hebb: las neuronas que se disparan juntas se conectan) y baja la exploración.</p></div>
+    <div><h3>Precios reales</h3><p>Con la app instalada en tu computadora, la placa aprende con el historial de SPY de tu cuenta de InvertirOnline y después opera los precios en vivo, de 11 a 17 (hora de Buenos Aires). También podés exportar BCBA:SPY desde <a href="https://www.tradingview.com/symbols/BCBA-SPY/" target="_blank" rel="noopener">TradingView</a> (y BCBA:SPYC para calcular el CCL como SPY ÷ SPYC) y cargar el CSV acá. Sin datos reales, la app usa un mercado simulado. Es un juego para aprender, no una recomendación de inversión.</p></div>
   </section>
 </div>
 
 <script>
 (() => {
   "use strict";
+  document.documentElement.lang = "es-AR";
   const $ = id => document.getElementById(id);
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const fmtARS = v => "$" + Math.round(v).toLocaleString("es-AR");
@@ -264,7 +269,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
         let c = 0.0005 + 0.2 * st.lastC + 0.006 * gauss();
         if (rand() < 0.01) c += 0.04 + 0.04 * rand(); // CCL jump
         st.lastR = r; st.lastC = c; st.spy *= Math.exp(r); st.ccl *= Math.exp(c); st.n++;
-        return { label: "Day " + (st.n - 26), px: st.spy * st.ccl / RATIO, spy: st.spy, ccl: st.ccl };
+        return { label: "Día " + (st.n - 26), px: st.spy * st.ccl / RATIO, spy: st.spy, ccl: st.ccl };
       },
     };
   }
@@ -274,10 +279,10 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     try {
       const r = await fetch(url, { signal: ctl.signal, cache: "no-store" });
       const body = await r.json().catch(() => null);
-      if (!r.ok) throw new Error((body && body.error) || "the data server answered " + r.status);
+      if (!r.ok) throw new Error((body && body.error) || "el servidor de datos respondió " + r.status);
       return body;
     } catch (e) {
-      throw new Error(e.name === "AbortError" ? "the data server timed out" : e instanceof TypeError ? "no local data server is running" : e.message);
+      throw new Error(e.name === "AbortError" ? "el servidor de datos no respondió a tiempo" : e instanceof TypeError ? "no está corriendo el servidor local de datos" : e.message);
     } finally { clearTimeout(t); }
   }
   const num = v => { const n = typeof v === "string" ? parseFloat(v) : v; return Number.isFinite(n) && n > 0 ? n : null; };
@@ -287,7 +292,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   async function loadServerBars() {
     const body = await getJSON("api/history");
     const bars = (body && body.bars || []).filter(b => num(b.px)).map(b => ({ label: b.label, px: b.px, ccl: num(b.ccl), spy: num(b.ccl) ? b.px * RATIO / b.ccl : null }));
-    if (bars.length < 60) throw new Error("the data server has fewer than 60 days of SPY history");
+    if (bars.length < 60) throw new Error("el servidor de datos tiene menos de 60 días de historial de SPY");
     serverSource = body.source || "your FinRL server";
     return bars.slice(-520);
   }
@@ -296,7 +301,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   function parseTradingViewCSV(text) {
     const lines = text.trim().split(/\r?\n/), head = lines[0].split(",").map(h => h.trim().toLowerCase());
     const it = head.indexOf("time"), ic = head.indexOf("close");
-    if (it < 0 || ic < 0) throw new Error("this isn't a TradingView export (no time and close columns)");
+    if (it < 0 || ic < 0) throw new Error("no es una exportación de TradingView (faltan las columnas time y close)");
     const rows = [];
     for (const ln of lines.slice(1)) {
       const c = ln.split(","), t = c[it], close = num(c[ic]);
@@ -314,8 +319,8 @@ canvas.chart { width: 100%; height: 100%; display: block; }
       const rows = parseTradingViewCSV(await f.text()), tic = tickerOf(f.name);
       if (tic === "SPYC" || tic === "SPYD") usd = new Map(rows.map(r => [r.date, r.c])); else ars = rows;
     }
-    if (!ars) throw new Error("pick the BCBA:SPY export (the pesos line); BCBA:SPYC is optional, for the CCL");
-    if (ars.length < 60) throw new Error("the SPY export has fewer than 60 days");
+    if (!ars) throw new Error("elegí la exportación de BCBA:SPY (en pesos); BCBA:SPYC es opcional, para el CCL");
+    if (ars.length < 60) throw new Error("la exportación de SPY tiene menos de 60 días");
     return ars.slice(-520).map(r => { const u = usd.get(r.date); return { label: r.date, px: r.c, ccl: u ? r.c / u : null, spy: u ? u * RATIO : null }; });
   }
   function realFeed(bars, source) {
@@ -332,7 +337,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   // Live quotes from IOL or BYMA, through the local server so the credentials never reach the page.
   const live = { ok: false, err: null, ccl: null, source: null, checked: null, day: null };
   const intervalSec = () => $("interval").value === "day" ? 60 : +$("interval").value;
-  const intervalName = () => $("interval").selectedOptions[0].textContent.toLowerCase();
+  const intervalName = () => $("interval").value === "day" ? "día" : $("interval").selectedOptions[0].textContent.toLowerCase();
   async function pollLive() {
     if (!S || S.feed.source !== "server" || !S.replayDone) return;
     const daily = $("interval").value === "day", t = baTime();
@@ -341,9 +346,9 @@ canvas.chart { width: 100%; height: 100%; display: block; }
       const q = await getJSON("api/quote");
       const px = num(q.px);
       if (num(q.ccl)) live.ccl = q.ccl;
-      live.source = q.source || "BYMA"; live.ok = !!px; live.err = px ? null : "the quote had no SPY price"; live.checked = baTime().hhmm;
+      live.source = q.source || "BYMA"; live.ok = !!px; live.err = px ? null : "la cotización no trajo precio de SPY"; live.checked = baTime().hhmm;
       if (px && bymaOpen() && (daily || px !== S.m.px[S.m.px.length - 1])) {
-        S.feed.queue.push({ label: (daily ? "Day " : "Live ") + (daily ? t.date : live.checked), px, ccl: live.ccl, spy: live.ccl ? px * RATIO / live.ccl : null });
+        S.feed.queue.push({ label: daily ? t.date : "En vivo " + live.checked, px, ccl: live.ccl, spy: live.ccl ? px * RATIO / live.ccl : null });
         live.day = t.date;
         stepDay();
       }
@@ -554,8 +559,8 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     g.globalAlpha = 1;
     g.fillStyle = cMuted; g.font = "600 11px " + css("--f-mono");
     g.textAlign = "right"; const u = motor(0, 0), dn = motor(1, NM - 1);
-    g.fillText("UP", u[0] - 8, u[1] - 8); g.fillText("DOWN", dn[0] - 8, dn[1] + 16);
-    g.textAlign = "left"; g.fillText("MARKET IN", cx - R * 0.86 + 12, cy + 4);
+    g.fillText("SUBE", u[0] - 8, u[1] - 8); g.fillText("BAJA", dn[0] - 8, dn[1] + 16);
+    g.textAlign = "left"; g.fillText("MERCADO", cx - R * 0.86 + 12, cy + 4);
   }
 
   // ---------- charts ----------
@@ -576,11 +581,11 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     if (!d) return t === 0 ? "" : "#" + t;
     const L = d.label || "";
     if (/^\d{4}-\d{2}-\d{2}$/.test(L)) {
-      const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+L.slice(5, 7) - 1];
+      const mon = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"][+L.slice(5, 7) - 1];
       return data.length < 200 ? +L.slice(8, 10) + " " + mon : mon + " " + L.slice(2, 4);
     }
-    if (L.startsWith("Live ")) return L.slice(5, 10);
-    return L.replace("Day ", "d");
+    if (L.startsWith("En vivo ")) return L.slice(8, 13);
+    return L.replace("Día ", "d");
   }
   function lineChart(cv, data, series, opts, hoverIdx) {
     const { g, W, H } = setupCanvas(cv);
@@ -625,13 +630,13 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     return { X, pad, cw, xMax };
   }
 
-  const eqSeries = () => [{ key: "dish", label: "Dish", color: css("--s1") }, { key: "you", label: "You", color: css("--s2") }, { key: "hold", label: "Hold", color: css("--s3") }];
+  const eqSeries = () => [{ key: "dish", label: "Placa", color: css("--s1") }, { key: "you", label: "Vos", color: css("--s2") }, { key: "hold", label: "Mantener", color: css("--s3") }];
   const hitSeries = () => [{ key: "v", label: "", color: css("--s1") }];
   const charts = {
     eq: { cv: $("cEq"), tip: $("tipEq"), hover: null, data: () => S.eq, series: eqSeries, opts: { fmtY: v => (v / 1e6).toFixed(2) + "M" },
-      tipHtml: d => `<div>${d.label}</div>` + eqSeries().map(s => `<div class="row"><span class="dot" style="--c:${s.color}"></span>${s.label === "Hold" ? "Buy & hold" : s.label} ${fmtARS(d[s.key])}</div>`).join("") },
+      tipHtml: d => `<div>${d.label}</div>` + eqSeries().map(s => `<div class="row"><span class="dot" style="--c:${s.color}"></span>${s.label === "Mantener" ? "Comprar y mantener" : s.label} ${fmtARS(d[s.key])}</div>`).join("") },
     hit: { cv: $("cHit"), tip: $("tipHit"), hover: null, data: () => S.hitRate, series: hitSeries, opts: { min: 0, max: 1, ticks: 4, ref: 0.5, fmtY: v => Math.round(v * 100) + "%" },
-      tipHtml: d => `<div>${d.label}</div><div>Hit rate ${(d.v * 100).toFixed(0)}%</div>` },
+      tipHtml: d => `<div>${d.label}</div><div>Aciertos ${(d.v * 100).toFixed(0)}%</div>` },
   };
   function drawChart(c) { c.geo = lineChart(c.cv, c.data(), c.series(), c.opts, c.hover); }
   for (const c of Object.values(charts)) {
@@ -656,30 +661,30 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   function renderAll() {
     const { m, dish } = S, n = m.px.length - 1;
     const real = S.feed.kind === "real";
-    $("dayLabel").textContent = S.day ? m.labels[n] : "Step 0";
+    $("dayLabel").textContent = S.day ? m.labels[n] : "Paso 0";
     const fe = $("feed"), note = $("feedNote");
-    const srcName = S.feed.source === "server" ? serverSource + " (via your FinRL server)" : "your TradingView export";
-    const pfx = S.mode === "real" ? (realCfg.armed ? "REAL MONEY · ARMED" : "REAL MONEY · OFF") : "PAPER";
+    const srcName = S.feed.source === "server" ? serverSource + " (vía tu servidor local)" : "tu exportación de TradingView";
+    const pfx = S.mode === "real" ? (realCfg.armed ? "PLATA REAL · ACTIVA" : "PLATA REAL · APAGADA") : "PRÁCTICA";
     if (real && S.replayDone && S.feed.source !== "server") {
-      fe.textContent = pfx + " · REPLAY DONE"; fe.className = "feed real";
-      note.textContent = "Replay of your TradingView export is done. Live quotes need the local FinRL server with your IOL login or BYMA credentials (see README).";
+      fe.textContent = pfx + " · HISTORIAL COMPLETO"; fe.className = "feed real";
+      note.textContent = "Terminó el historial de tu exportación de TradingView. Para precios en vivo, abrí la app instalada con tu usuario de IOL (ver README).";
     } else if (real && S.replayDone) {
-      fe.textContent = pfx + " · " + (!bymaOpen() ? "BYMA CLOSED" : live.ok ? "LIVE" : "WAITING"); fe.className = "feed " + (S.mode === "real" && realCfg.armed ? "money" : "real");
-      note.textContent = live.err ? `Live quote failed: ${live.err.replace(/\.$/, "")}. Retrying every ${intervalName()} while BYMA is open.`
-        : bymaOpen() ? `Trading live quotes from ${live.source || "your broker"}, every ${intervalName()}${live.checked ? " · last check " + live.checked + " ART" : ""}.`
-        : `BYMA is closed. The dish trades the next live quote after 11:00 ART${live.checked ? " · last check " + live.checked : ""}.`;
+      fe.textContent = pfx + " · " + (!bymaOpen() ? "BYMA CERRADO" : live.ok ? "EN VIVO" : "ESPERANDO"); fe.className = "feed " + (S.mode === "real" && realCfg.armed ? "money" : "real");
+      note.textContent = live.err ? `Falló la cotización en vivo: ${live.err.replace(/\.$/, "")}. Reintenta cada ${intervalName()} mientras BYMA esté abierto.`
+        : bymaOpen() ? `Operando precios en vivo de ${live.source || "tu broker"}, cada ${intervalName()}${live.checked ? " · última consulta " + live.checked : ""}.`
+        : `BYMA está cerrado. La placa opera el próximo precio después de las 11:00${live.checked ? " · última consulta " + live.checked : ""}.`;
     } else if (real) {
-      fe.textContent = pfx + " · TRAINING"; fe.className = "feed real";
-      note.textContent = `Training on ${S.feed.queue.length + S.day} daily closes from ${srcName}, ${S.feed.queue.length} to go.`;
+      fe.textContent = pfx + " · ENTRENANDO"; fe.className = "feed real";
+      note.textContent = `Entrenando con ${S.feed.queue.length + S.day} cierres diarios de ${srcName}; faltan ${S.feed.queue.length}.`;
     } else {
-      fe.textContent = "SIMULATED"; fe.className = "feed sim";
-      note.textContent = feedErr ? `Real data unavailable: ${feedErr}. Showing a simulated market. Load a TradingView export, or run the FinRL server with your IOL login for live quotes.` : "Simulated market. Load a TradingView export of BCBA:SPY to train on real prices.";
+      fe.textContent = "SIMULADO"; fe.className = "feed sim";
+      note.textContent = feedErr ? `Sin datos reales: ${feedErr}. Mostrando un mercado simulado. Cargá una exportación de TradingView, o abrí la app instalada con tu usuario de IOL para precios en vivo.` : "Mercado simulado. Cargá una exportación de BCBA:SPY de TradingView para entrenar con precios reales.";
     }
-    $("kDish").textContent = S.mode === "real" ? "Dish equity (virtual)" : "Dish equity";
+    $("kDish").textContent = S.mode === "real" ? "Capital de la placa (virtual)" : "Capital de la placa";
     renderReal();
     $("tPx").textContent = fmtARS(m.px[n]); chg($("tPxChg"), m.px[n] / m.px[n - 1] - 1);
     const useLive = real && S.replayDone && live.ccl, ccl = useLive ? live.ccl : m.cclHist[n], spyU = !useLive && m.spyHist[n] ? m.spyHist[n] : ccl ? m.px[n] * RATIO / ccl : null;
-    $("kSpy").textContent = real ? "SPY implied (USD)" : "SPY (USD)";
+    $("kSpy").textContent = real ? "SPY implícito (USD)" : "SPY (USD)";
     $("kCcl").textContent = real ? "Dólar CCL · SPY ÷ SPYC" : "Dólar CCL";
     $("tSpy").textContent = spyU ? "US$" + spyU.toFixed(2) : "–";
     if (m.spyHist[n] && m.spyHist[n - 1]) chg($("tSpyChg"), m.spyHist[n] / m.spyHist[n - 1] - 1); else $("tSpyChg").textContent = "";
@@ -690,13 +695,13 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     $("tYou").textContent = fmtM(last.you); chg($("tYouR"), last.you / START - 1);
     $("tHold").textContent = fmtM(last.hold); chg($("tHoldR"), last.hold / START - 1);
     const v = $("verdict");
-    if (S.last) { v.textContent = (S.last.hit ? "HIT · calm beat" : "MISS · noise") + " · called " + (S.last.up ? "UP" : "DOWN"); v.className = "verdict " + (S.last.hit ? "hit" : "miss"); }
-    else { v.textContent = "WAITING · press Run"; v.className = "verdict"; }
+    if (S.last) { v.textContent = (S.last.hit ? "ACIERTO · pulso tranquilo" : "ERROR · ruido") + " · dijo " + (S.last.up ? "SUBE" : "BAJA"); v.className = "verdict " + (S.last.hit ? "hit" : "miss"); }
+    else { v.textContent = "ESPERANDO · tocá Iniciar"; v.className = "verdict"; }
     $("mNoise").style.width = dish.noise * 100 + "%"; $("vNoise").textContent = Math.round(dish.noise * 100) + "%";
     $("mTemp").style.width = dish.temp * 100 + "%"; $("vTemp").textContent = Math.round(dish.temp * 100) + "%";
     const hr = S.hitRate[S.hitRate.length - 1];
     $("mHit").style.width = (hr ? hr.v * 100 : 0) + "%"; $("vHit").textContent = hr ? Math.round(hr.v * 100) + "%" : "–";
-    $("log").innerHTML = S.log.slice(0, 30).map(l => `<div><span>${l.label}</span><span>call ${l.up ? "UP" : "DOWN"}</span><span>${pct(l.r)}</span><span class="${l.hit ? "h" : "m"}">${l.hit ? "HIT" : "MISS"}</span></div>`).join("");
+    $("log").innerHTML = S.log.slice(0, 30).map(l => `<div><span>${l.label}</span><span>dijo ${l.up ? "SUBE" : "BAJA"}</span><span>${pct(l.r)}</span><span class="${l.hit ? "h" : "m"}">${l.hit ? "ACIERTO" : "ERROR"}</span></div>`).join("");
     $("btnLong").setAttribute("aria-pressed", String(S.youLongNext)); $("btnCash").setAttribute("aria-pressed", String(!S.youLongNext));
     drawChart(charts.eq); drawChart(charts.hit);
   }
@@ -711,7 +716,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     drawDish(now);
     requestAnimationFrame(frame);
   }
-  function setRunning(v) { running = v; $("btnRun").textContent = running ? "Pause" : "Run"; }
+  function setRunning(v) { running = v; $("btnRun").textContent = running ? "Pausar" : "Iniciar"; }
   $("btnRun").onclick = () => setRunning(!running);
   $("btnStep").onclick = () => { setRunning(false); stepDay(); };
   $("btnReset").onclick = () => { setRunning(false); start(S.feed.kind === "real" && realBars ? realFeed(realBars, realSource) : simFeed()); };
@@ -726,7 +731,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   $("interval").onchange = () => { scheduleLive(); renderAll(); };
   $("cost").onchange = () => renderAll();
   $("btnArm").onclick = async () => {
-    if (!$("ack").checked) { realMsg = "Tick the box to confirm you understand the risk."; return renderAll(); }
+    if (!$("ack").checked) { realMsg = "Marcá la casilla para confirmar que entendés el riesgo."; return renderAll(); }
     const r = await realCall("api/arm", { code: $("code").value });
     if (r && S.feed.source === "server" && !S.replayDone) fastForward();
   };
@@ -742,11 +747,11 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     soundOn = !soundOn;
     if (soundOn && !ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { soundOn = false; } }
     if (ac && ac.state === "suspended") ac.resume();
-    $("btnSound").textContent = soundOn ? "Sound on" : "Sound off"; $("btnSound").setAttribute("aria-pressed", String(soundOn));
+    $("btnSound").textContent = soundOn ? "Sonido encendido" : "Sonido apagado"; $("btnSound").setAttribute("aria-pressed", String(soundOn));
   };
   $("btnLong").onclick = () => { S.youLongNext = true; renderAll(); };
   $("btnCash").onclick = () => { S.youLongNext = false; renderAll(); };
-  speed.oninput = () => { $("speedV").textContent = speed.value + " steps/s"; };
+  speed.oninput = () => { $("speedV").textContent = speed.value + " pasos/s"; };
   addEventListener("resize", () => renderAll());
   matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => renderAll());
   new MutationObserver(() => renderAll()).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
@@ -754,10 +759,10 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   let realBars = null, realSource = null, feedErr = null;
 
   // ---------- real money ----------
-  let realCfg = { available: false, armed: false, reason: "Real trading needs the FinRL server (see README)." }, realMsg = "";
+  let realCfg = { available: false, armed: false, reason: "Para operar con plata real hace falta la app instalada en tu computadora (ver README)." }, realMsg = "";
   async function loadConfig() {
     try { const c = await getJSON("api/config"); realCfg = { ...c.real, armed: !!c.real.armed }; }
-    catch (e) { realCfg = { available: false, armed: false, reason: "Real trading needs the FinRL server running on this computer (see README)." }; }
+    catch (e) { realCfg = { available: false, armed: false, reason: "Para operar con plata real hace falta la app instalada y abierta en tu computadora (ver README)." }; }
     if (realCfg.maxArs) $("maxArs").max = realCfg.maxArs;
     renderAll();
   }
@@ -765,11 +770,11 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     try {
       const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
       const j = await r.json();
-      if (!r.ok) throw new Error(j.error || "the server answered " + r.status);
+      if (!r.ok) throw new Error(j.error || "el servidor respondió " + r.status);
       const st = j.status || j;
       realCfg = { ...realCfg, ...st, armed: !!st.armed };
-      realMsg = j.order ? `Sent: ${j.order.side} ${j.order.qty} SPY at ${fmtARS(j.order.price)}${j.order.operation ? " · operation " + j.order.operation : ""}`
-        : j.skipped ? "No order: " + j.skipped : url.endsWith("arm") && !url.endsWith("disarm") ? "Armed. The dish now trades your IOL account." : "Real trading stopped.";
+      realMsg = j.order ? `Enviada: ${j.order.side === "buy" ? "compra" : "venta"} de ${j.order.qty} SPY a ${fmtARS(j.order.price)}${j.order.operation ? " · operación " + j.order.operation : ""}`
+        : j.skipped ? "Sin orden: " + j.skipped : url.endsWith("arm") && !url.endsWith("disarm") ? "Activado. La placa ya opera tu cuenta de IOL." : "Plata real detenida.";
       return j;
     } catch (e) { realMsg = e.message; return null; }
     finally { renderAll(); }
@@ -788,18 +793,18 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     $("realBox").hidden = !real;
     $("mode").querySelector('[value="real"]').disabled = !realCfg.available;
     for (const o of $("interval").options) o.disabled = real && o.value !== "day" && +o.value < (realCfg.minInterval || 0);
-    $("modeNote").textContent = S.mode === "sim" ? "A made-up market. Nothing is real."
-      : real ? "Live prices, and the dish trades your real IOL account while armed. Charts still show the virtual ARS 1.000.000 game."
-      : "Live prices when the FinRL server is running, but the money is fake. Nothing is sent to your broker.";
+    $("modeNote").textContent = S.mode === "sim" ? "Un mercado inventado. Nada es real."
+      : real ? "Precios en vivo, y la placa opera tu cuenta real de IOL mientras esté activada. Los gráficos siguen mostrando el juego virtual de $1.000.000."
+      : "Precios reales con la app instalada, pero la plata es ficticia. No se manda nada a tu broker.";
     if (real && $("interval").selectedOptions[0].disabled) { $("interval").value = [...$("interval").options].find(o => !o.disabled).value; scheduleLive(); }
     if (!real) return;
     $("realNote").textContent = (realMsg ? realMsg + " · " : "") + (!realCfg.available ? realCfg.reason
-      : realCfg.armed ? `Armed. Buys up to ARS ${Number(realCfg.maxArs).toLocaleString("es-AR")} of SPY on UP, sells what it bought on DOWN. ${realCfg.ordersToday}/${realCfg.maxOrders} orders today.`
-      : `Off. Server limits: ARS ${Number(realCfg.maxArs).toLocaleString("es-AR")} per buy, ${realCfg.minInterval}s between orders, ${realCfg.maxOrders} orders a day.`);
+      : realCfg.armed ? `Activada. Con SUBE compra SPY hasta $${Number(realCfg.maxArs).toLocaleString("es-AR")}; con BAJA vende lo que compró. ${realCfg.ordersToday}/${realCfg.maxOrders} órdenes hoy.`
+      : `Apagada. Límites: $${Number(realCfg.maxArs).toLocaleString("es-AR")} por compra, ${realCfg.minInterval} s entre órdenes, ${realCfg.maxOrders} órdenes por día.`);
     $("btnArm").disabled = !realCfg.available || realCfg.armed;
     $("btnDisarm").disabled = !realCfg.armed;
     $("orders").innerHTML = (realCfg.orders || []).slice().reverse().map(o =>
-      `<div><span>${o.time.slice(5, 16)}</span><span>${o.side.toUpperCase()} ${o.qty}</span><span>${fmtARS(o.price)}</span><span>${o.operation ?? ""}</span></div>`).join("");
+      `<div><span>${o.time.slice(5, 16)}</span><span>${o.side === "buy" ? "COMPRA" : "VENTA"} ${o.qty}</span><span>${fmtARS(o.price)}</span><span>${o.operation ?? ""}</span></div>`).join("");
   }
   function start(feed) {
     seed = (Date.now() % 2147483646) + 1;
@@ -819,7 +824,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   $("mode").value = "sim";
   start(simFeed()); // something to look at while the real data loads
   feedErr = null;
-  $("feed").textContent = "CONNECTING"; $("feed").className = "feed"; $("feedNote").textContent = "Looking for the local FinRL data server…";
+  $("feed").textContent = "CONECTANDO"; $("feed").className = "feed"; $("feedNote").textContent = "Buscando el servidor local de datos…";
   boot();
   loadConfig();
   // Installable app (and offline shell) when served by the FinRL server on this computer.

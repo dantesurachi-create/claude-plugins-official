@@ -1,8 +1,6 @@
-finrl
+# The app: real-time quotes, history and the dish
 pandas
 numpy
 requests
 stockstats
-gymnasium
-matplotlib
-stable-baselines3
+tzdata
