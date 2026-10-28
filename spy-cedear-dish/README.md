@@ -48,6 +48,26 @@ Te pide usuario y contraseña de IOL. No se guardan en ningún archivo; si apret
 
 En Chrome o Edge también podés instalarla como app: con la app abierta en `http://localhost:8000`, elegí **Instalar app** en la barra de direcciones. Igual necesita que `iniciar` esté corriendo para tener precios.
 
+## En el celular (Android)
+
+La app corre en tu computadora y la abrís desde el celular por el Wi-Fi de tu casa. La computadora tiene que quedar prendida con la app abierta mientras opera.
+
+1. Abrí la app con **`iniciar-con-celular.bat`** (Windows) o `./iniciar.sh --celular` (Mac/Linux).
+   En Windows, si aparece el aviso del firewall, permití el acceso en **redes privadas**.
+2. Conectá el celular **al mismo Wi-Fi** que la computadora.
+3. Escaneá con la cámara del celular el código QR. Aparece en la terminal y en la app, en **Abrir en el celular**. Se abre en Chrome y el celular queda emparejado.
+4. En Chrome tocá **⋮ → Agregar a la pantalla principal** para tenerla como una app más.
+
+Seguridad:
+
+- Solo entran los dispositivos que escanearon el código; cualquier otro equipo de la red ve un aviso.
+- El código cambia cada vez que abrís la app, así que después de reiniciar hay que volver a escanear.
+- No compartas el código QR.
+- Tu usuario y contraseña de IOL quedan solo en la computadora.
+- La conexión por Wi-Fi no está cifrada. Usala solo en la red de tu casa, no en Wi-Fi públicas.
+
+Cada pantalla (la computadora y el celular) corre su propia placa. Con plata real, **opera solo la pantalla que la activó**: si la activás desde el celular, dejalo con la app abierta. La app evita que la pantalla se apague mientras opera en vivo.
+
 ## Modos
 
 | Modo | Precios | Plata |
@@ -63,8 +83,8 @@ En Chrome o Edge también podés instalarla como app: con la app abierta en `htt
 
 Viene apagada. Para habilitarla:
 
-- **Windows:** doble clic en `iniciar-plata-real.bat`. Te pregunta el máximo en pesos por compra.
-- **Mac / Linux:** `./iniciar.sh --real --max-ars 20000`.
+- **Windows:** doble clic en `iniciar-plata-real.bat`. Te pregunta el máximo en pesos por compra y si querés abrirla también desde el celular.
+- **Mac / Linux:** `./iniciar.sh --real --max-ars 20000` (sumá `--celular` para el teléfono).
 
 La terminal muestra un **código de activación**. En la app elegí **Plata real**, escribí el código, marcá la casilla de confirmación y tocá **Activar plata real**. Desde ahí la placa:
 
@@ -77,7 +97,7 @@ Protecciones:
 - Como mucho 1 orden por minuto y 20 por día. Al llegar al límite diario se desactiva sola. Se puede cambiar con `DISH_MIN_INTERVAL` y `DISH_MAX_ORDERS_PER_DAY`.
 - Solo manda órdenes con BYMA abierto.
 - **Detener plata real** la apaga al instante.
-- La app solo acepta pedidos de tu propia computadora.
+- La app solo acepta pedidos de tu computadora y de los celulares emparejados.
 
 Las órdenes son a precio límite, 0,5% del otro lado del último precio, válidas hasta el final del día, con liquidación a 24 h (`DISH_PLAZO=t1`).
 

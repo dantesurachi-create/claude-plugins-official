@@ -61,7 +61,7 @@ def main() -> None:
         print("Sin IOL: la app arranca con el mercado simulado o tus exportaciones de TradingView.")
         a.source, a.live = "tradingview", "off"
     apply_args(a)
-    server = build_server(a.source, a.data, a.live, a.port)
+    server = build_server(a.source, a.data, a.live, a.port, a.celular)
     threading.Timer(0.5, open_window, [f"http://localhost:{a.port}/"]).start()
     print("Para cerrar la app, cerrá esta ventana o apretá Ctrl+C.")
     try:

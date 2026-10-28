@@ -40,6 +40,7 @@ class RealTrader:
         self.plazo = os.environ.get("DISH_PLAZO", "t1")
         self.code = secrets.token_hex(3).upper()  # shown only in the terminal
         self.armed = False
+        self.owner = ""  # the screen that armed real trading
         self.path = Path(state_path)
         self.state = {"owned": 0, "day": "", "count": 0, "last_ts": 0.0, "orders": []}
         if self.path.exists():
