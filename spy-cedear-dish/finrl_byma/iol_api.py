@@ -1,4 +1,4 @@
-"""Client for the InvertirOnline (IOL) API: live quotes and daily history for BYMA instruments.
+"""Client for the InvertirOnline (IOL) API: quotes, daily history and orders for BYMA instruments.
 
 Log in with your IOL username and password, set as IOL_USERNAME and IOL_PASSWORD. The API must be
 enabled for your account (ask IOL). Endpoints follow the iol-api and node-iol-v2 client libraries.
@@ -53,6 +53,33 @@ class IOLClient:
             return None
         r.raise_for_status()
         return r.json()
+
+    def _post(self, path: str, body: dict[str, Any]) -> Any:
+        self._auth()
+        r = self.session.post(API_URL + path, json=body, timeout=20)
+        try:
+            data = r.json()
+        except ValueError:
+            data = {"message": r.text[:300]}
+        if not r.ok:
+            raise RuntimeError(f"IOL refused the order ({r.status_code}): {data}")
+        return data
+
+    def portfolio_qty(self, symbol: str) -> int:
+        """How many units of `symbol` the account holds in Argentina."""
+        body = self._get("portafolio/argentina") or {}
+        for a in body.get("activos", []):
+            t = a.get("titulo") or {}
+            if str(t.get("simbolo", "")).upper() == symbol.upper():
+                return int(float(a.get("cantidad") or 0))
+        return 0
+
+    def order(self, side: str, symbol: str, qty: int, price: float, plazo: str = "t1", market: str = MARKET) -> Any:
+        """Limit order valid until the end of today. side is "buy" or "sell"."""
+        validez = date.today().strftime("%Y-%m-%dT23:59:59.000Z")
+        body = {"mercado": market, "simbolo": symbol, "cantidad": int(qty), "precio": round(float(price), 2),
+                "plazo": plazo, "validez": validez, "tipoOrden": "precioLimite"}
+        return self._post("operar/Comprar" if side == "buy" else "operar/Vender", body)
 
     def quote(self, symbol: str, market: str = MARKET) -> dict[str, Any] | None:
         """Last trade of one instrument, e.g. quote("SPY") in pesos or quote("SPYC") in cable dollars."""

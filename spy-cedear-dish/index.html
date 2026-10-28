@@ -60,6 +60,17 @@ button.primary { background: var(--ink); color: var(--bg); border-color: var(--i
 button[aria-pressed="true"] { border-color: var(--s2); box-shadow: inset 0 0 0 1px var(--s2); }
 .speed { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-2); }
 .speed input { width: 110px; }
+.setup { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; }
+.setup label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+select, input[type="number"], input[type="password"] { font: 500 14px var(--f-body); color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+input[type="number"] { width: 130px; }
+select:focus-visible { outline: 2px solid var(--s1); outline-offset: 2px; }
+.realbox { display: grid; gap: 10px; border: 1px solid var(--miss); border-radius: 10px; padding: 14px; }
+.realbox p { margin: 0; font-size: 13px; color: var(--ink-2); }
+.ack { display: flex; gap: 8px; align-items: start; font-size: 13px; color: var(--ink-2); }
+button.danger { background: var(--miss); border-color: var(--miss); color: var(--surface); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+.feed.money { color: var(--miss); border-color: var(--miss); }
 .you { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 14px; }
 .you p { margin: 0; font-size: 13px; color: var(--ink-2); }
 
@@ -128,7 +139,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
         <div class="tile"><div class="k">SPY CEDEAR</div><div class="v" id="tPx">–</div><div class="sub" id="tPxChg">–</div></div>
         <div class="tile"><div class="k" id="kSpy">SPY (USD)</div><div class="v" id="tSpy">–</div><div class="sub" id="tSpyChg">–</div></div>
         <div class="tile"><div class="k" id="kCcl">Dólar CCL</div><div class="v" id="tCcl">–</div><div class="sub" id="tCclChg">–</div></div>
-        <div class="tile"><div class="k">Dish equity</div><div class="v" id="tDish">–</div><div class="sub" id="tDishR">–</div></div>
+        <div class="tile"><div class="k" id="kDish">Dish equity</div><div class="v" id="tDish">–</div><div class="sub" id="tDishR">–</div></div>
         <div class="tile"><div class="k">Your equity</div><div class="v" id="tYou">–</div><div class="sub" id="tYouR">–</div></div>
         <div class="tile"><div class="k">Buy &amp; hold</div><div class="v" id="tHold">–</div><div class="sub" id="tHoldR">–</div></div>
       </div>
@@ -136,10 +147,48 @@ canvas.chart { width: 100%; height: 100%; display: block; }
         <button class="primary" id="btnRun">Run</button>
         <button id="btnStep">Next step</button>
         <button id="btnReset">Restart</button>
-        <button id="btnMode">Use simulation</button>
         <label class="file" for="csv">Load TradingView CSV<input id="csv" type="file" accept=".csv,text/csv" multiple></label>
         <button id="btnSound" aria-pressed="false">Sound off</button>
         <label class="speed" for="speed">Speed <input id="speed" type="range" min="1" max="30" value="6"> <span id="speedV">6 steps/s</span></label>
+      </div>
+      <div class="setup">
+        <label for="mode">Mode
+          <select id="mode">
+            <option value="sim">Simulated market</option>
+            <option value="paper">Paper trading · real prices, fake money</option>
+            <option value="real">Real money · IOL account</option>
+          </select>
+        </label>
+        <label for="interval">Trading interval
+          <select id="interval">
+            <option value="15">15 seconds</option>
+            <option value="30">30 seconds</option>
+            <option value="60" selected>1 minute</option>
+            <option value="300">5 minutes</option>
+            <option value="900">15 minutes</option>
+            <option value="1800">30 minutes</option>
+            <option value="3600">1 hour</option>
+            <option value="day">Once a day</option>
+          </select>
+        </label>
+        <label for="cost">Cost per trade, %
+          <input id="cost" type="number" min="0" max="3" step="0.1" value="0.5">
+        </label>
+      </div>
+      <p class="fine" id="modeNote"></p>
+      <div class="realbox" id="realBox" hidden>
+        <div class="eyebrow">Real money</div>
+        <p id="realNote">Checking whether the server allows real trading…</p>
+        <div class="setup">
+          <label for="maxArs">Most per buy, ARS <input id="maxArs" type="number" min="1000" step="1000" value="50000"></label>
+          <label for="code">Arming code <input id="code" type="password" autocomplete="off" placeholder="shown in the server terminal"></label>
+        </div>
+        <label class="ack" for="ack"><input id="ack" type="checkbox"> I understand the dish will place real buy and sell orders for SPY in my IOL account, and I can lose money.</label>
+        <div class="controls">
+          <button id="btnArm" class="danger">Arm real trading</button>
+          <button id="btnDisarm">Stop real trading</button>
+        </div>
+        <div class="log" id="orders" aria-live="polite"></div>
       </div>
       <div class="you">
         <div class="eyebrow">Your position</div>
@@ -276,27 +325,36 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   function baTime(d = new Date()) {
     const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", { timeZone: TZ, weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false })
       .formatToParts(d).map(x => [x.type, x.value]));
-    return { day: p.weekday, h: +p.hour, hhmm: `${p.hour}:${p.minute}` };
+    return { day: p.weekday, h: +p.hour, hhmm: `${p.hour}:${p.minute}`, date: new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(d) };
   }
   const bymaOpen = () => { const t = baTime(); return !["Sat", "Sun"].includes(t.day) && t.h >= 11 && t.h < 17; };
 
-  // Live quotes from the BYMA Market Data API, through the local server so the credentials never reach the page.
-  const live = { ok: false, err: null, ccl: null, source: null, checked: null };
+  // Live quotes from IOL or BYMA, through the local server so the credentials never reach the page.
+  const live = { ok: false, err: null, ccl: null, source: null, checked: null, day: null };
+  const intervalSec = () => $("interval").value === "day" ? 60 : +$("interval").value;
+  const intervalName = () => $("interval").selectedOptions[0].textContent.toLowerCase();
   async function pollLive() {
     if (!S || S.feed.source !== "server" || !S.replayDone) return;
+    const daily = $("interval").value === "day", t = baTime();
+    if (daily && live.day === t.date) return; // once-a-day mode already traded today
     try {
       const q = await getJSON("api/quote");
       const px = num(q.px);
       if (num(q.ccl)) live.ccl = q.ccl;
       live.source = q.source || "BYMA"; live.ok = !!px; live.err = px ? null : "the quote had no SPY price"; live.checked = baTime().hhmm;
-      if (px && px !== S.m.px[S.m.px.length - 1] && bymaOpen()) {
-        S.feed.queue.push({ label: "Live " + live.checked, px, ccl: live.ccl, spy: live.ccl ? px * RATIO / live.ccl : null });
+      if (px && bymaOpen() && (daily || px !== S.m.px[S.m.px.length - 1])) {
+        S.feed.queue.push({ label: (daily ? "Day " : "Live ") + (daily ? t.date : live.checked), px, ccl: live.ccl, spy: live.ccl ? px * RATIO / live.ccl : null });
+        live.day = t.date;
         stepDay();
       }
     } catch (e) { live.ok = false; live.err = e.message; }
     renderAll();
   }
-  setInterval(() => { if (S && S.feed.source === "server" && S.replayDone && bymaOpen()) pollLive(); }, 30000);
+  let liveTimer = null;
+  function scheduleLive() {
+    clearInterval(liveTimer);
+    liveTimer = setInterval(() => { if (S && S.feed.source === "server" && S.replayDone && bymaOpen()) pollLive(); }, intervalSec() * 1000);
+  }
 
   function features(m) {
     const p = m.px, n = p.length - 1;
@@ -363,18 +421,22 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     const m = { px: [], labels: [], spyHist: [], cclHist: [] };
     for (let i = 0; i < 26 && feed.hasNext(); i++) pushBar(m, feed.next()); // warm-up history for the features
     const p0 = m.px[m.px.length - 1];
-    S = { m, feed, dish: makeDish(), day: 0, dishEq: START, youEq: START, holdUnits: START / p0, youLong: false, youLongNext: false, replayDone: false,
+    S = { m, feed, dish: makeDish(), day: 0, dishEq: START, youEq: START, holdUnits: START / p0, youLong: false, youLongNext: false, replayDone: false, pending: null, dishPos: null, mode: $("mode").value, fast: false,
       eq: [{ day: 0, label: m.labels[m.labels.length - 1], dish: START, you: START, hold: START }], hits: [], hitRate: [], last: null, log: [] };
   }
 
   function stepDay() {
     const { m, dish, feed } = S;
     if (!feed.hasNext()) {
-      if (feed.kind === "real" && !S.replayDone) { S.replayDone = true; setRunning(false); renderAll(); pollLive(); }
+      if (feed.kind === "real" && !S.replayDone) { S.replayDone = true; setRunning(false); decide(); renderAll(); scheduleLive(); pollLive(); }
       return false;
     }
-    const x = features(m);
-    const { up, h } = think(dish, x);
+    const { up, h } = S.pending || think(dish, features(m));
+    S.pending = null;
+    const cost = Math.max(0, +$("cost").value || 0) / 100;
+    if (S.dishPos != null && S.dishPos !== up) S.dishEq *= 1 - cost; // switching between CEDEARs and pesos costs a commission
+    S.dishPos = up;
+    if (S.youLong !== S.youLongNext && S.day > 0) S.youEq *= 1 - cost;
     const p0 = m.px[m.px.length - 1];
     S.youLong = S.youLongNext;
     const bar = feed.next();
@@ -392,9 +454,15 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     S.last = { hit, up, r };
     S.log.unshift({ label: bar.label, up, r, hit });
     if (S.log.length > 60) S.log.pop();
-    feedback(hit);
-    renderAll();
+    if (S.replayDone) decide();
+    if (!S.fast) { feedback(hit); renderAll(); }
     return true;
+  }
+
+  // Live: decide right away on the latest price, and send the order (real mode) before the next quote arrives.
+  function decide() {
+    S.pending = think(S.dish, features(S.m));
+    if (S.mode === "real" && realCfg.armed) sendOrder(S.pending.up ? "buy" : "sell");
   }
 
   // ---------- sound ----------
@@ -591,22 +659,24 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     $("dayLabel").textContent = S.day ? m.labels[n] : "Step 0";
     const fe = $("feed"), note = $("feedNote");
     const srcName = S.feed.source === "server" ? serverSource + " (via your FinRL server)" : "your TradingView export";
+    const pfx = S.mode === "real" ? (realCfg.armed ? "REAL MONEY · ARMED" : "REAL MONEY · OFF") : "PAPER";
     if (real && S.replayDone && S.feed.source !== "server") {
-      fe.textContent = "REAL · REPLAY DONE"; fe.className = "feed real";
+      fe.textContent = pfx + " · REPLAY DONE"; fe.className = "feed real";
       note.textContent = "Replay of your TradingView export is done. Live quotes need the local FinRL server with your IOL login or BYMA credentials (see README).";
     } else if (real && S.replayDone) {
-      fe.textContent = !bymaOpen() ? "REAL · BYMA CLOSED" : live.ok ? "LIVE · BYMA" : "REAL · WAITING"; fe.className = "feed real";
-      note.textContent = live.err ? `Live quote failed: ${live.err.replace(/\.$/, "")}. Retrying every 30 seconds while BYMA is open.`
-        : bymaOpen() ? `Trading live quotes from ${live.source || "your broker"}, every 30 seconds${live.checked ? " · last check " + live.checked + " ART" : ""}.`
+      fe.textContent = pfx + " · " + (!bymaOpen() ? "BYMA CLOSED" : live.ok ? "LIVE" : "WAITING"); fe.className = "feed " + (S.mode === "real" && realCfg.armed ? "money" : "real");
+      note.textContent = live.err ? `Live quote failed: ${live.err.replace(/\.$/, "")}. Retrying every ${intervalName()} while BYMA is open.`
+        : bymaOpen() ? `Trading live quotes from ${live.source || "your broker"}, every ${intervalName()}${live.checked ? " · last check " + live.checked + " ART" : ""}.`
         : `BYMA is closed. The dish trades the next live quote after 11:00 ART${live.checked ? " · last check " + live.checked : ""}.`;
     } else if (real) {
-      fe.textContent = "REAL · REPLAY"; fe.className = "feed real";
+      fe.textContent = pfx + " · TRAINING"; fe.className = "feed real";
       note.textContent = `Training on ${S.feed.queue.length + S.day} daily closes from ${srcName}, ${S.feed.queue.length} to go.`;
     } else {
       fe.textContent = "SIMULATED"; fe.className = "feed sim";
       note.textContent = feedErr ? `Real data unavailable: ${feedErr}. Showing a simulated market. Load a TradingView export, or run the FinRL server with your IOL login for live quotes.` : "Simulated market. Load a TradingView export of BCBA:SPY to train on real prices.";
     }
-    $("btnMode").textContent = real ? "Use simulation" : "Use real data";
+    $("kDish").textContent = S.mode === "real" ? "Dish equity (virtual)" : "Dish equity";
+    renderReal();
     $("tPx").textContent = fmtARS(m.px[n]); chg($("tPxChg"), m.px[n] / m.px[n - 1] - 1);
     const useLive = real && S.replayDone && live.ccl, ccl = useLive ? live.ccl : m.cclHist[n], spyU = !useLive && m.spyHist[n] ? m.spyHist[n] : ccl ? m.px[n] * RATIO / ccl : null;
     $("kSpy").textContent = real ? "SPY implied (USD)" : "SPY (USD)";
@@ -645,13 +715,28 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   $("btnRun").onclick = () => setRunning(!running);
   $("btnStep").onclick = () => { setRunning(false); stepDay(); };
   $("btnReset").onclick = () => { setRunning(false); start(S.feed.kind === "real" && realBars ? realFeed(realBars, realSource) : simFeed()); };
-  $("btnMode").onclick = () => { setRunning(false); S.feed.kind === "real" ? start(simFeed()) : realBars ? start(realFeed(realBars, realSource)) : boot(); };
+  $("mode").onchange = async () => {
+    setRunning(false);
+    const mode = $("mode").value;
+    if (mode !== "real" && realCfg.armed) await realCall("api/disarm", {});
+    if (mode === "sim") start(simFeed());
+    else if (realBars) start(realFeed(realBars, realSource));
+    else await boot();
+  };
+  $("interval").onchange = () => { scheduleLive(); renderAll(); };
+  $("cost").onchange = () => renderAll();
+  $("btnArm").onclick = async () => {
+    if (!$("ack").checked) { realMsg = "Tick the box to confirm you understand the risk."; return renderAll(); }
+    const r = await realCall("api/arm", { code: $("code").value });
+    if (r && S.feed.source === "server" && !S.replayDone) fastForward();
+  };
+  $("btnDisarm").onclick = () => realCall("api/disarm", {});
   $("csv").onchange = async e => {
     const files = [...e.target.files]; e.target.value = "";
     if (!files.length) return;
     setRunning(false);
-    try { realBars = await loadCsvBars(files); realSource = "csv"; feedErr = null; start(realFeed(realBars, "csv")); }
-    catch (err) { feedErr = err.message; if (S.feed.kind !== "sim") start(simFeed()); else renderAll(); }
+    try { realBars = await loadCsvBars(files); realSource = "csv"; feedErr = null; if ($("mode").value === "sim") $("mode").value = "paper"; start(realFeed(realBars, "csv")); }
+    catch (err) { feedErr = err.message; $("mode").value = "sim"; if (S.feed.kind !== "sim") start(simFeed()); else renderAll(); }
   };
   $("btnSound").onclick = () => {
     soundOn = !soundOn;
@@ -667,6 +752,55 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   new MutationObserver(() => renderAll()).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
   let realBars = null, realSource = null, feedErr = null;
+
+  // ---------- real money ----------
+  let realCfg = { available: false, armed: false, reason: "Real trading needs the FinRL server (see README)." }, realMsg = "";
+  async function loadConfig() {
+    try { const c = await getJSON("api/config"); realCfg = { ...c.real, armed: !!c.real.armed }; }
+    catch (e) { realCfg = { available: false, armed: false, reason: "Real trading needs the FinRL server running on this computer (see README)." }; }
+    if (realCfg.maxArs) $("maxArs").max = realCfg.maxArs;
+    renderAll();
+  }
+  async function realCall(url, body) {
+    try {
+      const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || "the server answered " + r.status);
+      const st = j.status || j;
+      realCfg = { ...realCfg, ...st, armed: !!st.armed };
+      realMsg = j.order ? `Sent: ${j.order.side} ${j.order.qty} SPY at ${fmtARS(j.order.price)}${j.order.operation ? " · operation " + j.order.operation : ""}`
+        : j.skipped ? "No order: " + j.skipped : url.endsWith("arm") && !url.endsWith("disarm") ? "Armed. The dish now trades your IOL account." : "Real trading stopped.";
+      return j;
+    } catch (e) { realMsg = e.message; return null; }
+    finally { renderAll(); }
+  }
+  function sendOrder(side) {
+    realCall("api/order", { side, maxArs: +$("maxArs").value, code: $("code").value });
+  }
+  function fastForward() {
+    S.fast = true;
+    while (stepDay()) { /* train on the rest of the history */ }
+    S.fast = false;
+    renderAll();
+  }
+  function renderReal() {
+    const real = S.mode === "real";
+    $("realBox").hidden = !real;
+    $("mode").querySelector('[value="real"]').disabled = !realCfg.available;
+    for (const o of $("interval").options) o.disabled = real && o.value !== "day" && +o.value < (realCfg.minInterval || 0);
+    $("modeNote").textContent = S.mode === "sim" ? "A made-up market. Nothing is real."
+      : real ? "Live prices, and the dish trades your real IOL account while armed. Charts still show the virtual ARS 1.000.000 game."
+      : "Live prices when the FinRL server is running, but the money is fake. Nothing is sent to your broker.";
+    if (real && $("interval").selectedOptions[0].disabled) { $("interval").value = [...$("interval").options].find(o => !o.disabled).value; scheduleLive(); }
+    if (!real) return;
+    $("realNote").textContent = (realMsg ? realMsg + " · " : "") + (!realCfg.available ? realCfg.reason
+      : realCfg.armed ? `Armed. Buys up to ARS ${Number(realCfg.maxArs).toLocaleString("es-AR")} of SPY on UP, sells what it bought on DOWN. ${realCfg.ordersToday}/${realCfg.maxOrders} orders today.`
+      : `Off. Server limits: ARS ${Number(realCfg.maxArs).toLocaleString("es-AR")} per buy, ${realCfg.minInterval}s between orders, ${realCfg.maxOrders} orders a day.`);
+    $("btnArm").disabled = !realCfg.available || realCfg.armed;
+    $("btnDisarm").disabled = !realCfg.armed;
+    $("orders").innerHTML = (realCfg.orders || []).slice().reverse().map(o =>
+      `<div><span>${o.time.slice(5, 16)}</span><span>${o.side.toUpperCase()} ${o.qty}</span><span>${fmtARS(o.price)}</span><span>${o.operation ?? ""}</span></div>`).join("");
+  }
   function start(feed) {
     seed = (Date.now() % 2147483646) + 1;
     newGame(feed);
@@ -676,13 +810,23 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     renderAll();
   }
   async function boot() {
-    try { realBars = await loadServerBars(); realSource = "server"; feedErr = null; start(realFeed(realBars, "server")); }
-    catch (e) { feedErr = e.message; if (!S || S.feed.kind !== "sim") start(simFeed()); else renderAll(); }
+    try {
+      realBars = await loadServerBars(); realSource = "server"; feedErr = null;
+      if ($("mode").value === "sim") $("mode").value = "paper";
+      start(realFeed(realBars, "server"));
+    } catch (e) { feedErr = e.message; $("mode").value = "sim"; if (!S || S.feed.kind !== "sim") start(simFeed()); else renderAll(); }
   }
+  $("mode").value = "sim";
   start(simFeed()); // something to look at while the real data loads
   feedErr = null;
   $("feed").textContent = "CONNECTING"; $("feed").className = "feed"; $("feedNote").textContent = "Looking for the local FinRL data server…";
   boot();
+  loadConfig();
+  // Installable app (and offline shell) when served by the FinRL server on this computer.
+  if (location.protocol.startsWith("http") && ["localhost", "127.0.0.1"].includes(location.hostname)) {
+    const link = document.createElement("link"); link.rel = "manifest"; link.href = "manifest.webmanifest"; document.head.appendChild(link);
+    navigator.serviceWorker?.register("sw.js").catch(() => {});
+  }
   requestAnimationFrame(frame);
 })();
 </script>

@@ -15,6 +15,56 @@ There are two ways to run it:
 
 This is a learning toy, not investment advice.
 
+## The app
+
+Run it as a desktop app. It starts the local server and opens the game in its own window (Chrome or Edge app mode, otherwise your default browser):
+
+```bash
+cd spy-cedear-dish
+pip install -r requirements.txt
+export IOL_USERNAME='your IOL user'
+export IOL_PASSWORD='your IOL password'
+python -m finrl_byma.app --source iol
+```
+
+You can also install it from the browser: open `http://localhost:8000` in Chrome or Edge and choose **Install app** in the address bar. The server still has to be running for prices.
+
+**Modes**
+
+| Mode | Prices | Money |
+|---|---|---|
+| Simulated market | Made up | Fake |
+| Paper trading | Real: IOL history, then live quotes | Fake (virtual ARS 1.000.000) |
+| Real money | Real | Your IOL account, while armed |
+
+**Trading interval:** how often the dish makes a live call. Choices are 15 s, 30 s, 1, 5, 15 and 30 min, 1 h, or once a day (at the first quote after BYMA opens). **Cost per trade** is charged on the virtual equity each time the dish switches between CEDEARs and pesos.
+
+### Real money
+
+Real trading is off unless you turn it on when starting the server:
+
+```bash
+export DISH_REAL_TRADING=1
+export DISH_MAX_ARS=50000             # largest buy, in pesos (default 100000)
+export DISH_MIN_INTERVAL=60           # seconds between orders (default 60)
+export DISH_MAX_ORDERS_PER_DAY=20     # default 20
+python -m finrl_byma.app --source iol
+```
+
+The terminal prints an **arming code**. In the app, choose **Real money**, type the code, tick the confirmation box and press **Arm real trading**. The dish then:
+
+- on **UP**, buys SPY with up to the per-buy limit, if it isn't already holding;
+- on **DOWN**, sells the SPY it bought itself. It never sells SPY you held before. Its holdings are tracked in `dish_positions.json`, capped by what your IOL portfolio shows.
+
+Orders are limit orders 0.5% through the last price, valid until the end of the day, settling T+1 (`DISH_PLAZO`). Orders are only sent while BYMA is open. Hitting the daily order limit disarms trading. **Stop real trading** disarms at once, and restarting the server always starts disarmed with a new code. The server only answers requests from this computer, and orders always need the code.
+
+Things to know before you arm it:
+
+- The dish is a toy learner. In tests it was right a bit more than half the time, and trading costs can eat that edge. You can lose money.
+- A limit order may not fill. The dish then thinks it holds SPY it doesn't have until the next portfolio check.
+- Open orders aren't cancelled automatically. Check your IOL account.
+- The order calls follow the iol-api library (`operar/Comprar`, `operar/Vender`, `portafolio/argentina`). They haven't been run against a real IOL account. Try it first with a small `DISH_MAX_ARS`.
+
 ## Quick start with InvertirOnline (IOL)
 
 IOL's API gives its clients live quotes and daily history for BYMA instruments. Ask IOL to enable API access for your account, then:
