@@ -1,0 +1,865 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e1312">
+<title>Placa SPY CEDEAR</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: lab bench. Left = the culture dish (live neurons), right = market + controls; charts full width below. */
+:root {
+  --bg: #f3f6f5; --surface: #ffffff; --surface-2: #e9efed; --ink: #121817; --ink-2: #4c5a57; --muted: #74827f; --line: #d5dedb;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  --hit: #12803f; --miss: #c63a39; --cell: #2a78d6; --noise: #c63a39;
+  --f-display: "Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0e1312; --surface: #161d1c; --surface-2: #1d2624; --ink: #e7eeec; --ink-2: #b4c2bf; --muted: #84948f; --line: #2b3735;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --hit: #3fbf72; --miss: #ef6b6a; --cell: #5fa3f0; --noise: #ef6b6a; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0e1312; --surface: #161d1c; --surface-2: #1d2624; --ink: #e7eeec; --ink-2: #b4c2bf; --muted: #84948f; --line: #2b3735;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --hit: #3fbf72; --miss: #ef6b6a; --cell: #5fa3f0; --noise: #ef6b6a; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.5; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-block: 28px 48px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 20px; }
+header h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(28px, 4.4vw, 46px); line-height: 1.05; margin: 0; letter-spacing: -0.02em; text-wrap: balance; }
+header p { margin: 8px 0 0; color: var(--ink-2); max-width: 68ch; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.bench { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); gap: 20px; }
+@media (max-width: 860px) { .bench { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 18px; min-width: 0; display: grid; gap: 14px; align-content: start; }
+.panel h2 { font-family: var(--f-display); font-weight: 500; font-size: 19px; margin: 0; }
+.dish-box { position: relative; width: 100%; max-width: 100%; aspect-ratio: 1 / 1; }
+#dish { width: 100%; height: 100%; display: block; }
+.verdict { position: absolute; left: 12px; top: 12px; font-family: var(--f-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
+  padding: 4px 9px; border-radius: 99px; background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line); }
+.verdict.hit { color: var(--hit); border-color: var(--hit); }
+.verdict.miss { color: var(--miss); border-color: var(--miss); }
+.legend-dish { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.legend-dish span::before { content: ""; display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 0; background: var(--c); }
+
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 480px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.tile { background: var(--surface-2); border-radius: 8px; padding: 10px 12px; min-width: 0; }
+.tile .k { font-size: 12px; color: var(--muted); }
+.tile .v { font-family: var(--f-mono); font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile .sub { font-family: var(--f-mono); font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+button { font: 600 14px var(--f-body); border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); padding: 9px 14px; cursor: pointer; }
+button:hover { border-color: var(--ink-2); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--s1); outline-offset: 2px; }
+.file { font: 600 14px var(--f-body); border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); padding: 9px 14px; cursor: pointer; }
+.file:hover { border-color: var(--ink-2); }
+.file:focus-within { outline: 2px solid var(--s1); outline-offset: 2px; }
+.file input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+button.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+button[aria-pressed="true"] { border-color: var(--s2); box-shadow: inset 0 0 0 1px var(--s2); }
+.speed { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.speed input { width: 110px; }
+.setup { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; }
+.setup label { display: grid; gap: 4px; font-size: 12px; color: var(--muted); }
+select, input[type="number"], input[type="password"] { font: 500 14px var(--f-body); color: var(--ink); background: var(--surface-2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+input[type="number"] { width: 130px; }
+select:focus-visible { outline: 2px solid var(--s1); outline-offset: 2px; }
+.realbox { display: grid; gap: 10px; border: 1px solid var(--miss); border-radius: 10px; padding: 14px; }
+.realbox p { margin: 0; font-size: 13px; color: var(--ink-2); }
+.ack { display: flex; gap: 8px; align-items: start; font-size: 13px; color: var(--ink-2); }
+button.danger { background: var(--miss); border-color: var(--miss); color: var(--surface); }
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+.feed.money { color: var(--miss); border-color: var(--miss); }
+.phone { border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+.phone summary { cursor: pointer; font-weight: 600; }
+.phone-body { display: flex; flex-wrap: wrap; gap: 14px; align-items: start; margin-top: 10px; }
+.phone-body img { background: #fff; border-radius: 8px; padding: 6px; max-width: 100%; }
+.phone-body p { margin: 0; flex: 1 1 220px; min-width: 0; font-size: 13px; color: var(--ink-2); overflow-wrap: anywhere; }
+.you { display: grid; gap: 8px; border-top: 1px solid var(--line); padding-top: 14px; }
+.you p { margin: 0; font-size: 13px; color: var(--ink-2); }
+
+.meters { display: grid; gap: 8px; }
+.meter { display: grid; grid-template-columns: 120px minmax(0, 1fr) 52px; gap: 10px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.bar { height: 8px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: var(--ink-2); border-radius: 99px; transition: width 0.2s; }
+.meter b { font-family: var(--f-mono); font-weight: 400; font-variant-numeric: tabular-nums; text-align: right; color: var(--ink); }
+
+.chart-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; align-items: baseline; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.legend span::before { content: ""; display: inline-block; width: 14px; height: 2px; margin-right: 6px; vertical-align: 4px; background: var(--c); }
+.chart-box { position: relative; width: 100%; height: 300px; }
+.chart-box.small { height: 170px; }
+canvas.chart { width: 100%; height: 100%; display: block; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
+  font-size: 12px; font-family: var(--f-mono); font-variant-numeric: tabular-nums; color: var(--ink); box-shadow: 0 4px 16px rgb(0 0 0 / 0.12); white-space: nowrap; z-index: 2; }
+.tip .row { display: flex; gap: 8px; align-items: center; }
+.tip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
+
+.log { font-family: var(--f-mono); font-size: 12px; font-variant-numeric: tabular-nums; max-height: 180px; overflow: auto; display: grid; gap: 2px; color: var(--ink-2); }
+.log div { display: grid; grid-template-columns: 112px 74px 1fr 56px; gap: 8px; white-space: nowrap; }
+.log .h { color: var(--hit); } .log .m { color: var(--miss); }
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; font-size: 14px; color: var(--ink-2); }
+.notes h3 { font-family: var(--f-display); font-weight: 500; font-size: 16px; color: var(--ink); margin: 0 0 4px; }
+.notes p { margin: 0; }
+.fine { font-size: 12px; color: var(--muted); margin: 0; }
+.fine a, .notes a { color: inherit; }
+.feed { font-family: var(--f-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; padding: 3px 8px; border-radius: 99px; border: 1px solid var(--line); color: var(--ink-2); }
+.feed.real { color: var(--hit); border-color: var(--hit); }
+.feed.sim { color: var(--s2); border-color: var(--s2); }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">BYMA · CEDEAR SPY · ratio 20:1 · en pesos vía CCL</div>
+    <h1>Enseñale a una placa de neuronas a operar SPY</h1>
+    <p>Un cultivo simulado de 48 neuronas mira el CEDEAR de SPY y decide si va a subir o a bajar. Como en el experimento DishBrain, no recibe premios. Cuando se equivoca, la placa se llena de ruido impredecible. Cuando acierta, recibe un pulso tranquilo y regular. Las células se reorganizan para que el mundo les resulte predecible.</p>
+  </header>
+
+  <div class="bench">
+    <section class="panel" aria-label="Cultivo de neuronas">
+      <div class="chart-head"><h2>El cultivo</h2><span class="eyebrow" id="dayLabel">Paso 0</span></div>
+      <div class="dish-box">
+        <canvas id="dish" aria-label="Placa de neuronas animada"></canvas>
+        <div class="verdict" id="verdict">ESPERANDO</div>
+      </div>
+      <div class="legend-dish">
+        <span style="--c: var(--muted)">electrodos sensoriales (entrada del mercado)</span>
+        <span style="--c: var(--cell)">neuronas del cultivo</span>
+        <span style="--c: var(--s3)">motor SUBE</span>
+        <span style="--c: var(--s2)">motor BAJA</span>
+      </div>
+      <div class="meters">
+        <div class="meter"><span>Sorpresa (ruido)</span><div class="bar"><i id="mNoise" style="background: var(--miss)"></i></div><b id="vNoise">0%</b></div>
+        <div class="meter"><span>Exploración</span><div class="bar"><i id="mTemp"></i></div><b id="vTemp">0%</b></div>
+        <div class="meter"><span>Aciertos, 20 pasos</span><div class="bar"><i id="mHit" style="background: var(--hit)"></i></div><b id="vHit">–</b></div>
+      </div>
+    </section>
+
+    <section class="panel" aria-label="Mercado y controles">
+      <div class="chart-head"><h2>Mercado</h2><span class="feed" id="feed">CONECTANDO</span></div>
+      <p class="fine" id="feedNote">Buscando el servidor local de datos…</p>
+      <div class="tiles">
+        <div class="tile"><div class="k">CEDEAR SPY</div><div class="v" id="tPx">–</div><div class="sub" id="tPxChg">–</div></div>
+        <div class="tile"><div class="k" id="kSpy">SPY (USD)</div><div class="v" id="tSpy">–</div><div class="sub" id="tSpyChg">–</div></div>
+        <div class="tile"><div class="k" id="kCcl">Dólar CCL</div><div class="v" id="tCcl">–</div><div class="sub" id="tCclChg">–</div></div>
+        <div class="tile"><div class="k" id="kDish">Capital de la placa</div><div class="v" id="tDish">–</div><div class="sub" id="tDishR">–</div></div>
+        <div class="tile"><div class="k">Tu capital</div><div class="v" id="tYou">–</div><div class="sub" id="tYouR">–</div></div>
+        <div class="tile"><div class="k">Comprar y mantener</div><div class="v" id="tHold">–</div><div class="sub" id="tHoldR">–</div></div>
+      </div>
+      <div class="controls">
+        <button class="primary" id="btnRun">Iniciar</button>
+        <button id="btnStep">Siguiente paso</button>
+        <button id="btnReset">Reiniciar</button>
+        <label class="file" for="csv">Cargar CSV de TradingView<input id="csv" type="file" accept=".csv,text/csv" multiple></label>
+        <button id="btnSound" aria-pressed="false">Sonido apagado</button>
+        <label class="speed" for="speed">Velocidad <input id="speed" type="range" min="1" max="30" value="6"> <span id="speedV">6 pasos/s</span></label>
+      </div>
+      <div class="setup">
+        <label for="mode">Modo
+          <select id="mode">
+            <option value="sim">Mercado simulado</option>
+            <option value="paper">Práctica · precios reales, plata ficticia</option>
+            <option value="real">Plata real · cuenta IOL</option>
+          </select>
+        </label>
+        <label for="interval">Intervalo de operación
+          <select id="interval">
+            <option value="15">15 segundos</option>
+            <option value="30">30 segundos</option>
+            <option value="60" selected>1 minuto</option>
+            <option value="300">5 minutos</option>
+            <option value="900">15 minutos</option>
+            <option value="1800">30 minutos</option>
+            <option value="3600">1 hora</option>
+            <option value="day">Una vez por día</option>
+          </select>
+        </label>
+        <label for="cost">Costo por operación, %
+          <input id="cost" type="number" min="0" max="3" step="0.1" value="0.5">
+        </label>
+      </div>
+      <p class="fine" id="modeNote"></p>
+      <div class="realbox" id="realBox" hidden>
+        <div class="eyebrow">Plata real</div>
+        <p id="realNote">Consultando si el servidor permite operar con plata real…</p>
+        <div class="setup">
+          <label for="maxArs">Máximo por compra, ARS <input id="maxArs" type="number" min="1000" step="1000" value="50000"></label>
+          <label for="code">Código de activación <input id="code" type="password" autocomplete="off" placeholder="lo muestra la terminal"></label>
+        </div>
+        <label class="ack" for="ack"><input id="ack" type="checkbox"> Entiendo que la placa va a mandar órdenes reales de compra y venta de SPY en mi cuenta de IOL, y que puedo perder plata.</label>
+        <div class="controls">
+          <button id="btnArm" class="danger">Activar plata real</button>
+          <button id="btnDisarm">Detener plata real</button>
+        </div>
+        <div class="log" id="orders" aria-live="polite"></div>
+      </div>
+      <details class="phone" id="phoneBox" hidden>
+        <summary>Abrir en el celular</summary>
+        <div class="phone-body">
+          <img id="phoneQr" alt="Código QR para abrir la app en el celular" width="180" height="180">
+          <p>Conectá el celular al mismo Wi-Fi que esta computadora y escaneá el código con la cámara. Después, en Chrome, tocá ⋮ y <b>Agregar a la pantalla principal</b>. La computadora tiene que quedar prendida con la app abierta.</p>
+          <p class="fine" id="phoneUrl"></p>
+        </div>
+      </details>
+      <div class="you">
+        <div class="eyebrow">Tu posición</div>
+        <div class="controls">
+          <button id="btnLong" aria-pressed="false">Tener CEDEARs</button>
+          <button id="btnCash" aria-pressed="true">Quedarme en pesos</button>
+        </div>
+        <p>Jugá contra la placa. Tu posición rige desde el próximo paso hasta que la cambies. Todos arrancan con $1.000.000.</p>
+      </div>
+      <div class="log" id="log" aria-live="polite"></div>
+    </section>
+  </div>
+
+  <section class="panel" aria-label="Rendimiento en el tiempo">
+    <div class="chart-head">
+      <h2>Rendimiento en el tiempo</h2>
+      <div class="legend">
+        <span style="--c: var(--s1)">Placa</span>
+        <span style="--c: var(--s2)">Vos</span>
+        <span style="--c: var(--s3)">Comprar y mantener</span>
+      </div>
+    </div>
+    <div class="chart-box"><canvas class="chart" id="cEq" aria-label="Capital en millones de pesos por paso"></canvas><div class="tip" id="tipEq" hidden></div></div>
+    <div class="chart-head"><span class="eyebrow">Aciertos de la placa, últimos 20 pasos · 50% es tirar una moneda</span></div>
+    <div class="chart-box small"><canvas class="chart" id="cHit" aria-label="Aciertos de la placa"></canvas><div class="tip" id="tipHit" hidden></div></div>
+  </section>
+
+  <section class="notes">
+    <div><h3>Cómo funciona un paso</h3><p>Seis señales del mercado (el último movimiento, la tendencia de 5 y 20 pasos, la distancia al promedio, la volatilidad y el movimiento del CCL) estimulan 12 electrodos sensoriales. El cultivo se acomoda, y la región motora que más se activa decide: sube significa tener CEDEARs, baja significa quedarse en pesos.</p></div>
+    <div><h3>Error: ruido</h3><p>Una predicción errada dispara una ráfaga de estímulos al azar que dura varios pasos, y las sinapsis que llevaron a esa decisión se debilitan y se sacuden. El cultivo intenta evitar justamente lo impredecible.</p></div>
+    <div><h3>Acierto: pulso tranquilo</h3><p>Una predicción correcta recibe un pulso regular y predecible. El camino que se activó se refuerza (Hebb: las neuronas que se disparan juntas se conectan) y baja la exploración.</p></div>
+    <div><h3>Precios reales</h3><p>Con la app instalada en tu computadora, la placa aprende con el historial de SPY de tu cuenta de InvertirOnline y después opera los precios en vivo, de 11 a 17 (hora de Buenos Aires). También podés exportar BCBA:SPY desde <a href="https://www.tradingview.com/symbols/BCBA-SPY/" target="_blank" rel="noopener">TradingView</a> (y BCBA:SPYC para calcular el CCL como SPY ÷ SPYC) y cargar el CSV acá. Sin datos reales, la app usa un mercado simulado. Es un juego para aprender, no una recomendación de inversión.</p></div>
+  </section>
+</div>
+
+<script>
+(() => {
+  "use strict";
+  document.documentElement.lang = "es-AR";
+  const $ = id => document.getElementById(id);
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const fmtARS = v => "$" + Math.round(v).toLocaleString("es-AR");
+  const fmtM = v => "$" + (v / 1e6).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "M";
+  const pct = v => (v >= 0 ? "+" : "") + (v * 100).toFixed(2) + "%";
+
+  // ---------- seeded RNG ----------
+  let seed = Date.now() % 2147483647;
+  const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const gauss = () => { let u = 0, v = 0; while (!u) u = rand(); while (!v) v = rand(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+
+  // ---------- constants ----------
+  const RATIO = 20, START = 1e6, NS = 12, NH = 48, NM = 8;
+  let S; // full game state
+
+  // ---------- market feeds ----------
+  // Shaped like the Gym trading environments (TradingGym, FinRL): a feed hands out one bar at a time.
+  // A bar is { label, px (ARS), spy (USD), ccl (ARS per USD) }; spy and ccl may be null on real bars.
+  const TZ = "America/Argentina/Buenos_Aires";
+
+  function pushBar(m, bar) {
+    m.px.push(bar.px); m.labels.push(bar.label);
+    m.spyHist.push(bar.spy ?? null); m.cclHist.push(bar.ccl ?? null);
+  }
+
+  function simFeed() {
+    const st = { spy: 640 + rand() * 80, ccl: 1380 + rand() * 120, regime: 1, lastR: 0, lastC: 0, n: 0 };
+    return {
+      kind: "sim",
+      hasNext: () => true,
+      next() {
+        if (rand() < 0.025) st.regime = rand() < 0.62 ? 1 : -1;
+        const mu = st.regime > 0 ? 0.0006 : -0.0012, vol = st.regime > 0 ? 0.008 : 0.016;
+        const r = mu + 0.38 * st.lastR + vol * gauss();
+        let c = 0.0005 + 0.2 * st.lastC + 0.006 * gauss();
+        if (rand() < 0.01) c += 0.04 + 0.04 * rand(); // CCL jump
+        st.lastR = r; st.lastC = c; st.spy *= Math.exp(r); st.ccl *= Math.exp(c); st.n++;
+        return { label: "Día " + (st.n - 26), px: st.spy * st.ccl / RATIO, spy: st.spy, ccl: st.ccl };
+      },
+    };
+  }
+
+  async function getJSON(url, ms = 9000) {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), ms);
+    try {
+      const r = await fetch(url, { signal: ctl.signal, cache: "no-store" });
+      const body = await r.json().catch(() => null);
+      if (r.status === 403 && !body) throw new Error("este dispositivo no está emparejado: escaneá el código QR de la computadora");
+      if (!r.ok) throw new Error((body && body.error) || "el servidor de datos respondió " + r.status);
+      return body;
+    } catch (e) {
+      throw new Error(e.name === "AbortError" ? "el servidor de datos no respondió a tiempo" : e instanceof TypeError ? "no está corriendo el servidor local de datos" : e.message);
+    } finally { clearTimeout(t); }
+  }
+  const num = v => { const n = typeof v === "string" ? parseFloat(v) : v; return Number.isFinite(n) && n > 0 ? n : null; };
+
+  // History from the local FinRL server (finrl_byma/server.py): your IOL account or TradingView exports.
+  let serverSource = null;
+  async function loadServerBars() {
+    const body = await getJSON("api/history");
+    const bars = (body && body.bars || []).filter(b => num(b.px)).map(b => ({ label: b.label, px: b.px, ccl: num(b.ccl), spy: num(b.ccl) ? b.px * RATIO / b.ccl : null }));
+    if (bars.length < 60) throw new Error("el servidor de datos tiene menos de 60 días de historial de SPY");
+    serverSource = body.source || "your FinRL server";
+    return bars.slice(-520);
+  }
+
+  // History straight from TradingView chart exports picked in the browser (BCBA:SPY, optionally BCBA:SPYC).
+  function parseTradingViewCSV(text) {
+    const lines = text.trim().split(/\r?\n/), head = lines[0].split(",").map(h => h.trim().toLowerCase());
+    const it = head.indexOf("time"), ic = head.indexOf("close");
+    if (it < 0 || ic < 0) throw new Error("no es una exportación de TradingView (faltan las columnas time y close)");
+    const rows = [];
+    for (const ln of lines.slice(1)) {
+      const c = ln.split(","), t = c[it], close = num(c[ic]);
+      if (!close) continue;
+      const d = /^\d+$/.test(t) ? new Date(+t * 1000) : new Date(t);
+      if (isNaN(d)) continue;
+      rows.push({ date: new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(d), c: close });
+    }
+    return rows;
+  }
+  const tickerOf = name => ((name.toUpperCase().match(/^(?:[A-Z]+_)?([A-Z0-9.]+)/) || [])[1] || "");
+  async function loadCsvBars(files) {
+    let ars = null, usd = new Map();
+    for (const f of files) {
+      const rows = parseTradingViewCSV(await f.text()), tic = tickerOf(f.name);
+      if (tic === "SPYC" || tic === "SPYD") usd = new Map(rows.map(r => [r.date, r.c])); else ars = rows;
+    }
+    if (!ars) throw new Error("elegí la exportación de BCBA:SPY (en pesos); BCBA:SPYC es opcional, para el CCL");
+    if (ars.length < 60) throw new Error("la exportación de SPY tiene menos de 60 días");
+    return ars.slice(-520).map(r => { const u = usd.get(r.date); return { label: r.date, px: r.c, ccl: u ? r.c / u : null, spy: u ? u * RATIO : null }; });
+  }
+  function realFeed(bars, source) {
+    return { kind: "real", source, queue: bars.slice(), hasNext() { return this.queue.length > 0; }, next() { return this.queue.shift(); } };
+  }
+
+  function baTime(d = new Date()) {
+    const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", { timeZone: TZ, weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false })
+      .formatToParts(d).map(x => [x.type, x.value]));
+    return { day: p.weekday, h: +p.hour, hhmm: `${p.hour}:${p.minute}`, date: new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(d) };
+  }
+  const bymaOpen = () => { const t = baTime(); return !["Sat", "Sun"].includes(t.day) && t.h >= 11 && t.h < 17; };
+
+  // Live quotes from IOL or BYMA, through the local server so the credentials never reach the page.
+  const live = { ok: false, err: null, ccl: null, source: null, checked: null, day: null };
+  const intervalSec = () => $("interval").value === "day" ? 60 : +$("interval").value;
+  const intervalName = () => $("interval").value === "day" ? "día" : $("interval").selectedOptions[0].textContent.toLowerCase();
+  async function pollLive() {
+    if (!S || S.feed.source !== "server" || !S.replayDone) return;
+    const daily = $("interval").value === "day", t = baTime();
+    if (daily && live.day === t.date) return; // once-a-day mode already traded today
+    try {
+      const q = await getJSON("api/quote");
+      const px = num(q.px);
+      if (num(q.ccl)) live.ccl = q.ccl;
+      live.source = q.source || "BYMA"; live.ok = !!px; live.err = px ? null : "la cotización no trajo precio de SPY"; live.checked = baTime().hhmm;
+      if (px && bymaOpen() && (daily || px !== S.m.px[S.m.px.length - 1])) {
+        S.feed.queue.push({ label: daily ? t.date : "En vivo " + live.checked, px, ccl: live.ccl, spy: live.ccl ? px * RATIO / live.ccl : null });
+        live.day = t.date;
+        stepDay();
+      }
+    } catch (e) { live.ok = false; live.err = e.message; }
+    renderAll();
+  }
+  let liveTimer = null;
+  function scheduleLive() {
+    clearInterval(liveTimer);
+    liveTimer = setInterval(() => { if (S && S.feed.source === "server" && S.replayDone && bymaOpen()) pollLive(); }, intervalSec() * 1000);
+  }
+
+  function features(m) {
+    const p = m.px, n = p.length - 1;
+    const ret = k => Math.log(p[n] / p[Math.max(0, n - k)]);
+    const ma = p.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, p.length);
+    const rets = []; for (let i = Math.max(1, n - 19); i <= n; i++) rets.push(Math.log(p[i] / p[i - 1]));
+    const sd = Math.sqrt(rets.reduce((a, b) => a + b * b, 0) / Math.max(1, rets.length)) || 0.01;
+    const c1 = m.cclHist[n], c0 = m.cclHist[Math.max(0, n - 1)];
+    const cc = c1 && c0 ? Math.log(c1 / c0) : 0;
+    const f = [ret(1) / 0.012, ret(5) / 0.03, ret(20) / 0.06, Math.log(p[n] / ma) / 0.03, (sd - 0.012) / 0.006, cc / 0.008];
+    const x = [];
+    for (const v of f) { const t = Math.tanh(v); x.push(Math.max(0, t), Math.max(0, -t)); } // on/off electrode pairs
+    return x;
+  }
+
+  // ---------- culture ----------
+  function makeDish() {
+    const neurons = [];
+    for (let i = 0; i < NH; i++) {
+      const a = rand() * Math.PI * 2, r = Math.sqrt(rand()) * 0.62;
+      neurons.push({ x: Math.cos(a) * r, y: Math.sin(a) * r, h: 0 });
+    }
+    const Win = [], Wr = [], W = [[], []];
+    for (let i = 0; i < NH; i++) {
+      Win.push(Array.from({ length: NS }, () => rand() < 0.5 ? gauss() * 1.1 : 0));
+      Wr.push(Array.from({ length: NH }, () => rand() < 0.1 ? gauss() * 0.35 : 0));
+    }
+    for (let k = 0; k < 2; k++) for (let i = 0; i < NH; i++) W[k].push(gauss() * 0.05);
+    return { neurons, Win, Wr, W, bias: Array.from({ length: NH }, () => gauss() * 0.2), temp: 0.6, noise: 0, beat: 0, motor: [0, 0], x: new Array(NS).fill(0) };
+  }
+
+  function think(d, x) {
+    d.x = x;
+    const prev = d.neurons.map(n => n.h);
+    for (let i = 0; i < NH; i++) {
+      let s = d.bias[i];
+      for (let j = 0; j < NS; j++) s += d.Win[i][j] * x[j];
+      for (let j = 0; j < NH; j++) if (d.Wr[i][j]) s += d.Wr[i][j] * prev[j];
+      s += d.noise * 0.6 * gauss();                    // lingering unpredictable stimulation
+      d.neurons[i].h = 0.3 * prev[i] + 0.7 * Math.tanh(s);
+    }
+    const h = d.neurons.map(n => n.h);
+    d.motor = d.W.map(w => w.reduce((a, wi, i) => a + wi * h[i], 0));
+    const drive = d.motor[0] - d.motor[1] + d.temp * 0.25 * gauss();
+    return { up: drive > 0, h };
+  }
+
+  function learn(d, h, choseUp, hit) {
+    const c = choseUp ? 0 : 1, o = 1 - c, eta = 0.04;
+    if (hit) { // calm beat: consolidate the pathway that worked
+      for (let i = 0; i < NH; i++) { d.W[c][i] += eta * h[i]; d.W[o][i] -= eta * h[i]; }
+      d.temp = Math.max(0.05, d.temp * 0.93);
+      d.noise *= 0.4; d.beat = 1;
+    } else {   // noise: weaken and jitter the pathway, raise exploration
+      for (let i = 0; i < NH; i++) { d.W[c][i] -= eta * h[i]; d.W[o][i] += eta * h[i]; d.W[c][i] += 0.01 * gauss(); }
+      d.temp = Math.min(1, d.temp + 0.04);
+      d.noise = Math.min(1, d.noise + 0.55);
+    }
+    for (const w of d.W) { const n = Math.hypot(...w); if (n > 3) for (let i = 0; i < NH; i++) w[i] *= 3 / n; }
+  }
+
+  // ---------- game ----------
+  function newGame(feed) {
+    const m = { px: [], labels: [], spyHist: [], cclHist: [] };
+    for (let i = 0; i < 26 && feed.hasNext(); i++) pushBar(m, feed.next()); // warm-up history for the features
+    const p0 = m.px[m.px.length - 1];
+    S = { m, feed, dish: makeDish(), day: 0, dishEq: START, youEq: START, holdUnits: START / p0, youLong: false, youLongNext: false, replayDone: false, pending: null, dishPos: null, mode: $("mode").value, fast: false,
+      eq: [{ day: 0, label: m.labels[m.labels.length - 1], dish: START, you: START, hold: START }], hits: [], hitRate: [], last: null, log: [] };
+  }
+
+  function stepDay() {
+    const { m, dish, feed } = S;
+    if (!feed.hasNext()) {
+      if (feed.kind === "real" && !S.replayDone) { S.replayDone = true; setRunning(false); decide(); renderAll(); scheduleLive(); pollLive(); }
+      return false;
+    }
+    const { up, h } = S.pending || think(dish, features(m));
+    S.pending = null;
+    const cost = Math.max(0, +$("cost").value || 0) / 100;
+    if (S.dishPos != null && S.dishPos !== up) S.dishEq *= 1 - cost; // switching between CEDEARs and pesos costs a commission
+    S.dishPos = up;
+    if (S.youLong !== S.youLongNext && S.day > 0) S.youEq *= 1 - cost;
+    const p0 = m.px[m.px.length - 1];
+    S.youLong = S.youLongNext;
+    const bar = feed.next();
+    pushBar(m, bar);
+    const r = bar.px / p0 - 1;
+    const hit = (r > 0) === up;
+    if (up) S.dishEq *= 1 + r;
+    if (S.youLong) S.youEq *= 1 + r;
+    learn(dish, h, up, hit);
+    S.day++;
+    S.hits.push(hit ? 1 : 0);
+    const w = S.hits.slice(-20);
+    S.hitRate.push({ day: S.day, label: bar.label, v: w.reduce((a, b) => a + b, 0) / w.length });
+    S.eq.push({ day: S.day, label: bar.label, dish: S.dishEq, you: S.youEq, hold: S.holdUnits * bar.px });
+    S.last = { hit, up, r };
+    S.log.unshift({ label: bar.label, up, r, hit });
+    if (S.log.length > 60) S.log.pop();
+    if (S.replayDone) decide();
+    if (!S.fast) { feedback(hit); renderAll(); }
+    return true;
+  }
+
+  // Live: decide right away on the latest price, and send the order (real mode) before the next quote arrives.
+  function decide() {
+    S.pending = think(S.dish, features(S.m));
+    if (S.mode === "real" && realCfg.armed) sendOrder(S.pending.up ? "buy" : "sell");
+  }
+
+  // ---------- sound ----------
+  let ac = null, soundOn = false;
+  function feedback(hit) {
+    flash = { hit, t: performance.now() };
+    if (!soundOn || !ac) return;
+    const t = ac.currentTime;
+    if (hit) { // two soft low beats, like a resting heartbeat
+      [0, 0.22].forEach((dt, k) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = "sine"; o.frequency.value = k ? 62 : 74;
+        g.gain.setValueAtTime(0.0001, t + dt); g.gain.exponentialRampToValueAtTime(0.35, t + dt + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dt + 0.2);
+        o.connect(g).connect(ac.destination); o.start(t + dt); o.stop(t + dt + 0.25);
+      });
+    } else { // burst of white noise
+      const len = Math.floor(ac.sampleRate * 0.35), buf = ac.createBuffer(1, len, ac.sampleRate), ch = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1;
+      const src = ac.createBufferSource(), g = ac.createGain(), f = ac.createBiquadFilter();
+      f.type = "bandpass"; f.frequency.value = 1800 + Math.random() * 2500; f.Q.value = 0.6;
+      g.gain.setValueAtTime(0.18, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+      src.buffer = buf; src.connect(f).connect(g).connect(ac.destination); src.start(t);
+    }
+  }
+
+  // ---------- dish drawing ----------
+  let flash = null;
+  const dishCv = $("dish");
+  function drawDish(now) {
+    const dpr = window.devicePixelRatio || 1, W = dishCv.clientWidth, H = dishCv.clientHeight;
+    if (!W) return;
+    if (dishCv.width !== Math.round(W * dpr)) { dishCv.width = Math.round(W * dpr); dishCv.height = Math.round(H * dpr); }
+    const g = dishCv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    const cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2 - 8, d = S.dish;
+    const cCell = css("--cell"), cLine = css("--line"), cMuted = css("--muted"), cUp = css("--s3"), cDn = css("--s2"), cNoise = css("--noise"), cHit = css("--hit"), cSurf = css("--surface-2");
+    // dish
+    g.fillStyle = cSurf; g.beginPath(); g.arc(cx, cy, R, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = cLine; g.lineWidth = 2; g.stroke();
+    g.beginPath(); g.arc(cx, cy, R - 7, 0, Math.PI * 2); g.lineWidth = 1; g.stroke();
+    // calm beat rings
+    const age = flash ? (now - flash.t) / 1000 : 9;
+    if (flash && flash.hit && age < 1.2) {
+      for (let k = 0; k < 2; k++) {
+        const a = age - k * 0.25; if (a < 0) continue;
+        g.strokeStyle = cHit; g.globalAlpha = Math.max(0, 0.6 - a * 0.6); g.lineWidth = 2;
+        g.beginPath(); g.arc(cx, cy, R * 0.15 + a * R * 0.7, 0, Math.PI * 2); g.stroke();
+      }
+      g.globalAlpha = 1;
+    }
+    const P = n => [cx + n.x * R, cy + n.y * R];
+    // sensory electrodes on the left arc
+    const sens = []; for (let j = 0; j < NS; j++) { const a = Math.PI * (0.7 + 0.6 * j / (NS - 1)); sens.push([cx + Math.cos(a) * R * 0.86, cy + Math.sin(a) * R * 0.86]); }
+    const motor = (k, i) => { const a = (k === 0 ? -0.42 : 0.12) * Math.PI + (i / (NM - 1)) * 0.3 * Math.PI; return [cx + Math.cos(a) * R * 0.86, cy + Math.sin(a) * R * 0.86]; };
+    // input wiring (strongest only)
+    g.lineWidth = 1;
+    for (let i = 0; i < NH; i++) for (let j = 0; j < NS; j++) {
+      const w = d.Win[i][j] * d.x[j]; if (Math.abs(w) < 0.35) continue;
+      g.strokeStyle = cMuted; g.globalAlpha = Math.min(0.35, Math.abs(w) * 0.2);
+      g.beginPath(); g.moveTo(...sens[j]); g.lineTo(...P(d.neurons[i])); g.stroke();
+    }
+    // output wiring: learned weights
+    for (let k = 0; k < 2; k++) for (let i = 0; i < NH; i++) {
+      const w = d.W[k][i]; if (w < 0.08) continue;
+      g.strokeStyle = k === 0 ? cUp : cDn; g.globalAlpha = Math.min(0.5, w * 0.9);
+      g.beginPath(); g.moveTo(...P(d.neurons[i])); g.lineTo(...motor(k, i % NM)); g.stroke();
+    }
+    g.globalAlpha = 1;
+    // neurons
+    const jitter = d.noise;
+    for (const n of d.neurons) {
+      let [x, y] = P(n);
+      if (jitter > 0.05) { x += (Math.random() - 0.5) * jitter * 6; y += (Math.random() - 0.5) * jitter * 6; }
+      const a = Math.abs(n.h);
+      g.fillStyle = cCell; g.globalAlpha = 0.15 + 0.85 * a;
+      g.beginPath(); g.arc(x, y, 4 + a * 5, 0, Math.PI * 2); g.fill();
+      if (jitter > 0.1 && Math.random() < jitter * 0.25) { // noise sparks
+        g.fillStyle = cNoise; g.globalAlpha = 0.9; g.beginPath(); g.arc(x, y, 2.5, 0, Math.PI * 2); g.fill();
+      }
+    }
+    g.globalAlpha = 1;
+    // electrodes
+    sens.forEach(([x, y], j) => { g.fillStyle = cMuted; g.globalAlpha = 0.3 + 0.7 * d.x[j]; g.fillRect(x - 4, y - 4, 8, 8); });
+    const mAct = d.motor.map(v => Math.min(1, Math.abs(v)));
+    for (let k = 0; k < 2; k++) for (let i = 0; i < NM; i++) {
+      const [x, y] = motor(k, i);
+      g.fillStyle = k === 0 ? cUp : cDn; g.globalAlpha = 0.35 + 0.65 * mAct[k];
+      g.fillRect(x - 4, y - 4, 8, 8);
+    }
+    g.globalAlpha = 1;
+    g.fillStyle = cMuted; g.font = "600 11px " + css("--f-mono");
+    g.textAlign = "right"; const u = motor(0, 0), dn = motor(1, NM - 1);
+    g.fillText("SUBE", u[0] - 8, u[1] - 8); g.fillText("BAJA", dn[0] - 8, dn[1] + 16);
+    g.textAlign = "left"; g.fillText("MERCADO", cx - R * 0.86 + 12, cy + 4);
+  }
+
+  // ---------- charts ----------
+  function setupCanvas(cv) {
+    const dpr = window.devicePixelRatio || 1, W = cv.clientWidth, H = cv.clientHeight;
+    if (cv.width !== Math.round(W * dpr) || cv.height !== Math.round(H * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    return { g, W, H };
+  }
+  function niceTicks(lo, hi, n) {
+    const span = hi - lo || 1, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+    const step = [1, 2, 2.5, 5, 10].map(s => s * mag).find(s => s >= step0);
+    const t = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) t.push(+v.toFixed(10));
+    return t;
+  }
+  function xLabel(data, t) {
+    const d = data.find(e => e.day === t);
+    if (!d) return t === 0 ? "" : "#" + t;
+    const L = d.label || "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(L)) {
+      const mon = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"][+L.slice(5, 7) - 1];
+      return data.length < 200 ? +L.slice(8, 10) + " " + mon : mon + " " + L.slice(2, 4);
+    }
+    if (L.startsWith("En vivo ")) return L.slice(8, 13);
+    return L.replace("Día ", "d");
+  }
+  function lineChart(cv, data, series, opts, hoverIdx) {
+    const { g, W, H } = setupCanvas(cv);
+    const pad = { l: 58, r: 66, t: 10, b: 24 };
+    const cw = W - pad.l - pad.r, ch = H - pad.t - pad.b;
+    const xs = data.map(d => d.day), xMax = Math.max(10, xs[xs.length - 1] || 0);
+    let lo = opts.min ?? Infinity, hi = opts.max ?? -Infinity;
+    if (opts.min == null) for (const d of data) for (const s of series) { lo = Math.min(lo, d[s.key]); hi = Math.max(hi, d[s.key]); }
+    if (opts.min == null) { const p = (hi - lo) * 0.08 || hi * 0.02; lo -= p; hi += p; }
+    const X = v => pad.l + (v / xMax) * cw, Y = v => pad.t + ch - ((v - lo) / (hi - lo)) * ch;
+    const cMuted = css("--muted"), cLine = css("--line"), cInk2 = css("--ink-2");
+    g.font = "11px " + css("--f-mono"); g.fillStyle = cMuted; g.lineWidth = 1;
+    for (const t of niceTicks(lo, hi, opts.ticks || 5)) {
+      const y = Math.round(Y(t)) + 0.5; g.strokeStyle = cLine; g.beginPath(); g.moveTo(pad.l, y); g.lineTo(pad.l + cw, y); g.stroke();
+      g.textAlign = "right"; g.fillText(opts.fmtY(t), pad.l - 8, y + 4);
+    }
+    g.textAlign = "center";
+    for (const t of niceTicks(0, xMax, 6)) if (t >= 0) { const lab = xLabel(data, t); if (lab) g.fillText(lab, X(t), H - 6); }
+    if (opts.ref != null) { g.setLineDash([4, 4]); g.strokeStyle = cInk2; g.beginPath(); g.moveTo(pad.l, Y(opts.ref)); g.lineTo(pad.l + cw, Y(opts.ref)); g.stroke(); g.setLineDash([]); }
+    g.lineWidth = 2; g.lineJoin = "round";
+    const ends = [];
+    for (const s of series) {
+      if (data.length < 1) continue;
+      g.strokeStyle = s.color; g.beginPath();
+      data.forEach((d, i) => { const x = X(d.day), y = Y(d[s.key]); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+      const last = data[data.length - 1]; ends.push({ s, x: X(last.day), y: Y(last[s.key]), v: last[s.key] });
+    }
+    // endpoint dots + direct labels, nudged apart
+    ends.sort((a, b) => a.y - b.y);
+    for (let i = 1; i < ends.length; i++) ends[i].ly = Math.max(ends[i].y, (ends[i - 1].ly ?? ends[i - 1].y) + 14);
+    g.textAlign = "left"; g.font = "600 11px " + css("--f-mono");
+    for (const e of ends) {
+      g.fillStyle = css("--surface"); g.beginPath(); g.arc(e.x, e.y, 5, 0, 7); g.fill();
+      g.fillStyle = e.s.color; g.beginPath(); g.arc(e.x, e.y, 3.5, 0, 7); g.fill();
+      g.fillStyle = cInk2; g.fillText(e.s.label, e.x + 9, (e.ly ?? e.y) + 4);
+    }
+    if (hoverIdx != null && data[hoverIdx]) {
+      const d = data[hoverIdx], x = X(d.day);
+      g.strokeStyle = cInk2; g.lineWidth = 1; g.beginPath(); g.moveTo(x, pad.t); g.lineTo(x, pad.t + ch); g.stroke();
+      for (const s of series) { g.fillStyle = css("--surface"); g.beginPath(); g.arc(x, Y(d[s.key]), 5, 0, 7); g.fill(); g.fillStyle = s.color; g.beginPath(); g.arc(x, Y(d[s.key]), 3.5, 0, 7); g.fill(); }
+    }
+    return { X, pad, cw, xMax };
+  }
+
+  const eqSeries = () => [{ key: "dish", label: "Placa", color: css("--s1") }, { key: "you", label: "Vos", color: css("--s2") }, { key: "hold", label: "Mantener", color: css("--s3") }];
+  const hitSeries = () => [{ key: "v", label: "", color: css("--s1") }];
+  const charts = {
+    eq: { cv: $("cEq"), tip: $("tipEq"), hover: null, data: () => S.eq, series: eqSeries, opts: { fmtY: v => (v / 1e6).toFixed(2) + "M" },
+      tipHtml: d => `<div>${d.label}</div>` + eqSeries().map(s => `<div class="row"><span class="dot" style="--c:${s.color}"></span>${s.label === "Mantener" ? "Comprar y mantener" : s.label} ${fmtARS(d[s.key])}</div>`).join("") },
+    hit: { cv: $("cHit"), tip: $("tipHit"), hover: null, data: () => S.hitRate, series: hitSeries, opts: { min: 0, max: 1, ticks: 4, ref: 0.5, fmtY: v => Math.round(v * 100) + "%" },
+      tipHtml: d => `<div>${d.label}</div><div>Aciertos ${(d.v * 100).toFixed(0)}%</div>` },
+  };
+  function drawChart(c) { c.geo = lineChart(c.cv, c.data(), c.series(), c.opts, c.hover); }
+  for (const c of Object.values(charts)) {
+    const move = e => {
+      const data = c.data(); if (!data.length || !c.geo) return;
+      const rect = c.cv.getBoundingClientRect(), mx = e.clientX - rect.left;
+      const day = ((mx - c.geo.pad.l) / c.geo.cw) * c.geo.xMax;
+      let best = 0; for (let i = 0; i < data.length; i++) if (Math.abs(data[i].day - day) < Math.abs(data[best].day - day)) best = i;
+      c.hover = best; drawChart(c);
+      c.tip.innerHTML = c.tipHtml(data[best]); c.tip.hidden = false;
+      const tw = c.tip.offsetWidth, x = c.geo.X(data[best].day);
+      c.tip.style.left = Math.min(rect.width - tw - 4, Math.max(4, x + 12 + tw > rect.width ? x - tw - 12 : x + 12)) + "px";
+      c.tip.style.top = "8px";
+    };
+    c.cv.addEventListener("pointermove", move);
+    c.cv.addEventListener("pointerdown", move);
+    c.cv.addEventListener("pointerleave", () => { c.hover = null; c.tip.hidden = true; drawChart(c); });
+  }
+
+  // ---------- render ----------
+  function chg(el, v) { el.textContent = pct(v); el.style.color = v >= 0 ? css("--hit") : css("--miss"); }
+  function renderAll() {
+    const { m, dish } = S, n = m.px.length - 1;
+    const real = S.feed.kind === "real";
+    $("dayLabel").textContent = S.day ? m.labels[n] : "Paso 0";
+    const fe = $("feed"), note = $("feedNote");
+    const srcName = S.feed.source === "server" ? serverSource + " (vía tu servidor local)" : "tu exportación de TradingView";
+    const pfx = S.mode === "real" ? (realCfg.armed ? "PLATA REAL · ACTIVA" : "PLATA REAL · APAGADA") : "PRÁCTICA";
+    if (real && S.replayDone && S.feed.source !== "server") {
+      fe.textContent = pfx + " · HISTORIAL COMPLETO"; fe.className = "feed real";
+      note.textContent = "Terminó el historial de tu exportación de TradingView. Para precios en vivo, abrí la app instalada con tu usuario de IOL (ver README).";
+    } else if (real && S.replayDone) {
+      fe.textContent = pfx + " · " + (!bymaOpen() ? "BYMA CERRADO" : live.ok ? "EN VIVO" : "ESPERANDO"); fe.className = "feed " + (S.mode === "real" && realCfg.armed ? "money" : "real");
+      note.textContent = live.err ? `Falló la cotización en vivo: ${live.err.replace(/\.$/, "")}. Reintenta cada ${intervalName()} mientras BYMA esté abierto.`
+        : bymaOpen() ? `Operando precios en vivo de ${live.source || "tu broker"}, cada ${intervalName()}${live.checked ? " · última consulta " + live.checked : ""}.`
+        : `BYMA está cerrado. La placa opera el próximo precio después de las 11:00${live.checked ? " · última consulta " + live.checked : ""}.`;
+    } else if (real) {
+      fe.textContent = pfx + " · ENTRENANDO"; fe.className = "feed real";
+      note.textContent = `Entrenando con ${S.feed.queue.length + S.day} cierres diarios de ${srcName}; faltan ${S.feed.queue.length}.`;
+    } else {
+      fe.textContent = "SIMULADO"; fe.className = "feed sim";
+      note.textContent = feedErr ? `Sin datos reales: ${feedErr}. Mostrando un mercado simulado. Cargá una exportación de TradingView, o abrí la app instalada con tu usuario de IOL para precios en vivo.` : "Mercado simulado. Cargá una exportación de BCBA:SPY de TradingView para entrenar con precios reales.";
+    }
+    $("kDish").textContent = S.mode === "real" ? "Capital de la placa (virtual)" : "Capital de la placa";
+    renderReal();
+    $("tPx").textContent = fmtARS(m.px[n]); chg($("tPxChg"), m.px[n] / m.px[n - 1] - 1);
+    const useLive = real && S.replayDone && live.ccl, ccl = useLive ? live.ccl : m.cclHist[n], spyU = !useLive && m.spyHist[n] ? m.spyHist[n] : ccl ? m.px[n] * RATIO / ccl : null;
+    $("kSpy").textContent = real ? "SPY implícito (USD)" : "SPY (USD)";
+    $("kCcl").textContent = real ? "Dólar CCL · SPY ÷ SPYC" : "Dólar CCL";
+    $("tSpy").textContent = spyU ? "US$" + spyU.toFixed(2) : "–";
+    if (m.spyHist[n] && m.spyHist[n - 1]) chg($("tSpyChg"), m.spyHist[n] / m.spyHist[n - 1] - 1); else $("tSpyChg").textContent = "";
+    $("tCcl").textContent = ccl ? fmtARS(ccl) : "–";
+    if (m.cclHist[n] && m.cclHist[n - 1]) chg($("tCclChg"), m.cclHist[n] / m.cclHist[n - 1] - 1); else $("tCclChg").textContent = "";
+    const last = S.eq[S.eq.length - 1];
+    $("tDish").textContent = fmtM(last.dish); chg($("tDishR"), last.dish / START - 1);
+    $("tYou").textContent = fmtM(last.you); chg($("tYouR"), last.you / START - 1);
+    $("tHold").textContent = fmtM(last.hold); chg($("tHoldR"), last.hold / START - 1);
+    const v = $("verdict");
+    if (S.last) { v.textContent = (S.last.hit ? "ACIERTO · pulso tranquilo" : "ERROR · ruido") + " · dijo " + (S.last.up ? "SUBE" : "BAJA"); v.className = "verdict " + (S.last.hit ? "hit" : "miss"); }
+    else { v.textContent = "ESPERANDO · tocá Iniciar"; v.className = "verdict"; }
+    $("mNoise").style.width = dish.noise * 100 + "%"; $("vNoise").textContent = Math.round(dish.noise * 100) + "%";
+    $("mTemp").style.width = dish.temp * 100 + "%"; $("vTemp").textContent = Math.round(dish.temp * 100) + "%";
+    const hr = S.hitRate[S.hitRate.length - 1];
+    $("mHit").style.width = (hr ? hr.v * 100 : 0) + "%"; $("vHit").textContent = hr ? Math.round(hr.v * 100) + "%" : "–";
+    $("log").innerHTML = S.log.slice(0, 30).map(l => `<div><span>${l.label}</span><span>dijo ${l.up ? "SUBE" : "BAJA"}</span><span>${pct(l.r)}</span><span class="${l.hit ? "h" : "m"}">${l.hit ? "ACIERTO" : "ERROR"}</span></div>`).join("");
+    $("btnLong").setAttribute("aria-pressed", String(S.youLongNext)); $("btnCash").setAttribute("aria-pressed", String(!S.youLongNext));
+    drawChart(charts.eq); drawChart(charts.hit);
+  }
+
+  // ---------- loop & controls ----------
+  let running = false, acc = 0, lastT = performance.now();
+  const speed = $("speed");
+  function frame(now) {
+    const dt = (now - lastT) / 1000; lastT = now;
+    if (running) { acc += dt * +speed.value; let k = 0; while (acc >= 1 && k++ < 5) { acc -= 1; stepDay(); } if (acc > 1) acc = 0; }
+    if (S.dish.noise > 0) S.dish.noise = Math.max(0, S.dish.noise - dt * 0.05);
+    drawDish(now);
+    requestAnimationFrame(frame);
+  }
+  function setRunning(v) { running = v; $("btnRun").textContent = running ? "Pausar" : "Iniciar"; }
+  $("btnRun").onclick = () => setRunning(!running);
+  $("btnStep").onclick = () => { setRunning(false); stepDay(); };
+  $("btnReset").onclick = () => { setRunning(false); start(S.feed.kind === "real" && realBars ? realFeed(realBars, realSource) : simFeed()); };
+  $("mode").onchange = async () => {
+    setRunning(false);
+    const mode = $("mode").value;
+    if (mode !== "real" && realCfg.armed) await realCall("api/disarm", {});
+    if (mode === "sim") start(simFeed());
+    else if (realBars) start(realFeed(realBars, realSource));
+    else await boot();
+  };
+  $("interval").onchange = () => { scheduleLive(); renderAll(); };
+  $("cost").onchange = () => renderAll();
+  $("btnArm").onclick = async () => {
+    if (!$("ack").checked) { realMsg = "Marcá la casilla para confirmar que entendés el riesgo."; return renderAll(); }
+    const r = await realCall("api/arm", { code: $("code").value, client: CLIENT });
+    if (r && S.feed.source === "server" && !S.replayDone) fastForward();
+  };
+  $("btnDisarm").onclick = () => realCall("api/disarm", {});
+  $("csv").onchange = async e => {
+    const files = [...e.target.files]; e.target.value = "";
+    if (!files.length) return;
+    setRunning(false);
+    try { realBars = await loadCsvBars(files); realSource = "csv"; feedErr = null; if ($("mode").value === "sim") $("mode").value = "paper"; start(realFeed(realBars, "csv")); }
+    catch (err) { feedErr = err.message; $("mode").value = "sim"; if (S.feed.kind !== "sim") start(simFeed()); else renderAll(); }
+  };
+  $("btnSound").onclick = () => {
+    soundOn = !soundOn;
+    if (soundOn && !ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { soundOn = false; } }
+    if (ac && ac.state === "suspended") ac.resume();
+    $("btnSound").textContent = soundOn ? "Sonido encendido" : "Sonido apagado"; $("btnSound").setAttribute("aria-pressed", String(soundOn));
+  };
+  $("btnLong").onclick = () => { S.youLongNext = true; renderAll(); };
+  $("btnCash").onclick = () => { S.youLongNext = false; renderAll(); };
+  speed.oninput = () => { $("speedV").textContent = speed.value + " pasos/s"; };
+  addEventListener("resize", () => renderAll());
+  matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => renderAll());
+  new MutationObserver(() => renderAll()).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+  let realBars = null, realSource = null, feedErr = null;
+
+  // ---------- real money ----------
+  const CLIENT = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)); // this screen
+  let realCfg = { available: false, armed: false, reason: "Para operar con plata real hace falta la app instalada en tu computadora (ver README)." }, realMsg = "";
+  async function loadConfig() {
+    try {
+      const c = await getJSON("api/config"); realCfg = { ...c.real, armed: !!c.real.armed };
+      // Served by the app's own server: make it installable (the offline shell needs localhost).
+      const link = document.createElement("link"); link.rel = "manifest"; link.href = "manifest.webmanifest"; document.head.appendChild(link);
+      navigator.serviceWorker?.register("sw.js").catch(() => {});
+      if (c.phone && c.phone.url) { $("phoneBox").hidden = false; $("phoneQr").src = "api/celular-qr.svg"; $("phoneUrl").textContent = c.phone.url; }
+    }
+    catch (e) { realCfg = { available: false, armed: false, reason: "Para operar con plata real hace falta la app instalada y abierta en tu computadora (ver README)." }; }
+    if (realCfg.maxArs) $("maxArs").max = realCfg.maxArs;
+    renderAll();
+  }
+  async function realCall(url, body) {
+    try {
+      const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+      const j = await r.json();
+      if (!r.ok) throw new Error(j.error || "el servidor respondió " + r.status);
+      const st = j.status || j;
+      realCfg = { ...realCfg, ...st, armed: !!st.armed };
+      realMsg = j.order ? `Enviada: ${j.order.side === "buy" ? "compra" : "venta"} de ${j.order.qty} SPY a ${fmtARS(j.order.price)}${j.order.operation ? " · operación " + j.order.operation : ""}`
+        : j.skipped ? "Sin orden: " + j.skipped : url.endsWith("arm") && !url.endsWith("disarm") ? "Activado. La placa ya opera tu cuenta de IOL." : "Plata real detenida.";
+      return j;
+    } catch (e) { realMsg = e.message; return null; }
+    finally { renderAll(); }
+  }
+  function sendOrder(side) {
+    realCall("api/order", { side, maxArs: +$("maxArs").value, code: $("code").value, client: CLIENT });
+  }
+  function fastForward() {
+    S.fast = true;
+    while (stepDay()) { /* train on the rest of the history */ }
+    S.fast = false;
+    renderAll();
+  }
+  // Keep the screen on while the dish trades live, so the phone doesn't fall asleep mid-session.
+  let wake = null;
+  async function keepAwake() {
+    const want = S.replayDone && S.feed.source === "server" && document.visibilityState === "visible";
+    try {
+      if (want && !wake && navigator.wakeLock) { wake = await navigator.wakeLock.request("screen"); wake.addEventListener("release", () => { wake = null; }); }
+      else if (!want && wake) { await wake.release(); wake = null; }
+    } catch (e) { wake = null; }
+  }
+  document.addEventListener("visibilitychange", () => keepAwake());
+  function renderReal() {
+    keepAwake();
+    const real = S.mode === "real";
+    $("realBox").hidden = !real;
+    $("mode").querySelector('[value="real"]').disabled = !realCfg.available;
+    for (const o of $("interval").options) o.disabled = real && o.value !== "day" && +o.value < (realCfg.minInterval || 0);
+    $("modeNote").textContent = S.mode === "sim" ? "Un mercado inventado. Nada es real."
+      : real ? "Precios en vivo, y la placa opera tu cuenta real de IOL mientras esté activada. Los gráficos siguen mostrando el juego virtual de $1.000.000."
+      : "Precios reales con la app instalada, pero la plata es ficticia. No se manda nada a tu broker.";
+    if (real && $("interval").selectedOptions[0].disabled) { $("interval").value = [...$("interval").options].find(o => !o.disabled).value; scheduleLive(); }
+    if (!real) return;
+    $("realNote").textContent = (realMsg ? realMsg + " · " : "") + (!realCfg.available ? realCfg.reason
+      : realCfg.armed ? `Activada. Con SUBE compra SPY hasta $${Number(realCfg.maxArs).toLocaleString("es-AR")}; con BAJA vende lo que compró. ${realCfg.ordersToday}/${realCfg.maxOrders} órdenes hoy.`
+      : `Apagada. Límites: $${Number(realCfg.maxArs).toLocaleString("es-AR")} por compra, ${realCfg.minInterval} s entre órdenes, ${realCfg.maxOrders} órdenes por día.`);
+    $("btnArm").disabled = !realCfg.available || realCfg.armed;
+    $("btnDisarm").disabled = !realCfg.armed;
+    $("orders").innerHTML = (realCfg.orders || []).slice().reverse().map(o =>
+      `<div><span>${o.time.slice(5, 16)}</span><span>${o.side === "buy" ? "COMPRA" : "VENTA"} ${o.qty}</span><span>${fmtARS(o.price)}</span><span>${o.operation ?? ""}</span></div>`).join("");
+  }
+  function start(feed) {
+    seed = (Date.now() % 2147483646) + 1;
+    newGame(feed);
+    // open in a working state: pre-run 60 steps so the dish and charts have history
+    for (let i = 0; i < 60; i++) stepDay();
+    flash = null;
+    renderAll();
+  }
+  async function boot() {
+    try {
+      realBars = await loadServerBars(); realSource = "server"; feedErr = null;
+      if ($("mode").value === "sim") $("mode").value = "paper";
+      start(realFeed(realBars, "server"));
+    } catch (e) { feedErr = e.message; $("mode").value = "sim"; if (!S || S.feed.kind !== "sim") start(simFeed()); else renderAll(); }
+  }
+  $("mode").value = "sim";
+  start(simFeed()); // something to look at while the real data loads
+  feedErr = null;
+  $("feed").textContent = "CONECTANDO"; $("feed").className = "feed"; $("feedNote").textContent = "Buscando el servidor local de datos…";
+  boot();
+  loadConfig();
+
+  requestAnimationFrame(frame);
+})();
+</script>

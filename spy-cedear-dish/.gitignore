@@ -1,0 +1,5 @@
+data/*.csv
+results/
+__pycache__/
+dish_positions.json
+.venv/
