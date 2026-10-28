@@ -106,7 +106,7 @@ class IOLClient:
             return df
         df = df.dropna(subset=["close"])
         for col in ("open", "high", "low"):
-            df[col] = df[col].fillna(df.close)
+            df[col] = pd.to_numeric(df[col], errors="coerce").fillna(df.close)
         # IOL can list several entries per day; keep the last one.
         return df.sort_values("date").drop_duplicates("date", keep="last").reset_index(drop=True)
 
