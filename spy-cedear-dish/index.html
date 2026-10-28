@@ -76,12 +76,16 @@ canvas.chart { width: 100%; height: 100%; display: block; }
 .tip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--c); }
 
 .log { font-family: var(--f-mono); font-size: 12px; font-variant-numeric: tabular-nums; max-height: 180px; overflow: auto; display: grid; gap: 2px; color: var(--ink-2); }
-.log div { display: grid; grid-template-columns: 64px 74px 1fr 56px; gap: 8px; white-space: nowrap; }
+.log div { display: grid; grid-template-columns: 112px 74px 1fr 56px; gap: 8px; white-space: nowrap; }
 .log .h { color: var(--hit); } .log .m { color: var(--miss); }
 .notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; font-size: 14px; color: var(--ink-2); }
 .notes h3 { font-family: var(--f-display); font-weight: 500; font-size: 16px; color: var(--ink); margin: 0 0 4px; }
 .notes p { margin: 0; }
-.fine { font-size: 12px; color: var(--muted); }
+.fine { font-size: 12px; color: var(--muted); margin: 0; }
+.fine a, .notes a { color: inherit; }
+.feed { font-family: var(--f-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; padding: 3px 8px; border-radius: 99px; border: 1px solid var(--line); color: var(--ink-2); }
+.feed.real { color: var(--hit); border-color: var(--hit); }
+.feed.sim { color: var(--s2); border-color: var(--s2); }
 @media (prefers-reduced-motion: reduce) { .bar i { transition: none; } }
 </style>
 
@@ -113,21 +117,23 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     </section>
 
     <section class="panel" aria-label="Market and controls">
-      <div class="chart-head"><h2>Market</h2><span class="eyebrow">simulated session</span></div>
+      <div class="chart-head"><h2>Market</h2><span class="feed" id="feed">CONNECTING</span></div>
+      <p class="fine" id="feedNote">Loading SPY CEDEAR history from data912…</p>
       <div class="tiles">
         <div class="tile"><div class="k">SPY CEDEAR</div><div class="v" id="tPx">–</div><div class="sub" id="tPxChg">–</div></div>
-        <div class="tile"><div class="k">SPY (USD)</div><div class="v" id="tSpy">–</div><div class="sub" id="tSpyChg">–</div></div>
-        <div class="tile"><div class="k">Dólar CCL</div><div class="v" id="tCcl">–</div><div class="sub" id="tCclChg">–</div></div>
+        <div class="tile"><div class="k" id="kSpy">SPY (USD)</div><div class="v" id="tSpy">–</div><div class="sub" id="tSpyChg">–</div></div>
+        <div class="tile"><div class="k" id="kCcl">Dólar CCL</div><div class="v" id="tCcl">–</div><div class="sub" id="tCclChg">–</div></div>
         <div class="tile"><div class="k">Dish equity</div><div class="v" id="tDish">–</div><div class="sub" id="tDishR">–</div></div>
         <div class="tile"><div class="k">Your equity</div><div class="v" id="tYou">–</div><div class="sub" id="tYouR">–</div></div>
         <div class="tile"><div class="k">Buy &amp; hold</div><div class="v" id="tHold">–</div><div class="sub" id="tHoldR">–</div></div>
       </div>
       <div class="controls">
         <button class="primary" id="btnRun">Run</button>
-        <button id="btnStep">Next day</button>
-        <button id="btnReset">New market</button>
+        <button id="btnStep">Next step</button>
+        <button id="btnReset">Restart</button>
+        <button id="btnMode">Use simulation</button>
         <button id="btnSound" aria-pressed="false">Sound off</button>
-        <label class="speed" for="speed">Speed <input id="speed" type="range" min="1" max="30" value="6"> <span id="speedV">6 d/s</span></label>
+        <label class="speed" for="speed">Speed <input id="speed" type="range" min="1" max="30" value="6"> <span id="speedV">6 steps/s</span></label>
       </div>
       <div class="you">
         <div class="eyebrow">Your position</div>
@@ -135,7 +141,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
           <button id="btnLong" aria-pressed="false">Hold CEDEARs</button>
           <button id="btnCash" aria-pressed="true">Stay in pesos</button>
         </div>
-        <p>Play against the dish. Your position applies from the next day until you change it. Everyone starts with ARS 1.000.000.</p>
+        <p>Play against the dish. Your position applies from the next step until you change it. Everyone starts with ARS 1.000.000.</p>
       </div>
       <div class="log" id="log" aria-live="polite"></div>
     </section>
@@ -159,7 +165,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     <div><h3>How a day works</h3><p>Before the open, six market features (yesterday's move, the 5- and 20-day trend, distance from the average, volatility, the CCL move) stimulate 12 sensory electrodes. The culture settles, and whichever motor region fires harder sets the call: up means hold CEDEARs, down means sit in pesos.</p></div>
     <div><h3>Miss: noise</h3><p>A wrong call triggers a burst of random stimulation that lingers for days, and the synapses that drove the call get weakened and jittered. Unpredictable input is what the culture is trying to avoid.</p></div>
     <div><h3>Hit: a calm beat</h3><p>A right call gets a steady, predictable pulse. The active pathway is strengthened (Hebbian: cells that fire together wire together) and exploration drops.</p></div>
-    <div><h3>The market</h3><p>Prices are a simulation, not live data: SPY follows trending regimes with short momentum, the CCL drifts up with jumps, and the CEDEAR is SPY × CCL ÷ 20. This is a toy for learning, not investment advice.</p></div>
+    <div><h3>The market</h3><p>Real mode trains the dish on about two years of daily SPY CEDEAR closes from <a href="https://data912.com" target="_blank" rel="noopener">data912</a>. Then it trades live quotes once a minute while BYMA is open (11:00 to 17:00 Buenos Aires time). The CCL comes from <a href="https://dolarapi.com" target="_blank" rel="noopener">DolarAPI</a>, or is implied as SPY ÷ SPYC. The quotes are free and delayed. If they can't be reached, the game falls back to a simulation. This is a toy for learning, not investment advice.</p></div>
   </section>
 </div>
 
@@ -181,19 +187,100 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   const RATIO = 20, START = 1e6, NS = 12, NH = 48, NM = 8;
   let S; // full game state
 
-  // ---------- market ----------
-  function marketStep(m) {
-    if (rand() < 0.025) m.regime = rand() < 0.62 ? 1 : -1;
-    const mu = m.regime > 0 ? 0.0006 : -0.0012;
-    const vol = m.regime > 0 ? 0.008 : 0.016;
-    const r = mu + 0.38 * m.lastR + vol * gauss();
-    let c = 0.0005 + 0.2 * m.lastC + 0.006 * gauss();
-    if (rand() < 0.01) c += 0.04 + 0.04 * rand(); // CCL jump
-    m.lastR = r; m.lastC = c;
-    m.spy *= Math.exp(r); m.ccl *= Math.exp(c);
-    m.spyHist.push(m.spy); m.cclHist.push(m.ccl);
-    m.px.push(m.spy * m.ccl / RATIO);
+  // ---------- market feeds ----------
+  // Shaped like the Gym trading environments (TradingGym, FinRL): a feed hands out one bar at a time.
+  // A bar is { label, px (ARS), spy (USD), ccl (ARS per USD) }; spy and ccl may be null on real bars.
+  const API = "https://data912.com", DOLAR = "https://dolarapi.com/v1/dolares/contadoconliqui";
+  const TZ = "America/Argentina/Buenos_Aires";
+
+  function pushBar(m, bar) {
+    m.px.push(bar.px); m.labels.push(bar.label);
+    m.spyHist.push(bar.spy ?? null); m.cclHist.push(bar.ccl ?? null);
   }
+
+  function simFeed() {
+    const st = { spy: 640 + rand() * 80, ccl: 1380 + rand() * 120, regime: 1, lastR: 0, lastC: 0, n: 0 };
+    return {
+      kind: "sim",
+      hasNext: () => true,
+      next() {
+        if (rand() < 0.025) st.regime = rand() < 0.62 ? 1 : -1;
+        const mu = st.regime > 0 ? 0.0006 : -0.0012, vol = st.regime > 0 ? 0.008 : 0.016;
+        const r = mu + 0.38 * st.lastR + vol * gauss();
+        let c = 0.0005 + 0.2 * st.lastC + 0.006 * gauss();
+        if (rand() < 0.01) c += 0.04 + 0.04 * rand(); // CCL jump
+        st.lastR = r; st.lastC = c; st.spy *= Math.exp(r); st.ccl *= Math.exp(c); st.n++;
+        return { label: "Day " + (st.n - 26), px: st.spy * st.ccl / RATIO, spy: st.spy, ccl: st.ccl };
+      },
+    };
+  }
+
+  async function getJSON(url, ms = 9000) {
+    const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), ms);
+    try {
+      const r = await fetch(url, { signal: ctl.signal, cache: "no-store" });
+      if (!r.ok) throw new Error(new URL(url).host + " answered " + r.status);
+      return await r.json();
+    } catch (e) {
+      throw new Error(e.name === "AbortError" ? new URL(url).host + " timed out" : e.message.startsWith(new URL(url).host) ? e.message : new URL(url).host + " is unreachable from this page");
+    } finally { clearTimeout(t); }
+  }
+  const num = v => { const n = typeof v === "string" ? parseFloat(v) : v; return Number.isFinite(n) && n > 0 ? n : null; };
+  const closeOf = r => num(r.c ?? r.close ?? r.cierre ?? r.last);
+  const dateOf = r => String(r.date ?? r.fecha ?? r.d ?? "").slice(0, 10);
+  async function history(ticker) {
+    const rows = await getJSON(`${API}/historical/cedears/${ticker}`);
+    if (!Array.isArray(rows)) throw new Error("data912 sent an unexpected history format");
+    return rows.map(r => ({ date: dateOf(r), c: closeOf(r) })).filter(r => r.date && r.c).sort((x, y) => x.date < y.date ? -1 : 1);
+  }
+
+  // Real BYMA data: daily closes of the SPY CEDEAR in pesos to train on, then delayed live quotes.
+  // The CCL is implied from the same CEDEAR in two currencies: SPY (pesos) ÷ SPYC (cable dollars).
+  async function loadRealBars() {
+    const ars = await history("SPY");
+    if (ars.length < 60) throw new Error("data912 returned too little SPY history");
+    let usd = new Map();
+    for (const t of ["SPYC", "SPYD"]) {
+      try { usd = new Map((await history(t)).map(r => [r.date, r.c])); if (usd.size) break; } catch (e) { /* optional */ }
+    }
+    return ars.slice(-520).map(r => {
+      const u = usd.get(r.date);
+      return { label: r.date, px: r.c, ccl: u ? r.c / u : null, spy: u ? u * RATIO : null };
+    });
+  }
+  function realFeed(bars) {
+    return { kind: "real", queue: bars.slice(), hasNext() { return this.queue.length > 0; }, next() { return this.queue.shift(); } };
+  }
+
+  function baTime(d = new Date()) {
+    const p = Object.fromEntries(new Intl.DateTimeFormat("en-GB", { timeZone: TZ, weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false })
+      .formatToParts(d).map(x => [x.type, x.value]));
+    return { day: p.weekday, h: +p.hour, hhmm: `${p.hour}:${p.minute}` };
+  }
+  const bymaOpen = () => { const t = baTime(); return !["Sat", "Sun"].includes(t.day) && t.h >= 11 && t.h < 17; };
+
+  const live = { ok: false, err: null, ccl: null, cclSource: null, checked: null };
+  async function pollLive() {
+    if (!S || S.feed.kind !== "real" || !S.replayDone) return;
+    try {
+      const [panel, dolar] = await Promise.all([getJSON(`${API}/live/arg_cedears`), getJSON(DOLAR).catch(() => null)]);
+      const row = sym => Array.isArray(panel) ? panel.find(r => String(r.symbol ?? r.ticker ?? "").toUpperCase() === sym) : null;
+      const spy = row("SPY"), spyc = row("SPYC") || row("SPYD");
+      const px = spy && num(spy.c ?? spy.last);
+      const u = spyc && num(spyc.c ?? spyc.last);
+      const cclApi = dolar && num(dolar.venta);
+      if (cclApi) { live.ccl = cclApi; live.cclSource = "dolarapi"; }
+      else if (px && u) { live.ccl = px / u; live.cclSource = "SPY ÷ SPYC"; }
+      live.ok = !!px; live.err = px ? null : "SPY was missing from the data912 CEDEAR panel"; live.checked = baTime().hhmm;
+      const lastPx = S.m.px[S.m.px.length - 1];
+      if (px && px !== lastPx && bymaOpen()) {
+        S.feed.queue.push({ label: "Live " + live.checked, px, ccl: live.ccl, spy: live.ccl ? px * RATIO / live.ccl : null });
+        stepDay();
+      }
+    } catch (e) { live.ok = false; live.err = e.message; }
+    renderAll();
+  }
+  setInterval(() => { if (S && S.feed.kind === "real" && S.replayDone && bymaOpen()) pollLive(); }, 60000);
 
   function features(m) {
     const p = m.px, n = p.length - 1;
@@ -201,7 +288,8 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     const ma = p.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, p.length);
     const rets = []; for (let i = Math.max(1, n - 19); i <= n; i++) rets.push(Math.log(p[i] / p[i - 1]));
     const sd = Math.sqrt(rets.reduce((a, b) => a + b * b, 0) / Math.max(1, rets.length)) || 0.01;
-    const cc = Math.log(m.cclHist[n] / m.cclHist[Math.max(0, n - 1)]);
+    const c1 = m.cclHist[n], c0 = m.cclHist[Math.max(0, n - 1)];
+    const cc = c1 && c0 ? Math.log(c1 / c0) : 0;
     const f = [ret(1) / 0.012, ret(5) / 0.03, ret(20) / 0.06, Math.log(p[n] / ma) / 0.03, (sd - 0.012) / 0.006, cc / 0.008];
     const x = [];
     for (const v of f) { const t = Math.tanh(v); x.push(Math.max(0, t), Math.max(0, -t)); } // on/off electrode pairs
@@ -255,25 +343,27 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   }
 
   // ---------- game ----------
-  function newGame() {
-    const m = { spy: 640 + rand() * 80, ccl: 1380 + rand() * 120, regime: 1, lastR: 0, lastC: 0, spyHist: [], cclHist: [], px: [] };
-    m.spyHist.push(m.spy); m.cclHist.push(m.ccl); m.px.push(m.spy * m.ccl / RATIO);
-    for (let i = 0; i < 25; i++) marketStep(m); // warm-up history for the features
+  function newGame(feed) {
+    const m = { px: [], labels: [], spyHist: [], cclHist: [] };
+    for (let i = 0; i < 26 && feed.hasNext(); i++) pushBar(m, feed.next()); // warm-up history for the features
     const p0 = m.px[m.px.length - 1];
-    S = { m, dish: makeDish(), day: 0, dishEq: START, youEq: START, holdUnits: START / p0, youLong: false, youLongNext: false,
-      eq: [{ day: 0, dish: START, you: START, hold: START }], hits: [], hitRate: [], last: null, log: [] };
-    renderAll();
+    S = { m, feed, dish: makeDish(), day: 0, dishEq: START, youEq: START, holdUnits: START / p0, youLong: false, youLongNext: false, replayDone: false,
+      eq: [{ day: 0, label: m.labels[m.labels.length - 1], dish: START, you: START, hold: START }], hits: [], hitRate: [], last: null, log: [] };
   }
 
   function stepDay() {
-    const { m, dish } = S;
+    const { m, dish, feed } = S;
+    if (!feed.hasNext()) {
+      if (feed.kind === "real" && !S.replayDone) { S.replayDone = true; setRunning(false); pollLive(); }
+      return false;
+    }
     const x = features(m);
     const { up, h } = think(dish, x);
     const p0 = m.px[m.px.length - 1];
     S.youLong = S.youLongNext;
-    marketStep(m);
-    const p1 = m.px[m.px.length - 1];
-    const r = p1 / p0 - 1;
+    const bar = feed.next();
+    pushBar(m, bar);
+    const r = bar.px / p0 - 1;
     const hit = (r > 0) === up;
     if (up) S.dishEq *= 1 + r;
     if (S.youLong) S.youEq *= 1 + r;
@@ -281,13 +371,14 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     S.day++;
     S.hits.push(hit ? 1 : 0);
     const w = S.hits.slice(-20);
-    S.hitRate.push({ day: S.day, v: w.reduce((a, b) => a + b, 0) / w.length });
-    S.eq.push({ day: S.day, dish: S.dishEq, you: S.youEq, hold: S.holdUnits * p1 });
+    S.hitRate.push({ day: S.day, label: bar.label, v: w.reduce((a, b) => a + b, 0) / w.length });
+    S.eq.push({ day: S.day, label: bar.label, dish: S.dishEq, you: S.youEq, hold: S.holdUnits * bar.px });
     S.last = { hit, up, r };
-    S.log.unshift({ day: S.day, up, r, hit });
+    S.log.unshift({ label: bar.label, up, r, hit });
     if (S.log.length > 60) S.log.pop();
     feedback(hit);
     renderAll();
+    return true;
   }
 
   // ---------- sound ----------
@@ -396,6 +487,17 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     const t = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) t.push(+v.toFixed(10));
     return t;
   }
+  function xLabel(data, t) {
+    const d = data.find(e => e.day === t);
+    if (!d) return t === 0 ? "" : "#" + t;
+    const L = d.label || "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(L)) {
+      const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+L.slice(5, 7) - 1];
+      return data.length < 200 ? +L.slice(8, 10) + " " + mon : mon + " " + L.slice(2, 4);
+    }
+    if (L.startsWith("Live ")) return L.slice(5, 10);
+    return L.replace("Day ", "d");
+  }
   function lineChart(cv, data, series, opts, hoverIdx) {
     const { g, W, H } = setupCanvas(cv);
     const pad = { l: 58, r: 66, t: 10, b: 24 };
@@ -412,7 +514,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
       g.textAlign = "right"; g.fillText(opts.fmtY(t), pad.l - 8, y + 4);
     }
     g.textAlign = "center";
-    for (const t of niceTicks(0, xMax, 6)) if (t >= 0) g.fillText("d" + t, X(t), H - 6);
+    for (const t of niceTicks(0, xMax, 6)) if (t >= 0) { const lab = xLabel(data, t); if (lab) g.fillText(lab, X(t), H - 6); }
     if (opts.ref != null) { g.setLineDash([4, 4]); g.strokeStyle = cInk2; g.beginPath(); g.moveTo(pad.l, Y(opts.ref)); g.lineTo(pad.l + cw, Y(opts.ref)); g.stroke(); g.setLineDash([]); }
     g.lineWidth = 2; g.lineJoin = "round";
     const ends = [];
@@ -443,9 +545,9 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   const hitSeries = () => [{ key: "v", label: "", color: css("--s1") }];
   const charts = {
     eq: { cv: $("cEq"), tip: $("tipEq"), hover: null, data: () => S.eq, series: eqSeries, opts: { fmtY: v => (v / 1e6).toFixed(2) + "M" },
-      tipHtml: d => `<div>Day ${d.day}</div>` + eqSeries().map(s => `<div class="row"><span class="dot" style="--c:${s.color}"></span>${s.label === "Hold" ? "Buy & hold" : s.label} ${fmtARS(d[s.key])}</div>`).join("") },
+      tipHtml: d => `<div>${d.label}</div>` + eqSeries().map(s => `<div class="row"><span class="dot" style="--c:${s.color}"></span>${s.label === "Hold" ? "Buy & hold" : s.label} ${fmtARS(d[s.key])}</div>`).join("") },
     hit: { cv: $("cHit"), tip: $("tipHit"), hover: null, data: () => S.hitRate, series: hitSeries, opts: { min: 0, max: 1, ticks: 4, ref: 0.5, fmtY: v => Math.round(v * 100) + "%" },
-      tipHtml: d => `<div>Day ${d.day}</div><div>Hit rate ${(d.v * 100).toFixed(0)}%</div>` },
+      tipHtml: d => `<div>${d.label}</div><div>Hit rate ${(d.v * 100).toFixed(0)}%</div>` },
   };
   function drawChart(c) { c.geo = lineChart(c.cv, c.data(), c.series(), c.opts, c.hover); }
   for (const c of Object.values(charts)) {
@@ -469,10 +571,30 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   function chg(el, v) { el.textContent = pct(v); el.style.color = v >= 0 ? css("--hit") : css("--miss"); }
   function renderAll() {
     const { m, dish } = S, n = m.px.length - 1;
-    $("dayLabel").textContent = "Day " + S.day;
+    const real = S.feed.kind === "real";
+    $("dayLabel").textContent = S.day ? m.labels[n] : "Step 0";
+    const fe = $("feed"), note = $("feedNote");
+    if (real && S.replayDone) {
+      fe.textContent = !bymaOpen() ? "REAL · BYMA CLOSED" : live.ok ? "LIVE · BYMA" : "REAL · WAITING"; fe.className = "feed real";
+      note.textContent = live.err ? `Live quote failed: ${live.err}. Retrying every minute while BYMA is open.`
+        : bymaOpen() ? `Trading delayed live quotes, polled every minute${live.checked ? " · last check " + live.checked + " ART" : ""}.`
+        : `BYMA is closed. The dish trades the next live quote after 11:00 ART${live.checked ? " · last check " + live.checked : ""}.`;
+    } else if (real) {
+      fe.textContent = "REAL · REPLAY"; fe.className = "feed real";
+      note.textContent = `Training on ${S.feed.queue.length + S.day} real daily closes from data912 (${S.feed.queue.length} to go). Live trading starts when the replay ends.`;
+    } else {
+      fe.textContent = "SIMULATED"; fe.className = "feed sim";
+      note.textContent = feedErr ? `Real data unavailable: ${feedErr}. Showing a simulated market. Open this file in a normal browser to use live BYMA data.` : "Simulated market.";
+    }
+    $("btnMode").textContent = real ? "Use simulation" : "Use real data";
     $("tPx").textContent = fmtARS(m.px[n]); chg($("tPxChg"), m.px[n] / m.px[n - 1] - 1);
-    $("tSpy").textContent = "US$" + m.spyHist[n].toFixed(2); chg($("tSpyChg"), m.spyHist[n] / m.spyHist[n - 1] - 1);
-    $("tCcl").textContent = fmtARS(m.ccl); chg($("tCclChg"), m.cclHist[n] / m.cclHist[n - 1] - 1);
+    const useLive = real && S.replayDone && live.ccl, ccl = useLive ? live.ccl : m.cclHist[n], spyU = !useLive && m.spyHist[n] ? m.spyHist[n] : ccl ? m.px[n] * RATIO / ccl : null;
+    $("kSpy").textContent = real ? "SPY implied (USD)" : "SPY (USD)";
+    $("kCcl").textContent = useLive ? "Dólar CCL · " + live.cclSource : real ? "Dólar CCL · SPY ÷ SPYC" : "Dólar CCL";
+    $("tSpy").textContent = spyU ? "US$" + spyU.toFixed(2) : "–";
+    if (m.spyHist[n] && m.spyHist[n - 1]) chg($("tSpyChg"), m.spyHist[n] / m.spyHist[n - 1] - 1); else $("tSpyChg").textContent = "";
+    $("tCcl").textContent = ccl ? fmtARS(ccl) : "–";
+    if (m.cclHist[n] && m.cclHist[n - 1]) chg($("tCclChg"), m.cclHist[n] / m.cclHist[n - 1] - 1); else $("tCclChg").textContent = "";
     const last = S.eq[S.eq.length - 1];
     $("tDish").textContent = fmtM(last.dish); chg($("tDishR"), last.dish / START - 1);
     $("tYou").textContent = fmtM(last.you); chg($("tYouR"), last.you / START - 1);
@@ -484,7 +606,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     $("mTemp").style.width = dish.temp * 100 + "%"; $("vTemp").textContent = Math.round(dish.temp * 100) + "%";
     const hr = S.hitRate[S.hitRate.length - 1];
     $("mHit").style.width = (hr ? hr.v * 100 : 0) + "%"; $("vHit").textContent = hr ? Math.round(hr.v * 100) + "%" : "–";
-    $("log").innerHTML = S.log.slice(0, 30).map(l => `<div><span>Day ${l.day}</span><span>call ${l.up ? "UP" : "DOWN"}</span><span>${pct(l.r)}</span><span class="${l.hit ? "h" : "m"}">${l.hit ? "HIT" : "MISS"}</span></div>`).join("");
+    $("log").innerHTML = S.log.slice(0, 30).map(l => `<div><span>${l.label}</span><span>call ${l.up ? "UP" : "DOWN"}</span><span>${pct(l.r)}</span><span class="${l.hit ? "h" : "m"}">${l.hit ? "HIT" : "MISS"}</span></div>`).join("");
     $("btnLong").setAttribute("aria-pressed", String(S.youLongNext)); $("btnCash").setAttribute("aria-pressed", String(!S.youLongNext));
     drawChart(charts.eq); drawChart(charts.hit);
   }
@@ -499,9 +621,11 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     drawDish(now);
     requestAnimationFrame(frame);
   }
-  $("btnRun").onclick = () => { running = !running; $("btnRun").textContent = running ? "Pause" : "Run"; };
-  $("btnStep").onclick = () => { running = false; $("btnRun").textContent = "Run"; stepDay(); };
-  $("btnReset").onclick = () => { seed = (Date.now() % 2147483646) + 1; newGame(); };
+  function setRunning(v) { running = v; $("btnRun").textContent = running ? "Pause" : "Run"; }
+  $("btnRun").onclick = () => setRunning(!running);
+  $("btnStep").onclick = () => { setRunning(false); stepDay(); };
+  $("btnReset").onclick = () => { setRunning(false); start(S.feed.kind === "real" && realBars ? realFeed(realBars) : simFeed()); };
+  $("btnMode").onclick = () => { setRunning(false); S.feed.kind === "real" ? start(simFeed()) : boot(); };
   $("btnSound").onclick = () => {
     soundOn = !soundOn;
     if (soundOn && !ac) { try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { soundOn = false; } }
@@ -510,15 +634,28 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   };
   $("btnLong").onclick = () => { S.youLongNext = true; renderAll(); };
   $("btnCash").onclick = () => { S.youLongNext = false; renderAll(); };
-  speed.oninput = () => { $("speedV").textContent = speed.value + " d/s"; };
+  speed.oninput = () => { $("speedV").textContent = speed.value + " steps/s"; };
   addEventListener("resize", () => renderAll());
   matchMedia("(prefers-color-scheme: dark)").addEventListener?.("change", () => renderAll());
   new MutationObserver(() => renderAll()).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
-  newGame();
-  // open in a working state: pre-run 60 days so the dish and charts have history
-  for (let i = 0; i < 60; i++) stepDay();
-  flash = null;
+  let realBars = null, feedErr = null;
+  function start(feed) {
+    seed = (Date.now() % 2147483646) + 1;
+    newGame(feed);
+    // open in a working state: pre-run 60 steps so the dish and charts have history
+    for (let i = 0; i < 60; i++) stepDay();
+    flash = null;
+    renderAll();
+  }
+  async function boot() {
+    try { realBars = realBars || await loadRealBars(); feedErr = null; start(realFeed(realBars)); }
+    catch (e) { feedErr = e.message; if (!S || S.feed.kind !== "sim") start(simFeed()); else renderAll(); }
+  }
+  start(simFeed()); // something to look at while the real data loads
+  feedErr = null;
+  $("feed").textContent = "CONNECTING"; $("feed").className = "feed"; $("feedNote").textContent = "Loading SPY CEDEAR history from data912…";
+  boot();
   requestAnimationFrame(frame);
 })();
 </script>
