@@ -2,8 +2,9 @@
 
 Un cultivo simulado de 48 neuronas aprende a operar el CEDEAR de SPY en BYMA. La idea viene del experimento DishBrain:
 
-- **Error:** una ráfaga de ruido impredecible. La placa se llena de estímulos al azar, y el camino que llevó a esa decisión se debilita.
-- **Acierto:** un pulso tranquilo y regular. El camino que se activó se refuerza (Hebb) y baja la exploración.
+- **Pierde plata** en un paso (comisiones incluidas): una ráfaga de ruido impredecible. La placa se llena de estímulos al azar, y el camino que llevó a esa decisión se debilita. Cuanto más pierde, más fuerte el ruido.
+- **Gana plata:** un pulso tranquilo y regular, más claro cuanto más gana. El camino que se activó se refuerza (Hebb) y baja la exploración.
+- **Se queda en pesos sin moverse:** ninguna señal. De a poco le vuelve la curiosidad para que no se quede en pesos para siempre.
 
 Es un juego para aprender, no una recomendación de inversión.
 
@@ -77,7 +78,10 @@ Cada pantalla (la computadora y el celular) corre su propia placa. Con plata rea
 | Plata real | Reales | Tu cuenta de IOL, mientras esté activada |
 
 - **Intervalo de operación:** cada cuánto decide la placa con precios en vivo: 15 s, 30 s, 1, 5, 15 o 30 min, 1 h, o una vez por día (con el primer precio después de que abre BYMA). Opera solo de 11 a 17, hora de Buenos Aires.
-- **Costo por operación:** se descuenta del capital virtual cada vez que la placa pasa de CEDEARs a pesos o al revés.
+- **Costo por operación:** se descuenta del capital virtual cada vez que la placa pasa de CEDEARs a pesos o al revés, y cuenta para la señal de aprendizaje.
+- **Señal de aprendizaje:** *Ganancia o pérdida real* (la predeterminada: ruido si pierde plata, pulso si gana) o *Acierto de dirección* (la versión anterior: pulso si acertó si el precio subía o bajaba, aunque estuviera en pesos).
+
+  Con la ganancia real, quedarse en pesos nunca da pulso, así que la placa aprende a estar casi siempre en CEDEARs. En las pruebas con el mercado simulado estuvo en pesos solo el 2–4% de los pasos. Con el acierto de dirección se anima más a salir y acierta un poco más seguido. En ninguno de los dos modos le ganó de forma consistente a comprar y mantener.
 
 ## Plata real
 
@@ -120,6 +124,7 @@ Para comparar la placa con comprar y mantener y con el agente PPO de FinRL, usan
 ```bash
 .venv/bin/python -m pip install -r requirements-finrl.txt   # descarga grande (incluye PyTorch)
 .venv/bin/python -m finrl_byma.run --source iol --ppo
+.venv/bin/python -m finrl_byma.run --source iol --signal direction   # con la señal de acierto de dirección
 ```
 
 En Windows, usá `.venv\Scripts\python` en lugar de `.venv/bin/python`.

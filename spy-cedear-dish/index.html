@@ -137,7 +137,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
       <div class="meters">
         <div class="meter"><span>Sorpresa (ruido)</span><div class="bar"><i id="mNoise" style="background: var(--miss)"></i></div><b id="vNoise">0%</b></div>
         <div class="meter"><span>Exploración</span><div class="bar"><i id="mTemp"></i></div><b id="vTemp">0%</b></div>
-        <div class="meter"><span>Aciertos, 20 pasos</span><div class="bar"><i id="mHit" style="background: var(--hit)"></i></div><b id="vHit">–</b></div>
+        <div class="meter"><span>Ganadoras, últimas 20</span><div class="bar"><i id="mHit" style="background: var(--hit)"></i></div><b id="vHit">–</b></div>
       </div>
     </section>
 
@@ -182,6 +182,12 @@ canvas.chart { width: 100%; height: 100%; display: block; }
         </label>
         <label for="cost">Costo por operación, %
           <input id="cost" type="number" min="0" max="3" step="0.1" value="0.5">
+        </label>
+        <label for="signal">Señal de aprendizaje
+          <select id="signal">
+            <option value="pnl" selected>Ganancia o pérdida real</option>
+            <option value="direction">Acierto de dirección</option>
+          </select>
         </label>
       </div>
       <p class="fine" id="modeNote"></p>
@@ -229,14 +235,14 @@ canvas.chart { width: 100%; height: 100%; display: block; }
       </div>
     </div>
     <div class="chart-box"><canvas class="chart" id="cEq" aria-label="Capital en millones de pesos por paso"></canvas><div class="tip" id="tipEq" hidden></div></div>
-    <div class="chart-head"><span class="eyebrow">Aciertos de la placa, últimos 20 pasos · 50% es tirar una moneda</span></div>
-    <div class="chart-box small"><canvas class="chart" id="cHit" aria-label="Aciertos de la placa"></canvas><div class="tip" id="tipHit" hidden></div></div>
+    <div class="chart-head"><span class="eyebrow">Operaciones ganadoras de la placa, últimas 20 · 50% es tirar una moneda</span></div>
+    <div class="chart-box small"><canvas class="chart" id="cHit" aria-label="Operaciones ganadoras de la placa"></canvas><div class="tip" id="tipHit" hidden></div></div>
   </section>
 
   <section class="notes">
     <div><h3>Cómo funciona un paso</h3><p>Seis señales del mercado (el último movimiento, la tendencia de 5 y 20 pasos, la distancia al promedio, la volatilidad y el movimiento del CCL) estimulan 12 electrodos sensoriales. El cultivo se acomoda, y la región motora que más se activa decide: sube significa tener CEDEARs, baja significa quedarse en pesos.</p></div>
-    <div><h3>Error: ruido</h3><p>Una predicción errada dispara una ráfaga de estímulos al azar que dura varios pasos, y las sinapsis que llevaron a esa decisión se debilitan y se sacuden. El cultivo intenta evitar justamente lo impredecible.</p></div>
-    <div><h3>Acierto: pulso tranquilo</h3><p>Una predicción correcta recibe un pulso regular y predecible. El camino que se activó se refuerza (Hebb: las neuronas que se disparan juntas se conectan) y baja la exploración.</p></div>
+    <div><h3>Pierde plata: ruido</h3><p>Si en el paso perdió plata, comisiones incluidas, recibe una ráfaga de estímulos al azar que dura varios pasos, y las sinapsis que llevaron a esa decisión se debilitan y se sacuden. Cuanto más pierde, más fuerte el ruido. El cultivo intenta evitar justamente lo impredecible.</p></div>
+    <div><h3>Gana plata: pulso tranquilo</h3><p>Si ganó, recibe un pulso regular y predecible, más claro cuanto más ganó. El camino que se activó se refuerza (Hebb: las neuronas que se disparan juntas se conectan) y baja la exploración. Quedarse en pesos sin moverse no da ninguna señal, pero de a poco le vuelve la curiosidad para que no se esconda en pesos para siempre.</p></div>
     <div><h3>Precios reales</h3><p>Con la app instalada en tu computadora, la placa aprende con el historial de SPY de tu cuenta de InvertirOnline y después opera los precios en vivo, de 11 a 17 (hora de Buenos Aires). También podés exportar BCBA:SPY desde <a href="https://www.tradingview.com/symbols/BCBA-SPY/" target="_blank" rel="noopener">TradingView</a> (y BCBA:SPYC para calcular el CCL como SPY ÷ SPYC) y cargar el CSV acá. Sin datos reales, la app usa un mercado simulado. Es un juego para aprender, no una recomendación de inversión.</p></div>
   </section>
 </div>
@@ -249,7 +255,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const fmtARS = v => "$" + Math.round(v).toLocaleString("es-AR");
   const fmtM = v => "$" + (v / 1e6).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + "M";
-  const pct = v => (v >= 0 ? "+" : "") + (v * 100).toFixed(2) + "%";
+  const pct = v => (v >= 0 ? "+" : "") + (v * 100).toFixed(2).replace(".", ",") + "%";
 
   // ---------- seeded RNG ----------
   let seed = Date.now() % 2147483647;
@@ -421,16 +427,20 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     return { up: drive > 0, h };
   }
 
-  function learn(d, h, choseUp, hit) {
-    const c = choseUp ? 0 : 1, o = 1 - c, eta = 0.04;
-    if (hit) { // calm beat: consolidate the pathway that worked
+  // outcome: +1 a gain (calm beat), -1 a loss (noise), 0 nothing happened (no signal).
+  // strength (0..1) grows with the size of the gain or loss.
+  function learn(d, h, choseUp, outcome, strength) {
+    const c = choseUp ? 0 : 1, o = 1 - c, eta = 0.04 * strength;
+    if (outcome > 0) { // calm beat: consolidate the pathway that worked
       for (let i = 0; i < NH; i++) { d.W[c][i] += eta * h[i]; d.W[o][i] -= eta * h[i]; }
-      d.temp = Math.max(0.05, d.temp * 0.93);
+      d.temp = Math.max(0.05, d.temp * (1 - 0.07 * strength));
       d.noise *= 0.4; d.beat = 1;
-    } else {   // noise: weaken and jitter the pathway, raise exploration
-      for (let i = 0; i < NH; i++) { d.W[c][i] -= eta * h[i]; d.W[o][i] += eta * h[i]; d.W[c][i] += 0.01 * gauss(); }
-      d.temp = Math.min(1, d.temp + 0.04);
-      d.noise = Math.min(1, d.noise + 0.55);
+    } else if (outcome < 0) { // noise: weaken and jitter the pathway, raise exploration
+      for (let i = 0; i < NH; i++) { d.W[c][i] -= eta * h[i]; d.W[o][i] += eta * h[i]; d.W[c][i] += 0.01 * strength * gauss(); }
+      d.temp = Math.min(1, d.temp + 0.04 * strength);
+      d.noise = Math.min(1, d.noise + 0.55 * strength);
+    } else { // sitting in pesos: no signal, but curiosity creeps back so it doesn't hide in cash forever
+      d.temp = Math.min(1, d.temp + 0.01);
     }
     for (const w of d.W) { const n = Math.hypot(...w); if (n > 3) for (let i = 0; i < NH; i++) w[i] *= 3 / n; }
   }
@@ -453,7 +463,8 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     const { up, h } = S.pending || think(dish, features(m));
     S.pending = null;
     const cost = Math.max(0, +$("cost").value || 0) / 100;
-    if (S.dishPos != null && S.dishPos !== up) S.dishEq *= 1 - cost; // switching between CEDEARs and pesos costs a commission
+    const switched = S.dishPos != null && S.dishPos !== up;
+    if (switched) S.dishEq *= 1 - cost; // switching between CEDEARs and pesos costs a commission
     S.dishPos = up;
     if (S.youLong !== S.youLongNext && S.day > 0) S.youEq *= 1 - cost;
     const p0 = m.px[m.px.length - 1];
@@ -461,20 +472,27 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     const bar = feed.next();
     pushBar(m, bar);
     const r = bar.px / p0 - 1;
-    const hit = (r > 0) === up;
     if (up) S.dishEq *= 1 + r;
     if (S.youLong) S.youEq *= 1 + r;
-    learn(dish, h, up, hit);
+    // The dish's own result this step, commission included: what it gained or lost in pesos.
+    const pnl = (up ? (1 - (switched ? cost : 0)) * (1 + r) - 1 : -(switched ? cost : 0));
+    let outcome, strength;
+    if ($("signal").value === "direction") { outcome = (r > 0) === up ? 1 : -1; strength = 1; }
+    else {
+      outcome = pnl > 1e-9 ? 1 : pnl < -1e-9 ? -1 : 0;
+      strength = Math.min(1, 0.3 + Math.abs(pnl) / 0.01); // a 0.7% move or bigger gives the full signal
+    }
+    learn(dish, h, up, outcome, strength);
     S.day++;
-    S.hits.push(hit ? 1 : 0);
-    const w = S.hits.slice(-20);
-    S.hitRate.push({ day: S.day, label: bar.label, v: w.reduce((a, b) => a + b, 0) / w.length });
+    S.hits.push(outcome);
+    const w = S.hits.filter(x => x !== 0).slice(-20), wins = w.filter(x => x > 0).length;
+    S.hitRate.push({ day: S.day, label: bar.label, v: w.length ? wins / w.length : 0.5 });
     S.eq.push({ day: S.day, label: bar.label, dish: S.dishEq, you: S.youEq, hold: S.holdUnits * bar.px });
-    S.last = { hit, up, r };
-    S.log.unshift({ label: bar.label, up, r, hit });
+    S.last = { outcome, up, r, pnl, strength };
+    S.log.unshift({ label: bar.label, up, r, pnl, outcome });
     if (S.log.length > 60) S.log.pop();
     if (S.replayDone) decide();
-    if (!S.fast) { feedback(hit); renderAll(); }
+    if (!S.fast) { feedback(outcome, strength); renderAll(); }
     return true;
   }
 
@@ -486,15 +504,15 @@ canvas.chart { width: 100%; height: 100%; display: block; }
 
   // ---------- sound ----------
   let ac = null, soundOn = false;
-  function feedback(hit) {
-    flash = { hit, t: performance.now() };
-    if (!soundOn || !ac) return;
-    const t = ac.currentTime;
+  function feedback(outcome, strength = 1) {
+    flash = outcome ? { hit: outcome > 0, strength, t: performance.now() } : null;
+    if (!outcome || !soundOn || !ac) return;
+    const t = ac.currentTime, hit = outcome > 0, vol = 0.35 + 0.65 * strength;
     if (hit) { // two soft low beats, like a resting heartbeat
       [0, 0.22].forEach((dt, k) => {
         const o = ac.createOscillator(), g = ac.createGain();
         o.type = "sine"; o.frequency.value = k ? 62 : 74;
-        g.gain.setValueAtTime(0.0001, t + dt); g.gain.exponentialRampToValueAtTime(0.35, t + dt + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dt + 0.2);
+        g.gain.setValueAtTime(0.0001, t + dt); g.gain.exponentialRampToValueAtTime(0.35 * vol, t + dt + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dt + 0.2);
         o.connect(g).connect(ac.destination); o.start(t + dt); o.stop(t + dt + 0.25);
       });
     } else { // burst of white noise
@@ -502,7 +520,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
       for (let i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1;
       const src = ac.createBufferSource(), g = ac.createGain(), f = ac.createBiquadFilter();
       f.type = "bandpass"; f.frequency.value = 1800 + Math.random() * 2500; f.Q.value = 0.6;
-      g.gain.setValueAtTime(0.18, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+      g.gain.setValueAtTime(0.18 * vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
       src.buffer = buf; src.connect(f).connect(g).connect(ac.destination); src.start(t);
     }
   }
@@ -650,7 +668,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     eq: { cv: $("cEq"), tip: $("tipEq"), hover: null, data: () => S.eq, series: eqSeries, opts: { fmtY: v => (v / 1e6).toFixed(2) + "M" },
       tipHtml: d => `<div>${d.label}</div>` + eqSeries().map(s => `<div class="row"><span class="dot" style="--c:${s.color}"></span>${s.label === "Mantener" ? "Comprar y mantener" : s.label} ${fmtARS(d[s.key])}</div>`).join("") },
     hit: { cv: $("cHit"), tip: $("tipHit"), hover: null, data: () => S.hitRate, series: hitSeries, opts: { min: 0, max: 1, ticks: 4, ref: 0.5, fmtY: v => Math.round(v * 100) + "%" },
-      tipHtml: d => `<div>${d.label}</div><div>Aciertos ${(d.v * 100).toFixed(0)}%</div>` },
+      tipHtml: d => `<div>${d.label}</div><div>Ganadoras ${(d.v * 100).toFixed(0)}%</div>` },
   };
   function drawChart(c) { c.geo = lineChart(c.cv, c.data(), c.series(), c.opts, c.hover); }
   for (const c of Object.values(charts)) {
@@ -709,13 +727,19 @@ canvas.chart { width: 100%; height: 100%; display: block; }
     $("tYou").textContent = fmtM(last.you); chg($("tYouR"), last.you / START - 1);
     $("tHold").textContent = fmtM(last.hold); chg($("tHoldR"), last.hold / START - 1);
     const v = $("verdict");
-    if (S.last) { v.textContent = (S.last.hit ? "ACIERTO · pulso tranquilo" : "ERROR · ruido") + " · dijo " + (S.last.up ? "SUBE" : "BAJA"); v.className = "verdict " + (S.last.hit ? "hit" : "miss"); }
+    if (S.last) {
+      const L = S.last, dir = $("signal").value === "direction";
+      v.textContent = L.outcome > 0 ? (dir ? "ACIERTO" : "GANÓ " + pct(L.pnl)) + " · pulso tranquilo"
+        : L.outcome < 0 ? (dir ? "ERROR" : "PERDIÓ " + pct(L.pnl)) + " · ruido"
+        : "EN PESOS · sin señal";
+      v.className = "verdict " + (L.outcome > 0 ? "hit" : L.outcome < 0 ? "miss" : "");
+    }
     else { v.textContent = "ESPERANDO · tocá Iniciar"; v.className = "verdict"; }
     $("mNoise").style.width = dish.noise * 100 + "%"; $("vNoise").textContent = Math.round(dish.noise * 100) + "%";
     $("mTemp").style.width = dish.temp * 100 + "%"; $("vTemp").textContent = Math.round(dish.temp * 100) + "%";
     const hr = S.hitRate[S.hitRate.length - 1];
     $("mHit").style.width = (hr ? hr.v * 100 : 0) + "%"; $("vHit").textContent = hr ? Math.round(hr.v * 100) + "%" : "–";
-    $("log").innerHTML = S.log.slice(0, 30).map(l => `<div><span>${l.label}</span><span>dijo ${l.up ? "SUBE" : "BAJA"}</span><span>${pct(l.r)}</span><span class="${l.hit ? "h" : "m"}">${l.hit ? "ACIERTO" : "ERROR"}</span></div>`).join("");
+    $("log").innerHTML = S.log.slice(0, 30).map(l => `<div><span>${l.label}</span><span>dijo ${l.up ? "SUBE" : "BAJA"}</span><span>${l.outcome === 0 ? pct(l.r) : pct(l.pnl)}</span><span class="${l.outcome > 0 ? "h" : l.outcome < 0 ? "m" : ""}">${l.outcome > 0 ? "GANA" : l.outcome < 0 ? "PIERDE" : "NEUTRO"}</span></div>`).join("");
     $("btnLong").setAttribute("aria-pressed", String(S.youLongNext)); $("btnCash").setAttribute("aria-pressed", String(!S.youLongNext));
     drawChart(charts.eq); drawChart(charts.hit);
   }
@@ -744,6 +768,7 @@ canvas.chart { width: 100%; height: 100%; display: block; }
   };
   $("interval").onchange = () => { scheduleLive(); renderAll(); };
   $("cost").onchange = () => renderAll();
+  $("signal").onchange = () => renderAll();
   $("btnArm").onclick = async () => {
     if (!$("ack").checked) { realMsg = "Marcá la casilla para confirmar que entendés el riesgo."; return renderAll(); }
     const r = await realCall("api/arm", { code: $("code").value, client: CLIENT });

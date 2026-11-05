@@ -1,8 +1,10 @@
 """The DishBrain-style agent, ported from the browser game (index.html).
 
 48 culture neurons get 12 sensory inputs (six market features as on/off pairs). Two motor
-regions vote UP or DOWN. A miss brings unpredictable noise into the culture and weakens the
-pathway that made the call; a hit brings a calm beat and strengthens it (Hebbian).
+regions vote UP or DOWN. A step that loses money (fees included) brings unpredictable noise into
+the culture and weakens the pathway that made the call; a step that makes money brings a calm
+beat and strengthens it (Hebbian). Both scale with the size of the result. Sitting in pesos gives
+no signal. outcome_from() can instead score the call's direction, as the first version did.
 """
 from __future__ import annotations
 
@@ -53,20 +55,31 @@ class DishAgent:
         self._last = (self.h.copy(), up)
         return up
 
-    def feedback(self, hit: bool) -> None:
+    @staticmethod
+    def outcome_from(pnl: float, up: bool, price_move: float, signal: str = "pnl") -> tuple[int, float]:
+        """(+1 gain / -1 loss / 0 no signal, strength 0..1) for one step."""
+        if signal == "direction":
+            return (1 if (price_move > 0) == up else -1), 1.0
+        outcome = 1 if pnl > 1e-9 else -1 if pnl < -1e-9 else 0
+        return outcome, min(1.0, 0.3 + abs(pnl) / 0.01)  # a 0.7% result or bigger gives the full signal
+
+    def feedback(self, outcome: int, strength: float = 1.0) -> None:
         h, up = self._last
-        c, o, eta = (0, 1, 0.04) if up else (1, 0, 0.04)
-        if hit:  # calm beat: consolidate the pathway that worked
+        c, o = (0, 1) if up else (1, 0)
+        eta = 0.04 * strength
+        if outcome > 0:  # calm beat: consolidate the pathway that worked
             self.w_out[c] += eta * h
             self.w_out[o] -= eta * h
-            self.temp = max(0.05, self.temp * 0.93)
+            self.temp = max(0.05, self.temp * (1 - 0.07 * strength))
             self.noise *= 0.4
-        else:    # noise: weaken and jitter the pathway, raise exploration
+        elif outcome < 0:  # noise: weaken and jitter the pathway, raise exploration
             self.w_out[c] -= eta * h
             self.w_out[o] += eta * h
-            self.w_out[c] += 0.01 * self.rng.normal(size=NH)
-            self.temp = min(1.0, self.temp + 0.04)
-            self.noise = min(1.0, self.noise + 0.55)
+            self.w_out[c] += 0.01 * strength * self.rng.normal(size=NH)
+            self.temp = min(1.0, self.temp + 0.04 * strength)
+            self.noise = min(1.0, self.noise + 0.55 * strength)
+        else:  # sitting in pesos: no signal, but curiosity creeps back
+            self.temp = min(1.0, self.temp + 0.01)
         norms = np.linalg.norm(self.w_out, axis=1, keepdims=True)
         self.w_out *= np.minimum(1.0, 3.0 / np.maximum(norms, 1e-9))
         self.noise = max(0.0, self.noise - 0.05)

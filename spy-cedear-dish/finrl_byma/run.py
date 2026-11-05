@@ -29,22 +29,29 @@ def make_env(df: pd.DataFrame, initial: float) -> StockTradingEnv:
         print_verbosity=10**9)
 
 
-def run_dish(df: pd.DataFrame, initial: float, seed: int | None) -> tuple[list[float], list[int]]:
+def run_dish(df: pd.DataFrame, initial: float, seed: int | None, signal: str = "pnl") -> tuple[list[float], list[int]]:
     env, agent = make_env(df, initial), DishAgent(seed)
     env.reset()
-    hits, done = [], False
+    outcomes, done = [], False
     while not done:
         price, ccl = env.state[1], float(env.data.ccl)
         agent.observe(price, ccl)
         up = agent.act()
+        before = env.asset_memory[-1]
         _, _, done, _, _ = env.step(np.array([1.0 if up else -1.0]))
         if done:
             break
-        new_price = env.state[1]
-        hit = (new_price > price) == up
-        agent.feedback(hit)
-        hits.append(int(hit))
-    return list(env.asset_memory), hits
+        # The step's real result in the FinRL account, trading costs included.
+        pnl = env.asset_memory[-1] / before - 1
+        outcome, strength = agent.outcome_from(pnl, up, env.state[1] / price - 1, signal)
+        agent.feedback(outcome, strength)
+        outcomes.append(outcome)
+    return list(env.asset_memory), outcomes
+
+
+def win_rate(outcomes: list[int]) -> float | None:
+    scored = [o for o in outcomes if o != 0]
+    return round(sum(o > 0 for o in scored) / len(scored), 4) if scored else None
 
 
 def run_ppo(train: pd.DataFrame, test: pd.DataFrame, initial: float, steps: int) -> list[float]:
@@ -70,6 +77,8 @@ def main() -> None:
     ap.add_argument("--ppo", action="store_true", help="also train FinRL's PPO agent as a baseline")
     ap.add_argument("--ppo-steps", type=int, default=20_000)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--signal", choices=["pnl", "direction"], default="pnl",
+                    help="pnl: noise on a losing step, calm beat on a winning one (default); direction: score the call")
     ap.add_argument("--out", default="results")
     a = ap.parse_args()
 
@@ -80,7 +89,7 @@ def main() -> None:
     print(f"{len(dates)} trading days of SPY CEDEAR, {dates[0]} to {dates[-1]}; test period starts {cut}")
 
     # The dish learns online, so it trades the whole history; it is scored on the same test period as PPO.
-    eq_all, hits = run_dish(df, a.initial, a.seed)
+    eq_all, hits = run_dish(df, a.initial, a.seed, a.signal)
     k = dates.index(cut)
     dish = [v * a.initial / eq_all[k] for v in eq_all[k:]]
     hold = list(a.initial * test.close.to_numpy() / test.close.iloc[0])
@@ -94,8 +103,10 @@ def main() -> None:
     pd.DataFrame({"date": test.date.to_numpy()[:n], **{k: v[:n] for k, v in curves.items()}}).to_csv(out / "equity.csv", index=False)
     summary = {
         "days": len(dates), "test_start": cut, "test_end": dates[-1],
-        "dish_hit_rate_all": round(float(np.mean(hits)), 4),
-        "dish_hit_rate_test": round(float(np.mean(hits[k:])), 4) if hits[k:] else None,
+        "signal": a.signal,
+        "dish_win_rate_all": win_rate(hits),
+        "dish_win_rate_test": win_rate(hits[k:]),
+        "dish_steps_in_pesos_without_signal": round(hits.count(0) / max(1, len(hits)), 4),
         **{f"{name}_return_test": round(c[n - 1] / c[0] - 1, 4) for name, c in curves.items()},
     }
     (out / "summary.json").write_text(json.dumps(summary, indent=2))
