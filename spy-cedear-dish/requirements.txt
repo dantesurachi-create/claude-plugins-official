@@ -1,0 +1,7 @@
+# The app: real-time quotes, history and the dish
+pandas
+numpy
+requests
+stockstats
+tzdata
+qrcode

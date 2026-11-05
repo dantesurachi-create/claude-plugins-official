@@ -1,0 +1,11 @@
+{
+  "name": "SPY CEDEAR Dish",
+  "short_name": "SPY Dish",
+  "description": "A neuron culture that learns to trade the SPY CEDEAR on BYMA.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0e1312",
+  "theme_color": "#0e1312",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

@@ -1,0 +1,6 @@
+# Optional: FinRL backtests (python -m finrl_byma.run). Large download (includes PyTorch).
+-r requirements.txt
+finrl
+gymnasium
+matplotlib
+stable-baselines3
